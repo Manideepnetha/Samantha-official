@@ -1,4 +1,7 @@
 [build]
   command = "cd project && npm run build"
   publish = "project/dist/demo/browser"
-  functions = "project/functions" 
+  functions = "project/functions"
+
+[build.environment]
+  NPM_FLAGS = "--ignore-scripts" 
