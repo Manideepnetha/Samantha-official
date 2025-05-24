@@ -29,7 +29,7 @@
             "assets": [],
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "outputPath": "dist/demo/browser",
+            "outputPath": "dist/demo/browser/browser",
             "polyfills": ["zone.js"],
             "scripts": [],
             "styles": ["src/global_styles.css"],
