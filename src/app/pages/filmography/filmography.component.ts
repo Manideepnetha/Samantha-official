@@ -7,7 +7,7 @@ interface Movie {
   title: string;
   year: number;
   releaseDate?: string;
-  language: 'Tamil' | 'Telugu' | 'Hindi' | 'Multilingual';
+  language: string;
   genre: string[];
   role: string;
   director: string;
@@ -204,6 +204,48 @@ interface Movie {
         </div>
       </section>
 
+      <!-- Cameo Appearances Section -->
+      <section class="py-16 bg-ivory dark:bg-deep-black" *ngIf="cameoMovies.length > 0">
+        <div class="container mx-auto px-4">
+          <div class="mb-8 text-charcoal dark:text-ivory">
+            <h2 class="text-3xl md:text-4xl font-playfair font-bold mb-2">Cameo Appearances</h2>
+            <p>Showing {{cameoMovies.length}} cameo appearances</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div *ngFor="let movie of cameoMovies" class="movie-card group relative rounded-lg overflow-hidden shadow-lg hover-lift">
+              <div class="relative aspect-[2/3] overflow-hidden">
+                <img 
+                  [src]="movie.poster" 
+                  [alt]="movie.title" 
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                />
+                
+                <div class="absolute inset-0 bg-gradient-to-t from-deep-black/90 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                  <span class="text-royal-gold font-inter text-sm">{{movie.year}} • {{movie.language}}</span>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">{{movie.title}}</h3>
+                  <p class="text-ivory/80 text-sm mb-4">{{movie.role}}</p>
+                  <span class="inline-block px-3 py-1 bg-royal-gold/20 text-royal-gold rounded-full text-xs mb-2">Cameo</span>
+                  <button 
+                    class="mt-auto px-4 py-2 bg-royal-gold text-deep-black rounded font-inter font-medium hover:bg-royal-gold/90 transition-colors"
+                    (click)="openMovieDetails(movie)"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+              
+              <div class="sm:hidden bg-white dark:bg-charcoal p-4">
+                <span class="text-royal-gold font-inter text-sm">{{movie.year}} • {{movie.language}}</span>
+                <h3 class="font-playfair text-lg font-bold text-charcoal dark:text-ivory">{{movie.title}}</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 text-sm">{{movie.role}}</p>
+                <span class="inline-block px-3 py-1 bg-royal-gold/20 text-royal-gold rounded-full text-xs mt-2">Cameo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Movie Details Modal -->
       <div *ngIf="selectedMovie" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-deep-black/80 backdrop-blur-sm">
         <div class="relative bg-white dark:bg-charcoal rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -285,58 +327,79 @@ interface Movie {
 export class FilmographyComponent implements OnInit {
   movies: Movie[] = [
     { id: 1, title: 'Ye Maaya Chesave', year: 2010, releaseDate: '2010-02-26', language: 'Telugu', genre: ['Romance', 'Drama'], role: 'Jessie', director: 'Gautham Vasudev Menon', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/big_72182_2b57b25f6b78309614a6d526b9419b5a_q3uhir.jpg', description: 'Released February 26, 2010.', trailer: '' },
-    { id: 2, title: 'Vinnaithaandi Varuvaayaa', year: 2010, releaseDate: '2010-02-26', language: 'Tamil', genre: ['Romance', 'Drama'], role: 'Cameo', director: 'Gautham Vasudev Menon', poster: '', description: 'Cameo. Released February 26, 2010.', trailer: '' },
+    { id: 2, title: 'Vinnaithaandi Varuvaayaa', year: 2010, releaseDate: '2010-02-26', language: 'Tamil', genre: ['Romance', 'Drama'], role: 'Cameo', director: 'Gautham Vasudev Menon', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748156999/O_My_Friend_Telugu_Movie_Images_ccvjle.jpg', description: 'Cameo. Released February 26, 2010.', trailer: '' },
     { id: 3, title: 'Baana Kaathadi', year: 2010, releaseDate: '2010-08-06', language: 'Tamil', genre: ['Drama'], role: 'Priya', director: 'Badri Venkatesh', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/MV5BMTJiODNjYjMtZmQxNC00Zjk0LTgyMjUtNGUzMmJiYzJjMjMyXkEyXkFqcGdeQXVyODk1MzE5NDA_._V1__h5q6lx.jpg', description: 'Released August 6, 2010.', trailer: '' },
-    { id: 4, title: 'Moscowin Kavery', year: 2010, releaseDate: '2010-08-27', language: 'Tamil', genre: ['Romance'], role: 'Kaveri', director: 'Ravi Varman', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/SAVE_20210802_170503_jq6g94.jpg', description: 'Released August 27, 2010.', trailer: '' },
+    { id: 4, title: 'Moscowin Kavery', year: 2010, releaseDate: '2010-08-27', language: 'Tamil', genre: ['Romance'], role: 'Kaveri', director: 'Ravi Varman', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/moscowin_kaveri_posters_03_b5zkab.jpg', description: 'Released August 27, 2010.', trailer: '' },
     { id: 5, title: 'Brindavanam', year: 2010, releaseDate: '2010-10-14', language: 'Telugu', genre: ['Romance', 'Drama'], role: 'Indu', director: 'Vamsi Paidipally', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122618/brindavanamwp_6_murgci.jpg', description: 'Released October 14, 2010.', trailer: '' },
-    { id: 6, title: 'Nadunisi Naaygal', year: 2011, language: 'Tamil', genre: ['Thriller'], role: 'Cameo', director: 'Gautham Vasudev Menon', poster: '', description: 'Cameo. Released February 18, 2011.', trailer: '' },
+    { id: 6, title: 'Nadunisi Naaygal', year: 2011, language: 'Tamil', genre: ['Thriller'], role: 'Cameo', director: 'Gautham Vasudev Menon', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748157293/MV5BOTgxOTUyYTktYzQ3NC00MGIwLThiNWMtMjgxOTM4N2EyMzZkXkEyXkFqcGc_._V1__rlnnmi.jpg', description: 'Cameo. Released February 18, 2011.', trailer: '' },
     { id: 7, title: 'Dookudu', year: 2011, language: 'Telugu', genre: ['Action', 'Comedy'], role: 'Prashanthi', director: 'Srinu Vaitla', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/Picsart_25-05-24_13-12-39-407_jsfgqk.jpg', description: 'Released September 23, 2011.', trailer: '' },
-    { id: 8, title: 'Eega', year: 2012, language: 'Telugu', genre: ['Fantasy', 'Action'], role: 'Bindu', director: 'S. S. Rajamouli', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/C_23673_dmfo9e.jpg', description: 'Released July 6, 2012.', trailer: '' },
-    { id: 9, title: 'Naan Ee', year: 2012, language: 'Tamil', genre: ['Fantasy', 'Action'], role: 'Bindu', director: 'S. S. Rajamouli', poster: '', description: 'Tamil version of Eega. Released July 6, 2012.', trailer: '' },
-    { id: 10, title: 'Neethaane En Ponvasantham', year: 2012, language: 'Tamil', genre: ['Romance', 'Drama'], role: 'Nithya', director: 'Gautham Vasudev Menon', poster: '', description: 'Released December 14, 2012.', trailer: '' },
-    { id: 11, title: 'Yeto Vellipoyindhi Manasu', year: 2012, language: 'Telugu', genre: ['Romance', 'Drama'], role: 'Nithya', director: 'Gautham Vasudev Menon', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/C50nIOvXMAAV5EB_pconzm.jpg', description: 'Released December 14, 2012.', trailer: '' },
-    { id: 12, title: 'Seethamma Vakitlo Sirimalle Chettu', year: 2013, language: 'Telugu', genre: ['Drama'], role: 'Geetha', director: 'Srikanth Addala', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/155803_403954009689964_477256738_n_jcokmy.jpg', description: 'Released January 11, 2013.', trailer: '' },
-    { id: 13, title: 'Jabardasth', year: 2013, language: 'Telugu', genre: ['Comedy'], role: 'Shreya', director: 'B. V. Nandini Reddy', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/Jabardasth-telugu-movie-songs-lyrics_jyzdsa.jpg', description: 'Released February 22, 2013.', trailer: '' },
-    { id: 14, title: 'Attarintiki Daredi', year: 2013, language: 'Telugu', genre: ['Drama', 'Comedy'], role: 'Sashi', director: 'Trivikram Srinivas', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/Attarintiki_Daredi_Release_Date_Posters_21_cdba22.jpg', description: 'Released September 27, 2013.', trailer: '' },
-    { id: 15, title: 'Ramayya Vasthavayya', year: 2013, language: 'Telugu', genre: ['Action', 'Drama'], role: 'Akkam', director: 'Harish Shankar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/1600862506.Ramayya_Vastavayya__21_zybu6u.jpg', description: 'Released October 11, 2013.', trailer: '' },
-    { id: 16, title: 'Manam', year: 2014, language: 'Telugu', genre: ['Drama', 'Fantasy'], role: 'Anjali', director: 'Vikram Kumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/Manam_Movie_release_date_Posters_1_vdkoet.jpg', description: 'Released May 23, 2014.', trailer: '' },
-    { id: 17, title: 'Autonagar Surya', year: 2014, language: 'Telugu', genre: ['Action', 'Drama'], role: 'Siri', director: 'Deva Katta', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/Autonagar_Surya_Movie_New_Wallpapers_1_pcdxpo.jpg', description: 'Released June 27, 2014.', trailer: '' },
-    { id: 18, title: 'Alludu Seenu', year: 2014, language: 'Telugu', genre: ['Action', 'Comedy'], role: 'Cameo', director: 'V. V. Vinayak', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/0Alludu_Srinu_profile_j45i0m.png', description: 'Cameo. Released July 24, 2014.', trailer: '' },
-    { id: 19, title: 'Anjaan', year: 2014, language: 'Tamil', genre: ['Action', 'Thriller'], role: 'Jeeva', director: 'N. Lingusamy', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/suriya_samantha_anjaan_movie_first_look_posters_wallpapers_57d4c8e_vltwnp.jpg', description: 'Released August 15, 2014.', trailer: '' },
-    { id: 20, title: 'Rabhasa', year: 2014, language: 'Telugu', genre: ['Action', 'Comedy'], role: 'Indu', director: 'Santosh Srinivas', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/rabhasa_movie_wallpapers_jr_ntr_samantha_07031d8_byb8bb.jpg', description: 'Released August 29, 2014.', trailer: '' },
-    { id: 21, title: 'Kaththi', year: 2014, language: 'Tamil', genre: ['Action', 'Drama'], role: 'Ankitha', director: 'A. R. Murugadoss', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/f0f76f373519ae46b739b1b78a4f9473_xrxmvb.jpg', description: 'Released October 22, 2014.', trailer: '' },
-    { id: 22, title: 'S/O Satyamurthy', year: 2015, language: 'Telugu', genre: ['Drama'], role: 'Subbalakshmi', director: 'Trivikram Srinivas', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/rabhasa_movie_wallpapers_jr_ntr_samantha_07031d8_byb8bb.jpg', description: 'Released April 9, 2015.', trailer: '' },
-    { id: 23, title: '10 Endrathukulla', year: 2015, language: 'Tamil', genre: ['Action'], role: 'Shakeela', director: 'Vijay Milton', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122746/DK88z6_V4AACGK9_bqulmu.jpg', description: 'Released October 21, 2015.', trailer: '' },
-    { id: 24, title: 'Thanga Magan', year: 2015, language: 'Tamil', genre: ['Drama'], role: 'Yamuna', director: 'Velraj', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/MV5BYjQ1ODViNTYtZThlNi00NTZiLWE4MDYtMmUyYjUyMjExNjc1XkEyXkFqcGdeQXVyNjkwOTg4MTA_._V1__ngbmsh.jpg', description: 'Released December 18, 2015.', trailer: '' },
-    { id: 25, title: 'Bangalore Naatkal', year: 2016, language: 'Tamil', genre: ['Drama'], role: 'Ammu', director: 'Bommarillu Bhaskar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122611/CZt2J-JWwAI88-x_uckon3.jpg', description: 'Released February 5, 2016.', trailer: '' },
-    { id: 26, title: 'Theri', year: 2016, language: 'Tamil', genre: ['Action', 'Drama'], role: 'Annie', director: 'Atlee', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122611/8121rYGgVUL._RI__b0twdx.jpg', description: 'Released April 14, 2016.', trailer: '' },
-    { id: 27, title: '24', year: 2016, language: 'Tamil', genre: ['Sci-Fi', 'Thriller'], role: 'Sathya', director: 'Vikram Kumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122612/DV-UDMzW0AAaqFe_f1kxlh.jpg', description: 'Released May 6, 2016.', trailer: '' },
-    { id: 28, title: 'Brahmotsavam', year: 2016, language: 'Telugu', genre: ['Drama'], role: 'Kavya', director: 'Srikanth Addala', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/brahmotsavam_ver2_xlg_z15nvm.jpg', description: 'Released May 20, 2016.', trailer: '' },
-    { id: 29, title: 'A Aa', year: 2016, language: 'Telugu', genre: ['Romance', 'Drama'], role: 'Anasuya', director: 'Trivikram Srinivas', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122616/a_aa_movie_audio_release_posters_nithin_samantha_6a8d956_fb34nz.jpg', description: 'Released June 2, 2016.', trailer: '' },
-    { id: 30, title: 'Janatha Garage', year: 2016, language: 'Telugu', genre: ['Action', 'Drama'], role: 'Sita', director: 'Koratala Siva', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122613/Picsart_25-05-24_13-41-54-759_evq9pl.jpg', description: 'Released September 1, 2016.', trailer: '' },
-    { id: 31, title: 'Raju Gari Gadhi 2', year: 2017, language: 'Telugu', genre: ['Horror', 'Thriller'], role: 'Amrutha', director: 'Ohmkar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122613/MV5BZTQyYzE1MjgtMDE0Yi00MWFiLTgxMTMtNTAxN2NjNDg5N2RkXkEyXkFqcGdeQXVyNTYyODAxNDg_._V1__e2jqbk.jpg', description: 'Released October 13, 2017.', trailer: '' },
-    { id: 32, title: 'Mersal', year: 2017, language: 'Tamil', genre: ['Action', 'Thriller'], role: 'Anu Pallavi', director: 'Atlee', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/SAVE_20210802_170503_jq6g94.jpg', description: 'Released October 18, 2017.', trailer: '' },
-    { id: 33, title: 'Rangasthalam', year: 2018, language: 'Telugu', genre: ['Action', 'Drama'], role: 'Ramalakshmi', director: 'Sukumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/20221129_184521_jfb7tz.jpg', description: 'Released March 30, 2018.', trailer: '' },
-    { id: 34, title: 'Mahanati', year: 2018, language: 'Telugu', genre: ['Biography', 'Drama'], role: 'Madhuravani', director: 'Nag Ashwin', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122748/Restored-2_fxrn2v.jpg', description: 'Released May 9, 2018.', trailer: '' },
-    { id: 35, title: 'Irumbu Thirai', year: 2018, language: 'Tamil', genre: ['Action', 'Thriller'], role: 'Rathi Devi', director: 'P. S. Mithran', poster: '', description: 'Released May 11, 2018.', trailer: '' },
-    { id: 36, title: 'Seemaraja', year: 2018, language: 'Tamil', genre: ['Action', 'Comedy'], role: 'Suthanthira Selvi', director: 'Ponram', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122614/Dy3RDcMV4AASUPO_sujrw7.jpg', description: 'Released September 13, 2018.', trailer: '' },
-    { id: 37, title: 'U Turn', year: 2018, language: 'Tamil', genre: ['Thriller'], role: 'Rachana', director: 'Pawan Kumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122617/IMG_20220413_132933_iacqws.jpg', description: 'Released September 13, 2018.', trailer: '' },
-    { id: 38, title: 'Super Deluxe', year: 2019, language: 'Tamil', genre: ['Drama', 'Thriller'], role: 'Vaembu', director: 'Thiagarajan Kumararaja', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122622/Super_Deluxe_xnzav8.jpg', description: 'Released March 29, 2019.', trailer: '' },
-    { id: 39, title: 'Majili', year: 2019, language: 'Telugu', genre: ['Romance', 'Drama'], role: 'Sravani', director: 'Shiva Nirvana', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122614/20230129_232410_u1vi0t.jpg', description: 'Released April 5, 2019.', trailer: '' },
-    { id: 40, title: 'Oh! Baby', year: 2019, language: 'Telugu', genre: ['Fantasy', 'Comedy', 'Drama'], role: 'Savitri / Baby', director: 'B. V. Nandini Reddy', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122622/IMG_20210816_134153_snv5io.jpg', description: 'Released July 5, 2019.', trailer: '' },
-    { id: 41, title: 'Manmadhudu 2', year: 2019, language: 'Telugu', genre: ['Romance', 'Comedy'], role: 'Avanthika', director: 'Rahul Ravindran', poster: '', description: 'Released August 9, 2019.', trailer: '' },
-    { id: 42, title: 'Jaanu', year: 2020, language: 'Telugu', genre: ['Romance', 'Drama'], role: 'Jaanu', director: 'C. Prem Kumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/Picsart_25-05-24_13-38-39-468_j8y5qf.jpg', description: 'Released February 7, 2020.', trailer: '' },
-    { id: 43, title: 'Pushpa: The Rise', year: 2021, language: 'Telugu', genre: ['Action', 'Drama'], role: 'Special Appearance', director: 'Sukumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122616/IMG_20211208_214018_nawid7.jpg', description: 'Special appearance. Released December 17, 2021.', trailer: '' },
-    { id: 44, title: 'Kaathuvaakula Rendu Kaadhal', year: 2022, language: 'Tamil', genre: ['Romance', 'Comedy'], role: 'Khatija', director: 'Vignesh Shivan', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122617/IMG_20220527_124415_mxmev1.jpg', description: 'Released April 28, 2022.', trailer: '' },
-    { id: 45, title: 'Yashoda', year: 2022, language: 'Telugu', genre: ['Action', 'Thriller'], role: 'Yashoda', director: 'Hari–Harish', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122614/Picsart_22-09-08_22-58-25-225_zupgqe.jpg', description: 'Released November 11, 2022.', trailer: '' },
-    { id: 46, title: 'Shaakuntalam', year: 2023, language: 'Telugu', genre: ['Mythology', 'Drama', 'Romance'], role: 'Shakuntala', director: 'Gunasekhar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122615/PicsArt_04-28-01.30.05_jdpk8h.jpg', description: 'Released April 14, 2023.', trailer: '' },
-    { id: 47, title: 'Kushi', year: 2023, language: 'Telugu', genre: ['Romance', 'Comedy', 'Drama'], role: 'Aradhya', director: 'Shiva Nirvana', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122707/20220909_210838_vrhgsu.jpg', description: 'Released September 1, 2023.', trailer: '' },
-    { id: 48, title: 'Subham', year: 2025, language: 'Telugu', genre: ['Drama'], role: 'TBA', director: 'TBA', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748018718/subham-et00440249-1747030168_rsxwsc.avif', description: 'Expected May 9, 2025.', trailer: '' },
-    { id: 49, title: 'Maa Inti Bangaram', year: 2025, releaseDate: '2025-12-31', language: 'Telugu', genre: ['Drama'], role: 'TBA', director: 'TBA', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122616/Picsart_24-12-11_00-02-55-486_vk48af.png', description: 'Expected 2025.', trailer: '' },
-    { id: 50, title: 'SVSC', year: 2013, language: 'Telugu', genre: ['Drama', 'Comedy'], role: 'Geetha', director: 'Srikanth Addala', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/155803_403954009689964_477256738_n_jcokmy.jpg', description: 'Released January 11, 2013.', trailer: '' }
+    { 
+      id: 8, 
+      title: 'Eega / Naan Ee', 
+      year: 2012, 
+      language: 'Telugu, Tamil', 
+      genre: ['Fantasy', 'Action'], 
+      role: 'Bindu', 
+      director: 'S. S. Rajamouli', 
+      poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/C_23673_dmfo9e.jpg', 
+      description: 'Released July 6, 2012. Telugu version titled "Eega", Tamil version titled "Naan Ee".', 
+      trailer: '' 
+    },
+    { 
+      id: 9, 
+      title: 'Neethane En Ponvasantham / Yeto Vellipoyindhi Manasu', 
+      year: 2012, 
+      language: 'Tamil, Telugu', 
+      genre: ['Romance', 'Drama'], 
+      role: 'Nithya', 
+      director: 'Gautham Vasudev Menon', 
+      poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/C50nIOvXMAAV5EB_pconzm.jpg', 
+      description: 'Released December 14, 2012. Tamil version titled "Neethane En Ponvasantham", Telugu version titled "Yeto Vellipoyindhi Manasu".', 
+      trailer: '' 
+    },
+    { id: 10, title: 'Seethamma Vakitlo Sirimalle Chettu', year: 2013, language: 'Telugu', genre: ['Drama'], role: 'Geetha', director: 'Srikanth Addala', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/155803_403954009689964_477256738_n_jcokmy.jpg', description: 'Released January 11, 2013.', trailer: '' },
+    { id: 11, title: 'Jabardasth', year: 2013, language: 'Telugu', genre: ['Comedy'], role: 'Shreya', director: 'B. V. Nandini Reddy', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/Jabardasth-telugu-movie-songs-lyrics_jyzdsa.jpg', description: 'Released February 22, 2013.', trailer: '' },
+    { id: 12, title: 'Attarintiki Daredi', year: 2013, language: 'Telugu', genre: ['Drama', 'Comedy'], role: 'Sashi', director: 'Trivikram Srinivas', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/Attarintiki_Daredi_Release_Date_Posters_21_cdba22.jpg', description: 'Released September 27, 2013.', trailer: '' },
+    { id: 13, title: 'Ramayya Vasthavayya', year: 2013, language: 'Telugu', genre: ['Action', 'Drama'], role: 'Akkam', director: 'Harish Shankar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/1600862506.Ramayya_Vastavayya__21_zybu6u.jpg', description: 'Released October 11, 2013.', trailer: '' },
+    { id: 14, title: 'Manam', year: 2014, language: 'Telugu', genre: ['Drama', 'Fantasy'], role: 'Anjali', director: 'Vikram Kumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/Manam_Movie_release_date_Posters_1_vdkoet.jpg', description: 'Released May 23, 2014.', trailer: '' },
+    { id: 15, title: 'Autonagar Surya', year: 2014, language: 'Telugu', genre: ['Action', 'Drama'], role: 'Siri', director: 'Deva Katta', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/Autonagar_Surya_Movie_New_Wallpapers_1_pcdxpo.jpg', description: 'Released June 27, 2014.', trailer: '' },
+    { id: 16, title: 'Alludu Seenu', year: 2014, language: 'Telugu', genre: ['Action', 'Comedy'], role: 'Cameo', director: 'V. V. Vinayak', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/0Alludu_Srinu_profile_j45i0m.png', description: 'Cameo. Released July 24, 2014.', trailer: '' },
+    { id: 17, title: 'Anjaan', year: 2014, language: 'Tamil', genre: ['Action', 'Thriller'], role: 'Jeeva', director: 'N. Lingusamy', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/suriya_samantha_anjaan_movie_first_look_posters_wallpapers_57d4c8e_vltwnp.jpg', description: 'Released August 15, 2014.', trailer: '' },
+    { id: 18, title: 'Rabhasa', year: 2014, language: 'Telugu', genre: ['Action', 'Comedy'], role: 'Indu', director: 'Santosh Srinivas', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/rabhasa_movie_wallpapers_jr_ntr_samantha_07031d8_byb8bb.jpg', description: 'Released August 29, 2014.', trailer: '' },
+    { id: 19, title: 'Kaththi', year: 2014, language: 'Tamil', genre: ['Action', 'Drama'], role: 'Ankitha', director: 'A. R. Murugadoss', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/f0f76f373519ae46b739b1b78a4f9473_xrxmvb.jpg', description: 'Released October 22, 2014.', trailer: '' },
+    { id: 20, title: 'S/O Satyamurthy', year: 2015, language: 'Telugu', genre: ['Drama'], role: 'Subbalakshmi', director: 'Trivikram Srinivas', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/rabhasa_movie_wallpapers_jr_ntr_samantha_07031d8_byb8bb.jpg', description: 'Released April 9, 2015.', trailer: '' },
+    { id: 21, title: '10 Endrathukulla', year: 2015, language: 'Tamil', genre: ['Action'], role: 'Shakeela', director: 'Vijay Milton', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122746/DK88z6_V4AACGK9_bqulmu.jpg', description: 'Released October 21, 2015.', trailer: '' },
+    { id: 22, title: 'Thanga Magan', year: 2015, language: 'Tamil', genre: ['Drama'], role: 'Yamuna', director: 'Velraj', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/MV5BYjQ1ODViNTYtZThlNi00NTZiLWE4MDYtMmUyYjUyMjExNjc1XkEyXkFqcGdeQXVyNjkwOTg4MTA_._V1__ngbmsh.jpg', description: 'Released December 18, 2015.', trailer: '' },
+    { id: 23, title: 'Bangalore Naatkal', year: 2016, language: 'Tamil', genre: ['Drama'], role: 'Ammu', director: 'Bommarillu Bhaskar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122611/CZt2J-JWwAI88-x_uckon3.jpg', description: 'Released February 5, 2016.', trailer: '' },
+    { id: 24, title: 'Theri', year: 2016, language: 'Tamil', genre: ['Action', 'Drama'], role: 'Annie', director: 'Atlee', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122611/8121rYGgVUL._RI__b0twdx.jpg', description: 'Released April 14, 2016.', trailer: '' },
+    { id: 25, title: '24', year: 2016, language: 'Tamil', genre: ['Sci-Fi', 'Thriller'], role: 'Sathya', director: 'Vikram Kumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122612/DV-UDMzW0AAaqFe_f1kxlh.jpg', description: 'Released May 6, 2016.', trailer: '' },
+    { id: 26, title: 'Brahmotsavam', year: 2016, language: 'Telugu', genre: ['Drama'], role: 'Kavya', director: 'Srikanth Addala', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/brahmotsavam_ver2_xlg_z15nvm.jpg', description: 'Released May 20, 2016.', trailer: '' },
+    { id: 27, title: 'A Aa', year: 2016, language: 'Telugu', genre: ['Romance', 'Drama'], role: 'Anasuya', director: 'Trivikram Srinivas', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122616/a_aa_movie_audio_release_posters_nithin_samantha_6a8d956_fb34nz.jpg', description: 'Released June 2, 2016.', trailer: '' },
+    { id: 28, title: 'Janatha Garage', year: 2016, language: 'Telugu', genre: ['Action', 'Drama'], role: 'Sita', director: 'Koratala Siva', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122613/Picsart_25-05-24_13-41-54-759_evq9pl.jpg', description: 'Released September 1, 2016.', trailer: '' },
+    { id: 29, title: 'Raju Gari Gadhi 2', year: 2017, language: 'Telugu', genre: ['Horror', 'Thriller'], role: 'Amrutha', director: 'Ohmkar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122613/MV5BZTQyYzE1MjgtMDE0Yi00MWFiLTgxMTMtNTAxN2NjNDg5N2RkXkEyXkFqcGdeQXVyNTYyODAxNDg_._V1__e2jqbk.jpg', description: 'Released October 13, 2017.', trailer: '' },
+    { id: 30, title: 'Mersal', year: 2017, language: 'Tamil', genre: ['Action', 'Thriller'], role: 'Anu Pallavi', director: 'Atlee', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/SAVE_20210802_170503_jq6g94.jpg', description: 'Released October 18, 2017.', trailer: '' },
+    { id: 31, title: 'Rangasthalam', year: 2018, language: 'Telugu', genre: ['Action', 'Drama'], role: 'Ramalakshmi', director: 'Sukumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/20221129_184521_jfb7tz.jpg', description: 'Released March 30, 2018.', trailer: '' },
+    { id: 32, title: 'Mahanati', year: 2018, language: 'Telugu', genre: ['Biography', 'Drama'], role: 'Madhuravani', director: 'Nag Ashwin', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122748/Restored-2_fxrn2v.jpg', description: 'Released May 9, 2018.', trailer: '' },
+    { id: 33, title: 'Irumbu Thirai', year: 2018, language: 'Tamil', genre: ['Action', 'Thriller'], role: 'Rathi Devi', director: 'P. S. Mithran', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122614/02-Vishal-Abhimanyudu-Movie-First-Look-ULTRA-HD-Posters-WallPapers_fckvhc.jpg', description: 'Released May 11, 2018.', trailer: '' },
+    { id: 34, title: 'Seemaraja', year: 2018, language: 'Tamil', genre: ['Action', 'Comedy'], role: 'Suthanthira Selvi', director: 'Ponram', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122614/Dy3RDcMV4AASUPO_sujrw7.jpg', description: 'Released September 13, 2018.', trailer: '' },
+    { id: 35, title: 'U Turn', year: 2018, language: 'Tamil', genre: ['Thriller'], role: 'Rachana', director: 'Pawan Kumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122617/IMG_20220413_132933_iacqws.jpg', description: 'Released September 13, 2018.', trailer: '' },
+    { id: 36, title: 'Super Deluxe', year: 2019, language: 'Tamil', genre: ['Drama', 'Thriller'], role: 'Vaembu', director: 'Thiagarajan Kumararaja', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122622/Super_Deluxe_xnzav8.jpg', description: 'Released March 29, 2019.', trailer: '' },
+    { id: 37, title: 'Majili', year: 2019, language: 'Telugu', genre: ['Romance', 'Drama'], role: 'Sravani', director: 'Shiva Nirvana', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122614/20230129_232410_u1vi0t.jpg', description: 'Released April 5, 2019.', trailer: '' },
+    { id: 38, title: 'Oh! Baby', year: 2019, language: 'Telugu', genre: ['Fantasy', 'Comedy', 'Drama'], role: 'Savitri / Baby', director: 'B. V. Nandini Reddy', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122622/IMG_20210816_134153_snv5io.jpg', description: 'Released July 5, 2019.', trailer: '' },
+    { id: 39, title: 'Manmadhudu 2', year: 2019, language: 'Telugu', genre: ['Romance', 'Comedy'], role: 'Avanthika', director: 'Rahul Ravindran', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748156903/tnm_import_sites_default_files_Nag-samantha_nrslzs.avif', description: 'Released August 9, 2019.', trailer: '' },
+    { id: 40, title: 'Jaanu', year: 2020, language: 'Telugu', genre: ['Romance', 'Drama'], role: 'Jaanu', director: 'C. Prem Kumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/Picsart_25-05-24_13-38-39-468_j8y5qf.jpg', description: 'Released February 7, 2020.', trailer: '' },
+    { id: 41, title: 'Pushpa: The Rise', year: 2021, language: 'Telugu', genre: ['Action', 'Drama'], role: 'Special Appearance', director: 'Sukumar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122616/IMG_20211208_214018_nawid7.jpg', description: 'Special appearance. Released December 17, 2021.', trailer: '' },
+    { id: 42, title: 'Kaathuvaakula Rendu Kaadhal', year: 2022, language: 'Tamil', genre: ['Romance', 'Comedy'], role: 'Khatija', director: 'Vignesh Shivan', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122617/IMG_20220527_124415_mxmev1.jpg', description: 'Released April 28, 2022.', trailer: '' },
+    { id: 43, title: 'Yashoda', year: 2022, language: 'Telugu', genre: ['Action', 'Thriller'], role: 'Yashoda', director: 'Hari–Harish', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122614/Picsart_22-09-08_22-58-25-225_zupgqe.jpg', description: 'Released November 11, 2022.', trailer: '' },
+    { id: 44, title: 'Shaakuntalam', year: 2023, language: 'Telugu', genre: ['Mythology', 'Drama', 'Romance'], role: 'Shakuntala', director: 'Gunasekhar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122615/PicsArt_04-28-01.30.05_jdpk8h.jpg', description: 'Released April 14, 2023.', trailer: '' },
+    { id: 45, title: 'Kushi', year: 2023, language: 'Telugu', genre: ['Romance', 'Comedy', 'Drama'], role: 'Aradhya', director: 'Shiva Nirvana', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122707/20220909_210838_vrhgsu.jpg', description: 'Released September 1, 2023.', trailer: '' },
+    { id: 46, title: 'Subham', year: 2025, language: 'Telugu', genre: ['Drama'], role: 'TBA', director: 'TBA', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748018718/subham-et00440249-1747030168_rsxwsc.avif', description: 'Expected May 9, 2025.', trailer: '' },
+    { id: 47, title: 'Maa Inti Bangaram', year: 2025, releaseDate: '2025-12-31', language: 'Telugu', genre: ['Drama'], role: 'TBA', director: 'TBA', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122616/Picsart_24-12-11_00-02-55-486_vk48af.png', description: 'Expected 2025.', trailer: '' },
+    { id: 48, title: 'SVSC', year: 2013, language: 'Telugu', genre: ['Drama', 'Comedy'], role: 'Geetha', director: 'Srikanth Addala', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/155803_403954009689964_477256738_n_jcokmy.jpg', description: 'Released January 11, 2013.', trailer: '' }
   ];
 
   filteredMovies: Movie[] = [];
+  cameoMovies: Movie[] = [];
   selectedMovie: Movie | null = null;
   
   // Filter values
@@ -393,6 +456,25 @@ export class FilmographyComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeFilters();
+    
+    // Separate cameo movies first
+    this.cameoMovies = this.movies.filter(movie => 
+      (movie.role.toLowerCase().includes('cameo') || 
+       movie.role.toLowerCase().includes('special appearance') ||
+       movie.title === 'Manmadhudu 2') &&
+      movie.title !== 'Alludu Seenu' &&
+      movie.title !== 'Pushpa: The Rise'
+    );
+    
+    // Remove cameo movies from main list (except the specified ones)
+    this.movies = this.movies.filter(movie => 
+      (!movie.role.toLowerCase().includes('cameo') && 
+       !movie.role.toLowerCase().includes('special appearance') &&
+       movie.title !== 'Manmadhudu 2') ||
+      movie.title === 'Alludu Seenu' ||
+      movie.title === 'Pushpa: The Rise'
+    );
+    
     this.filteredMovies = [...this.movies];
     this.applyFilters();
   }
