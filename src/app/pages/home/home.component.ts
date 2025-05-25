@@ -63,8 +63,8 @@ import { gsap } from 'gsap';
       <section class="video-highlights py-20 bg-ivory dark:bg-deep-black/80">
         <div class="container mx-auto px-4">
           <div class="text-center mb-16">
-            <span class="section-label">Latest Videos</span>
-            <h2>Current Highlights</h2>
+            <span class="inline-block text-royal-gold font-inter text-sm uppercase tracking-wider mb-2">Latest Videos</span>
+            <h2 class="text-3xl md:text-4xl font-playfair font-bold text-charcoal dark:text-ivory">Current Highlights</h2>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
