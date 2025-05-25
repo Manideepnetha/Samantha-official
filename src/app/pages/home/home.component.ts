@@ -144,9 +144,9 @@ import { gsap } from 'gsap';
       <!-- Quote Section -->
       <section class="py-32 bg-deep-black relative">
         <div class="absolute inset-0 opacity-20">
-          <img src="https://images.pexels.com/photos/4347366/pexels-photo-4347366.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
-               alt="Background texture" 
-               class="w-full h-full object-cover" />
+          <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748178089/6923df53863279.5943b8caecd81_vxre5s.jpg" 
+               alt="Samantha Ruth Prabhu quote background" 
+               class="w-full h-full object-cover object-[center_18%]" />
         </div>
         <div class="container mx-auto px-4 relative z-10">
           <div class="max-w-3xl mx-auto text-center">
@@ -240,25 +240,25 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   latestNews = [
     {
-      image: 'https://images.pexels.com/photos/6954162/pexels-photo-6954162.jpeg',
+      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181752/1KBvNGVxuMg-HD_gvqzhe.jpg',
       date: 'May 15, 2025',
-      title: 'New Project Announcement',
-      excerpt: 'Samantha joins the cast of an international project directed by an acclaimed filmmaker.',
-      link: '#'
+      title: 'Galatta Interview',
+      excerpt: 'In this interview, Baradwaj Rangan has a candid conversation with Samantha for Shubham. They ate a lot, talked a lot, and had lots of fun. Samantha Ruth Prabhu Interview With Baradwaj Rangan | Food For Thought | Galatta Plus',
+      link: 'https://youtu.be/1KBvNGVxuMg?si=6c4pq5wmmkIocelt'
     },
     {
-      image: 'https://images.pexels.com/photos/3394231/pexels-photo-3394231.png',
+      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181934/5SK0jFVolHU-HD_za0gfe.jpg',
       date: 'April 28, 2025',
-      title: 'Award for Philanthropy Work',
-      excerpt: 'Pratyusha Foundation receives recognition for its outstanding contribution to women\'s education.',
-      link: '#'
+      title: 'Celebrating 15 Years Of Samantha Promo',
+      excerpt: 'Celebrating 15 Years Of Samantha Promo | Apsara Awards 2025 | This Saturday at 5:30PM | Zee Telugu',
+      link: 'https://youtu.be/5SK0jFVolHU?si=IHIkUwZ-McsgR9Bb'
     },
     {
-      image: 'https://images.pexels.com/photos/2916450/pexels-photo-2916450.jpeg',
+      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748182251/oeK3C-9cbVc-HD_qzprbm.jpg',
       date: 'April 10, 2025',
-      title: 'Fashion Line Launch',
-      excerpt: 'Saaki by Samantha unveils its new summer collection with sustainable materials.',
-      link: '#'
+      title: 'Samantha on health, stopping junk food ads, startups, struggles and childhood | Rethink India Ep.6',
+      excerpt: 'Samantha was one of the first people who supported me when I started Label Padhega India...',
+      link: 'https://youtu.be/oeK3C-9cbVc?si=dKNuBerq_MvuxsF_'
     }
   ];
 
@@ -268,7 +268,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       type: 'Feature Film',
       releaseDate: 'To be announced',
       description: 'A thrilling new project.',
-      director: 'To be announced'
+      director: 'Rahi Anil Barve'
     },
     {
       title: 'Maa Inti Bangaram',
