@@ -108,26 +108,15 @@ import { CommonModule } from '@angular/common';
         <div class="container mx-auto px-4">
           <h2 class="text-3xl md:text-4xl font-playfair font-bold text-center text-charcoal dark:text-ivory mb-16">Success Stories</h2>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div class="bg-white dark:bg-charcoal p-8 rounded-lg hover-lift">
-              <img src="https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg" alt="Success Story 1" class="w-full h-64 object-cover rounded-lg mb-6" />
-              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Empowering Through Education</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-4">
-                Meet Priya, a young girl from rural Tamil Nadu who dreamed of becoming a doctor. Through our educational support program, she's now pursuing her MBBS.
+          <div class="flex justify-center">
+            <div class="bg-white dark:bg-charcoal p-10 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-2xl">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748291908/bg16_unojqa.jpg" alt="Success Story" class="w-full h-64 object-cover rounded-lg mb-6" />
+              <h3 class="font-playfair text-2xl font-bold mb-4 text-charcoal dark:text-ivory">Pratyusha Support: Founded by Samantha Ruth Prabhu</h3>
+              <p class="text-charcoal/80 dark:text-ivory/80 mb-6 leading-relaxed">
+                Conceptualized by leading South Indian actress - Samantha Ruth Prabhu, Pratyusha Support has started its services in February 2014. Since then, we have been serving the underprivileged by delivering some unparalleled medical support to women and children, while fulfilling wishes of those children suffering from life-threatening medical conditions. We have been closely working with our partnered hospitals, Rainbow, Continental, Livlife, Ankura and Andhra Hospitals in Telangana and Andhra Pradesh states primarily.
               </p>
-              <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
-                "Education has given me wings to fly and the power to change my destiny."
-              </blockquote>
-            </div>
-
-            <div class="bg-white dark:bg-charcoal p-8 rounded-lg hover-lift">
-              <img src="https://images.pexels.com/photos/6646919/pexels-photo-6646919.jpeg" alt="Success Story 2" class="w-full h-64 object-cover rounded-lg mb-6" />
-              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Breaking Barriers</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-4">
-                Lakshmi's journey from a small village to owning her own tailoring business inspires us. Our skill development program helped her achieve financial independence.
-              </p>
-              <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
-                "I now employ five other women from my village. Change is possible when we support each other."
+              <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90 text-lg">
+                "I wanted to create something that would outlive me—something that would continue to bring hope to people long after I'm gone. That's why I started Pratyusha Support."
               </blockquote>
             </div>
           </div>
@@ -159,9 +148,9 @@ import { CommonModule } from '@angular/common';
                 <p class="text-charcoal/80 dark:text-ivory/80 mb-6">
                   Join our volunteer program and contribute your time and skills to make a difference.
                 </p>
-                <button class="px-6 py-3 bg-transparent border border-royal-gold text-royal-gold rounded-full font-inter font-medium hover:bg-royal-gold/10 transition-all">
+                <a href="https://pratyushasupport.org/" target="_blank" class="px-6 py-3 bg-transparent border border-royal-gold text-royal-gold rounded-full font-inter font-medium hover:bg-royal-gold/10 transition-all">
                   Join as Volunteer
-                </button>
+                </a>
               </div>
             </div>
           </div>
