@@ -179,46 +179,6 @@ export class GalleryComponent implements OnInit {
     },
     {
       id: 3,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296881/53885681037_6a705301cf_o_ztjyeg.jpg',
-      alt: 'Behind the Scenes',
-      category: 'bts',
-      caption: 'Behind the Scenes',
-      date: 'March 2024',
-      width: 1200,
-      height: 800
-    },
-    {
-      id: 4,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296812/SRP_q8wmpl.jpg',
-      alt: 'Film Still',
-      category: 'films',
-      caption: 'Latest Film Project',
-      date: '2024',
-      width: 1200,
-      height: 900
-    },
-    {
-      id: 5,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295435/5_6185746542628962569_bgalhv.jpg',
-      alt: 'Fashion Event',
-      category: 'events',
-      caption: 'Fashion Event Appearance',
-      date: 'March 2024',
-      width: 900,
-      height: 1200
-    },
-    {
-      id: 6,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295799/5_6185746542628962570_c68nyo.jpg',
-      alt: 'Magazine Cover',
-      category: 'photoshoots',
-      caption: 'Magazine Cover Shoot',
-      date: 'March 2024',
-      width: 800,
-      height: 1100
-    },
-    {
-      id: 7,
       url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297784/behance_download_1705218613069_toqclh.jpg',
       alt: 'Fashion Editorial - Blue Saree',
       category: 'fashion',
@@ -228,27 +188,7 @@ export class GalleryComponent implements OnInit {
       height: 800
     },
     {
-      id: 8,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296786/20231102_115421_zbia4t.jpg',
-      alt: 'Brand Photoshoot',
-      category: 'fashion',
-      caption: 'Brand Photoshoot',
-      date: 'March 2024',
-      width: 800,
-      height: 1200
-    },
-    {
-      id: 9,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297381/IMG_20231010_193941_idl7at.jpg',
-      alt: 'Fashion Event',
-      category: 'events',
-      caption: 'Fashion Event Appearance',
-      date: 'October 2023',
-      width: 1200,
-      height: 800
-    },
-    {
-      id: 10,
+      id: 4,
       url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297382/Samantha17_zxr8ah.jpg',
       alt: 'Fashion Editorial',
       category: 'fashion',
@@ -256,6 +196,66 @@ export class GalleryComponent implements OnInit {
       date: 'March 2024',
       width: 900,
       height: 1100
+    },
+    {
+      id: 5,
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296644/ee0bed145412067.629e2c026e891_1_wgw0tk.jpg',
+      alt: 'Fashion Editorial',
+      category: 'fashion',
+      caption: 'Latest Fashion Editorial',
+      date: 'March 2024',
+      width: 1200,
+      height: 900
+    },
+    {
+      id: 6,
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296812/SRP_q8wmpl.jpg',
+      alt: 'Film Still',
+      category: 'films',
+      caption: 'Latest Film Project',
+      date: '2024',
+      width: 1200,
+      height: 900
+    },
+    {
+      id: 7,
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296881/53885681037_6a705301cf_o_ztjyeg.jpg',
+      alt: 'Behind the Scenes',
+      category: 'bts',
+      caption: 'Behind the Scenes',
+      date: 'March 2024',
+      width: 1200,
+      height: 800
+    },
+    {
+      id: 8,
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295435/5_6185746542628962569_bgalhv.jpg',
+      alt: 'Fashion Event',
+      category: 'events',
+      caption: 'Fashion Event Appearance',
+      date: 'March 2024',
+      width: 900,
+      height: 1200
+    },
+    {
+      id: 9,
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295799/5_6185746542628962570_c68nyo.jpg',
+      alt: 'Magazine Cover',
+      category: 'photoshoots',
+      caption: 'Magazine Cover Shoot',
+      date: 'March 2024',
+      width: 800,
+      height: 1100
+    },
+    {
+      id: 10,
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297381/IMG_20231010_193941_idl7at.jpg',
+      alt: 'Fashion Event',
+      category: 'events',
+      caption: 'Fashion Event Appearance',
+      date: 'October 2023',
+      width: 1200,
+      height: 800
     },
     {
       id: 11,
@@ -266,16 +266,6 @@ export class GalleryComponent implements OnInit {
       date: 'September 2023',
       width: 1200,
       height: 800
-    },
-    {
-      id: 12,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296644/ee0bed145412067.629e2c026e891_1_wgw0tk.jpg',
-      alt: 'Fashion Editorial',
-      category: 'fashion',
-      caption: 'Latest Fashion Editorial',
-      date: 'March 2024',
-      width: 1200,
-      height: 900
     }
   ];
 
