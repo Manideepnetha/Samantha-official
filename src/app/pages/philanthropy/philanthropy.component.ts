@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -38,19 +38,19 @@ import { CommonModule } from '@angular/common';
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
               <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
                 <div class="text-5xl text-royal-gold mb-4">😊</div>
-                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">754</div>
+                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">{{ happyDonorsCount | number:'1.0-0' }}</div>
                 <div class="text-charcoal/80 dark:text-ivory/80">Happy Donors</div>
               </div>
 
               <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
                 <div class="text-5xl text-royal-gold mb-4">🚀</div>
-                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">675</div>
+                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">{{ successMissionCount | number:'1.0-0' }}</div>
                 <div class="text-charcoal/80 dark:text-ivory/80">Success Mission</div>
               </div>
 
               <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
                 <div class="text-5xl text-royal-gold mb-4">👤+</div>
-                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">1,248</div>
+                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">{{ volunteerReachedCount | number:'1.0-0' }}</div>
                 <div class="text-charcoal/80 dark:text-ivory/80">Volunteer Reached</div>
               </div>
             </div>
@@ -160,4 +160,45 @@ import { CommonModule } from '@angular/common';
   `,
   styles: []
 })
-export class PhilanthropyComponent {}
+export class PhilanthropyComponent implements OnInit {
+  happyDonorsCount = 0;
+  successMissionCount = 0;
+  volunteerReachedCount = 0;
+
+  private happyDonorsTarget = 754;
+  private successMissionTarget = 675;
+  private volunteerReachedTarget = 1248;
+  private animationDuration = 2000; // milliseconds
+  private animationStep = 10; // milliseconds
+
+  ngOnInit(): void {
+    this.animateNumber('happyDonors', this.happyDonorsTarget);
+    this.animateNumber('successMission', this.successMissionTarget);
+    this.animateNumber('volunteerReached', this.volunteerReachedTarget);
+  }
+
+  animateNumber(property: string, target: number): void {
+    const increment = target / (this.animationDuration / this.animationStep);
+    const timer = setInterval(() => {
+      if (property === 'happyDonors') {
+        this.happyDonorsCount += increment;
+        if (this.happyDonorsCount >= target) {
+          this.happyDonorsCount = target;
+          clearInterval(timer);
+        }
+      } else if (property === 'successMission') {
+        this.successMissionCount += increment;
+        if (this.successMissionCount >= target) {
+          this.successMissionCount = target;
+          clearInterval(timer);
+        }
+      } else if (property === 'volunteerReached') {
+        this.volunteerReachedCount += increment;
+        if (this.volunteerReachedCount >= target) {
+          this.volunteerReachedCount = target;
+          clearInterval(timer);
+        }
+      }
+    }, this.animationStep);
+  }
+}

@@ -15,18 +15,18 @@ import { CommonModule } from '@angular/common';
 
         <!-- Media Content -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div class="rounded-lg overflow-hidden hover-lift">
+          <a href="https://x.com/Teamtwts2/status/1927045273177469277" target="_blank" rel="noopener noreferrer" class="block rounded-lg overflow-hidden hover-lift">
             <img 
-              src="https://images.pexels.com/photos/2263436/pexels-photo-2263436.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748293717/FFoxLHbX3EA-HD_p81ikk.jpg"
               alt="Press Coverage"
               class="w-full h-64 object-cover"
             />
             <div class="p-6 bg-white dark:bg-charcoal">
-              <span class="text-sm text-royal-gold">May 15, 2025</span>
-              <h3 class="font-playfair text-xl font-bold mt-2 mb-3 text-charcoal dark:text-ivory">Latest Interview</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80">Exclusive interview about upcoming projects and personal growth journey.</p>
+              <span class="text-sm text-royal-gold">May 27, 2025</span>
+              <h3 class="font-playfair text-xl font-bold mt-2 mb-3 text-charcoal dark:text-ivory">Samantha Ruth Prabhu Grace The Vogue India Beauty & Wellness Honours 2025</h3>
+              <p class="text-charcoal/80 dark:text-ivory/80">Actor Samantha Ruth Prabhu looked stunning in a form-fitting brown dress on Monday evening as she attended the Vogue Beauty and Wellness Honours. In a video posted by a paparazzo account, she looked drop-dead gorgeous as she posed for pictures before making her way inside</p>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </div>
