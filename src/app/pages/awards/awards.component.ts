@@ -28,7 +28,7 @@ import { CommonModule } from '@angular/common';
       <!-- Awards Timeline -->
       <section class="py-20 bg-ivory dark:bg-deep-black">
         <div class="container mx-auto px-4">
-          <div class="max-w-4xl mx-auto">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- 2024 -->
             <div class="relative pl-8 sm:pl-32 py-6 group">
               <!-- Year Label -->
@@ -41,10 +41,10 @@ import { CommonModule } from '@angular/common';
               <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
               
               <!-- Content -->
-              <div class="bg-white dark:bg-charcoal p-6 rounded-lg shadow-md hover-lift">
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
                 <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Best Actress - Filmfare Awards South</h3>
-                <p class="text-charcoal/80 dark:text-ivory/80 mb-4">For the groundbreaking performance in "Kushi" that captivated audiences and critics alike.</p>
-                <img src="https://images.pexels.com/photos/2916450/pexels-photo-2916450.jpeg" alt="Filmfare Awards 2024" class="w-full rounded-lg mb-4" />
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">For the groundbreaking performance in "Kushi" that captivated audiences and critics alike.</p>
+                <img src="https://images.pexels.com/photos/2916450/pexels-photo-2916450.jpeg" alt="Filmfare Awards 2024" class="w-full rounded-lg mb-3" />
                 <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
                   "This award is dedicated to every artist who dares to dream beyond boundaries."
                 </blockquote>
@@ -56,10 +56,10 @@ import { CommonModule } from '@angular/common';
               <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2023</div>
               <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
               <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
-              <div class="bg-white dark:bg-charcoal p-6 rounded-lg shadow-md hover-lift">
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
                 <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Indian Film Festival Melbourne - Excellence in Cinema</h3>
-                <p class="text-charcoal/80 dark:text-ivory/80 mb-4">Recognized for outstanding contribution to Indian cinema and breaking stereotypes.</p>
-                <img src="https://images.pexels.com/photos/2900115/pexels-photo-2900115.jpeg" alt="IFFM 2023" class="w-full rounded-lg mb-4" />
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Recognized for outstanding contribution to Indian cinema and breaking stereotypes.</p>
+                <img src="https://images.pexels.com/photos/2900115/pexels-photo-2900115.jpeg" alt="IFFM 2023" class="w-full rounded-lg mb-3" />
                 <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
                   "Cinema has the power to transform lives and challenge perspectives."
                 </blockquote>
@@ -71,10 +71,10 @@ import { CommonModule } from '@angular/common';
               <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2022</div>
               <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
               <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
-              <div class="bg-white dark:bg-charcoal p-6 rounded-lg shadow-md hover-lift">
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
                 <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Critics' Choice Award - Best Actress</h3>
-                <p class="text-charcoal/80 dark:text-ivory/80 mb-4">For the powerful portrayal in "Yashoda" that showcased unprecedented versatility.</p>
-                <img src="https://images.pexels.com/photos/2513900/pexels-photo-2513900.jpeg" alt="Critics Choice 2022" class="w-full rounded-lg mb-4" />
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">For the powerful portrayal in "Yashoda" that showcased unprecedented versatility.</p>
+                <img src="https://images.pexels.com/photos/2513900/pexels-photo-2513900.jpeg" alt="Critics Choice 2022" class="w-full rounded-lg mb-3" />
                 <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
                   "Every role is an opportunity to push boundaries and discover new dimensions."
                 </blockquote>
@@ -86,10 +86,10 @@ import { CommonModule } from '@angular/common';
               <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2021</div>
               <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
               <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
-              <div class="bg-white dark:bg-charcoal p-6 rounded-lg shadow-md hover-lift">
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
                 <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Best Performance in a Series - Filmfare OTT Awards</h3>
-                <p class="text-charcoal/80 dark:text-ivory/80 mb-4">For the groundbreaking role of Raji in "The Family Man 2" that redefined digital entertainment.</p>
-                <img src="https://images.pexels.com/photos/2916450/pexels-photo-2916450.jpeg" alt="Filmfare OTT Awards 2021" class="w-full rounded-lg mb-4" />
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">For the groundbreaking role of Raji in "The Family Man 2" that redefined digital entertainment.</p>
+                <img src="https://images.pexels.com/photos/2916450/pexels-photo-2916450.jpeg" alt="Filmfare OTT Awards 2021" class="w-full rounded-lg mb-3" />
                 <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
                   "Digital platforms have opened new avenues for storytelling and character exploration."
                 </blockquote>
@@ -105,32 +105,167 @@ import { CommonModule } from '@angular/common';
           <h2 class="text-3xl md:text-4xl font-playfair font-bold text-center text-charcoal dark:text-ivory mb-16">Award Gallery</h2>
           
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Card 1 -->
             <div class="relative group overflow-hidden rounded-lg hover-lift">
-              <img src="https://images.pexels.com/photos/2513900/pexels-photo-2513900.jpeg" alt="Award 1" class="w-full aspect-[3/4] object-cover" />
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249628/samantha-ritz-style-awards-2014-hq-012_mznaor.jpg" alt="Ritz Style Award" class="w-full aspect-[3/4] object-cover" />
               <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
                 <div>
-                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Filmfare Award</h3>
-                  <p class="text-ivory/90">Best Actress - Telugu</p>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Ritz Style Award</h3>
+                  <p class="text-ivory/90">2014</p>
                 </div>
               </div>
             </div>
 
+            <!-- Card 2 -->
             <div class="relative group overflow-hidden rounded-lg hover-lift">
-              <img src="https://images.pexels.com/photos/2900115/pexels-photo-2900115.jpeg" alt="Award 2" class="w-full aspect-[3/4] object-cover" />
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249626/Samantha_in_Pink_Saree_Photo_Gallery_5_ww73qx.jpg" alt="Pink Saree Event" class="w-full aspect-[3/4] object-cover" />
               <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
                 <div>
-                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">SIIMA Award</h3>
-                  <p class="text-ivory/90">Best Actress - Tamil</p>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Special Appearance</h3>
+                  <p class="text-ivory/90">Pink Saree Event</p>
                 </div>
               </div>
             </div>
 
+            <!-- Card 3 -->
             <div class="relative group overflow-hidden rounded-lg hover-lift">
-              <img src="https://images.pexels.com/photos/2916450/pexels-photo-2916450.jpeg" alt="Award 3" class="w-full aspect-[3/4] object-cover" />
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249626/IMG_20160704_171051_sgdwig.jpg" alt="Award Ceremony" class="w-full aspect-[3/4] object-cover" />
               <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
                 <div>
-                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Critics' Choice Award</h3>
-                  <p class="text-ivory/90">Best Performance</p>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Award Ceremony</h3>
+                  <p class="text-ivory/90">2016</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249625/insta630823-___B6W1hyBB_p8___-_xtgwdh.jpg" alt="Instagram Event" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Instagram Special</h3>
+                  <p class="text-ivory/90">Fan Event</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249624/images_3_16_fujcje.jpg" alt="Press Event" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Press Event</h3>
+                  <p class="text-ivory/90">2017</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249621/images_3_13_szn72z.jpg" alt="Award Show" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Award Show</h3>
+                  <p class="text-ivory/90">2018</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 7 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249611/DCVZboIUQAE5KAE_msxjzx.jpg" alt="Special Recognition" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Special Recognition</h3>
+                  <p class="text-ivory/90">2019</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 8 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249610/BPpBBG8CYAAL16J_yrhmnj.jpg" alt="Special Award" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Special Award</h3>
+                  <p class="text-ivory/90">2020</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 9 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249610/BLrxRoNCMAEKIY6_ywdro0.jpg" alt="Fashion Icon Award" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Fashion Icon Award</h3>
+                  <p class="text-ivory/90">2021</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 10 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249610/behindwoods-gold-medals-2014_1438582220200_nojatw.jpg" alt="Behindwoods Gold Medal" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Behindwoods Gold Medal</h3>
+                  <p class="text-ivory/90">2014</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 11 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249610/20230206_182208_zftdrl.jpg" alt="Recent Achievement" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Recent Achievement</h3>
+                  <p class="text-ivory/90">2023</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 12 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249610/21242093_fw7vkl.jpg" alt="Award Ceremony" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Award Ceremony</h3>
+                  <p class="text-ivory/90">2022</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 13 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249609/20230206_173648_ewtlvj.jpg" alt="Special Honor" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Special Honor</h3>
+                  <p class="text-ivory/90">2023</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 14 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249609/20230206_173107_h3vlh8.jpg" alt="Achievement Award" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Achievement Award</h3>
+                  <p class="text-ivory/90">2023</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 15 -->
+            <div class="relative group overflow-hidden rounded-lg hover-lift">
+              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748249609/20230206_172356_lesaha.jpg" alt="Recognition Event" class="w-full aspect-[3/4] object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">Recognition Event</h3>
+                  <p class="text-ivory/90">2023</p>
                 </div>
               </div>
             </div>
