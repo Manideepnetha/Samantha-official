@@ -29,29 +29,35 @@ import { CommonModule } from '@angular/common';
       <section class="py-20 bg-ivory dark:bg-deep-black">
         <div class="container mx-auto px-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- 2024 -->
+            <!-- 2025 Awards -->
             <div class="relative pl-8 sm:pl-32 py-6 group">
-              <!-- Year Label -->
-              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2024</div>
-              
-              <!-- Timeline line -->
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2025</div>
               <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
-              
-              <!-- Timeline dot -->
               <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
-              
-              <!-- Content -->
               <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
-                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Best Actress - Filmfare Awards South</h3>
-                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">For the groundbreaking performance in "Kushi" that captivated audiences and critics alike.</p>
-                <img src="https://images.pexels.com/photos/2916450/pexels-photo-2916450.jpeg" alt="Filmfare Awards 2024" class="w-full rounded-lg mb-3" />
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Vogue Power List - Power Performer of the Year</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Featured in Vogue's elite list celebrating influential women in entertainment.</p>
                 <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
-                  "This award is dedicated to every artist who dares to dream beyond boundaries."
+                  "An unstoppable force in cinema and beyond."
                 </blockquote>
               </div>
             </div>
 
-            <!-- 2023 -->
+            <!-- 2024 Awards -->
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2024</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">IIFA Utsavam - Woman of the Year in Indian Cinema</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Recognized for her contributions to Indian cinema.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "A testament to her enduring impact on the industry."
+                </blockquote>
+              </div>
+            </div>
+
+            <!-- 2023 Awards -->
             <div class="relative pl-8 sm:pl-32 py-6 group">
               <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2023</div>
               <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
@@ -59,14 +65,13 @@ import { CommonModule } from '@angular/common';
               <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
                 <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Indian Film Festival Melbourne - Excellence in Cinema</h3>
                 <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Recognized for outstanding contribution to Indian cinema and breaking stereotypes.</p>
-                <img src="https://images.pexels.com/photos/2900115/pexels-photo-2900115.jpeg" alt="IFFM 2023" class="w-full rounded-lg mb-3" />
                 <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
                   "Cinema has the power to transform lives and challenge perspectives."
                 </blockquote>
               </div>
             </div>
 
-            <!-- 2022 -->
+            <!-- 2022 Awards -->
             <div class="relative pl-8 sm:pl-32 py-6 group">
               <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2022</div>
               <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
@@ -74,14 +79,13 @@ import { CommonModule } from '@angular/common';
               <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
                 <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Critics' Choice Award - Best Actress</h3>
                 <p class="text-charcoal/80 dark:text-ivory/80 mb-3">For the powerful portrayal in "Yashoda" that showcased unprecedented versatility.</p>
-                <img src="https://images.pexels.com/photos/2513900/pexels-photo-2513900.jpeg" alt="Critics Choice 2022" class="w-full rounded-lg mb-3" />
                 <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
                   "Every role is an opportunity to push boundaries and discover new dimensions."
                 </blockquote>
               </div>
             </div>
 
-            <!-- 2021 -->
+            <!-- 2021 Awards -->
             <div class="relative pl-8 sm:pl-32 py-6 group">
               <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2021</div>
               <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
@@ -89,9 +93,158 @@ import { CommonModule } from '@angular/common';
               <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
                 <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Best Performance in a Series - Filmfare OTT Awards</h3>
                 <p class="text-charcoal/80 dark:text-ivory/80 mb-3">For the groundbreaking role of Raji in "The Family Man 2" that redefined digital entertainment.</p>
-                <img src="https://images.pexels.com/photos/2916450/pexels-photo-2916450.jpeg" alt="Filmfare OTT Awards 2021" class="w-full rounded-lg mb-3" />
                 <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
                   "Digital platforms have opened new avenues for storytelling and character exploration."
+                </blockquote>
+              </div>
+            </div>
+
+            <!-- 2020 Awards -->
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2020</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Zee Cine Awards (Telugu) - Best Actress</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Honored for her performance in Oh! Baby.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "A powerful blend of humor and emotion."
+                </blockquote>
+              </div>
+            </div>
+
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2020</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Zee Cine Awards (Telugu) - Best Actress</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Awarded for her role in Majili.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "An emotionally stirring performance."
+                </blockquote>
+              </div>
+            </div>
+
+            <!-- 2019 Awards -->
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2019</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">SIIMA Awards - Critics Best Actress (Telugu)</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Awarded for her outstanding performance in Rangasthalam.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "An unforgettable role with immense depth."
+                </blockquote>
+              </div>
+            </div>
+
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2019</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">TV9 Nava Nakshatra Sanmanam - Best Actor (Female)</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Honored for her roles in Rangasthalam, Mahanati, and Oh! Baby.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "A golden year of powerful performances."
+                </blockquote>
+              </div>
+            </div>
+
+            <!-- 2016 Awards -->
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2016</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Filmfare Awards South - Best Actress (Telugu)</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Awarded for her role in A Aa.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "A delightful performance that charmed audiences."
+                </blockquote>
+              </div>
+            </div>
+
+            <!-- 2014 Awards -->
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2014</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">SIIMA Awards - Critics Best Actress (Telugu)</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Recognized for her performance in Manam.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "A nuanced role that showcased her acting prowess."
+                </blockquote>
+              </div>
+            </div>
+
+            <!-- 2013 Awards -->
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2013</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">SIIMA Awards - Best Actress (Telugu)</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Honored for her role in Attarintiki Daredi.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "A performance that blended charm and depth."
+                </blockquote>
+              </div>
+            </div>
+
+            <!-- ===== 2012 Awards ===== -->
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2012</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Filmfare Awards South - Best Actress (Telugu)</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Awarded for her role in Eega.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "A transformative role showcasing her versatility."
+                </blockquote>
+              </div>
+            </div>
+
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2012</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Filmfare Awards South - Best Actress (Tamil)</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Recognized for her performance in Neethaane En Ponvasantham.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "A heartfelt portrayal that resonated with many."
+                </blockquote>
+              </div>
+            </div>
+
+            <!-- ===== 2010 Awards ===== -->
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2010</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Filmfare Awards South - Best Female Debut</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Recognized for her debut performance in Ye Maaya Chesave.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "A stellar debut that marked the rise of a new star."
+                </blockquote>
+              </div>
+            </div>
+
+            <div class="relative pl-8 sm:pl-32 py-6 group">
+              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">2010</div>
+              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
+              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
+              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
+                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">Nandi Awards - Special Jury Award</h3>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">Honored for her performance in Ye Maaya Chesave.</p>
+                <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
+                  "A performance that captivated audiences and critics alike."
                 </blockquote>
               </div>
             </div>

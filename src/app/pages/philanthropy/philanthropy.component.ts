@@ -9,9 +9,9 @@ import { CommonModule } from '@angular/common';
     <div class="min-h-screen bg-ivory dark:bg-deep-black">
       <!-- Hero Section -->
       <section class="relative h-[50vh] overflow-hidden">
-        <div class="absolute inset-0">
+       <div class="absolute bottom-[-500px] left-0 right-0">
           <img 
-            src="https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+            src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748288170/96372bg8_1_lm3v2w.jpg" 
             alt="Philanthropy" 
             class="w-full h-full object-cover object-center" 
           />
@@ -36,19 +36,22 @@ import { CommonModule } from '@angular/common';
             
             <!-- Impact Numbers -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-              <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift">
-                <div class="text-4xl font-playfair font-bold text-royal-gold mb-2">1,200+</div>
-                <div class="text-charcoal/80 dark:text-ivory/80">Lives Impacted</div>
+              <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
+                <div class="text-5xl text-royal-gold mb-4">😊</div>
+                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">754</div>
+                <div class="text-charcoal/80 dark:text-ivory/80">Happy Donors</div>
               </div>
-              
-              <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift">
-                <div class="text-4xl font-playfair font-bold text-royal-gold mb-2">15</div>
-                <div class="text-charcoal/80 dark:text-ivory/80">Active Projects</div>
+
+              <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
+                <div class="text-5xl text-royal-gold mb-4">🚀</div>
+                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">675</div>
+                <div class="text-charcoal/80 dark:text-ivory/80">Success Mission</div>
               </div>
-              
-              <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift">
-                <div class="text-4xl font-playfair font-bold text-royal-gold mb-2">5</div>
-                <div class="text-charcoal/80 dark:text-ivory/80">States Reached</div>
+
+              <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
+                <div class="text-5xl text-royal-gold mb-4">👤+</div>
+                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">1,248</div>
+                <div class="text-charcoal/80 dark:text-ivory/80">Volunteer Reached</div>
               </div>
             </div>
           </div>
@@ -60,47 +63,41 @@ import { CommonModule } from '@angular/common';
         <div class="container mx-auto px-4">
           <h2 class="text-3xl md:text-4xl font-playfair font-bold text-center text-charcoal dark:text-ivory mb-16">Key Initiatives</h2>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Education -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Sponsor for Health -->
             <div class="bg-ivory dark:bg-deep-black p-8 rounded-lg hover-lift">
               <div class="w-16 h-16 bg-royal-gold/10 rounded-full flex items-center justify-center mb-6">
-                <span class="text-3xl text-royal-gold">📚</span>
+                <span class="text-3xl text-royal-gold">😊</span>
               </div>
-              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Education for All</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">Supporting underprivileged children with quality education, school supplies, and mentorship programs.</p>
-              <ul class="space-y-2 text-charcoal/70 dark:text-ivory/70">
-                <li>• 500+ children sponsored</li>
-                <li>• 10 schools supported</li>
-                <li>• After-school programs</li>
-              </ul>
+              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Sponsor for Health</h3>
+              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">So far, Pratyusha Support has sponsored for more than 150 critical surgeries for the underprivileged. This being our main objective, we have always intended to provide good health and support to the children and their families.</p>
             </div>
 
-            <!-- Healthcare -->
+            <!-- Awareness Campaigns -->
             <div class="bg-ivory dark:bg-deep-black p-8 rounded-lg hover-lift">
               <div class="w-16 h-16 bg-royal-gold/10 rounded-full flex items-center justify-center mb-6">
-                <span class="text-3xl text-royal-gold">🏥</span>
+                <span class="text-3xl text-royal-gold">🚀</span>
               </div>
-              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Healthcare Access</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">Providing medical support and healthcare facilities to communities in need.</p>
-              <ul class="space-y-2 text-charcoal/70 dark:text-ivory/70">
-                <li>• Mobile health clinics</li>
-                <li>• Women's health camps</li>
-                <li>• Mental health support</li>
-              </ul>
+              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Awareness Campaigns</h3>
+              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">These days, its important for children and women to be aware of various day to day issues happening in the society. Team Pratyusha Support works towards creating awareness on various sensitive topics at Government Schools, Orphanages and other Societies.</p>
             </div>
 
-            <!-- Women Empowerment -->
+            <!-- Shelter for Poor -->
             <div class="bg-ivory dark:bg-deep-black p-8 rounded-lg hover-lift">
               <div class="w-16 h-16 bg-royal-gold/10 rounded-full flex items-center justify-center mb-6">
-                <span class="text-3xl text-royal-gold">💪</span>
+                <span class="text-3xl text-royal-gold">🏠</span>
               </div>
-              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Women Empowerment</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">Empowering women through skill development and entrepreneurship programs.</p>
-              <ul class="space-y-2 text-charcoal/70 dark:text-ivory/70">
-                <li>• Vocational training</li>
-                <li>• Micro-finance support</li>
-                <li>• Leadership workshops</li>
-              </ul>
+              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Shelter for Poor</h3>
+              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">Associated full-time with Pyaram Vijayabharathi Vidyasagar Charitable Trust, located in Nadargul, Adibatla Village. Sheltering about 28 orphan kids at the moment and providing them with education, health and other necessary amenities.</p>
+            </div>
+
+            <!-- Wish come True -->
+            <div class="bg-ivory dark:bg-deep-black p-8 rounded-lg hover-lift">
+              <div class="w-16 h-16 bg-royal-gold/10 rounded-full flex items-center justify-center mb-6">
+                <span class="text-3xl text-royal-gold">✨</span>
+              </div>
+              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Wish come True</h3>
+              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">A special initiative by the team where we fulfill the wishes of those unfortunate children with life-threatening ailments.</p>
             </div>
           </div>
         </div>
@@ -152,9 +149,9 @@ import { CommonModule } from '@angular/common';
                 <p class="text-charcoal/80 dark:text-ivory/80 mb-6">
                   Support our initiatives through monetary contributions. Every donation helps us reach more lives.
                 </p>
-                <button class="px-6 py-3 bg-royal-gold text-deep-black rounded-full font-inter font-medium hover:bg-royal-gold/90 transition-all">
+                <a href="https://pratyushasupport.org/hdfc/pay.php" target="_blank" class="px-6 py-3 bg-royal-gold text-deep-black rounded-full font-inter font-medium hover:bg-royal-gold/90 transition-all">
                   Make a Donation
-                </button>
+                </a>
               </div>
 
               <div class="bg-ivory dark:bg-deep-black p-8 rounded-lg hover-lift">
