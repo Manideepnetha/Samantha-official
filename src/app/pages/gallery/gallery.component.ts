@@ -21,9 +21,9 @@ interface GalleryImage {
     <div class="min-h-screen bg-ivory dark:bg-deep-black">
       <!-- Hero Section -->
       <section class="relative h-[40vh] md:h-[50vh] overflow-hidden">
-        <div class="absolute inset-0">
+        <div class="absolute bottom-[-1490px] left-0 right-0">
           <img 
-            src="https://images.pexels.com/photos/3379942/pexels-photo-3379942.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+            src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295799/5_6185746542628962570_c68nyo.jpg" 
             alt="Gallery" 
             class="w-full h-full object-cover object-center" 
           />
@@ -159,121 +159,121 @@ export class GalleryComponent implements OnInit {
   images: GalleryImage[] = [
     {
       id: 1,
-      url: 'https://images.pexels.com/photos/994605/pexels-photo-994605.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      alt: 'Red Carpet Appearance',
-      category: 'events',
-      caption: 'Attending the 68th National Film Awards',
-      date: 'March 2025',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296933/Samantha_x_burberry_ml1yed.jpg',
+      alt: 'Samantha x Burberry',
+      category: 'fashion',
+      caption: 'Samantha x Burberry Collaboration',
+      date: 'March 2024',
       width: 800,
       height: 1200
     },
     {
       id: 2,
-      url: 'https://images.pexels.com/photos/2002719/pexels-photo-2002719.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748298223/d5wj1d4ydqe61_fr3adf.jpg',
       alt: 'Fashion Editorial',
       category: 'fashion',
-      caption: 'For Vogue India Special Edition',
-      date: 'January 2025',
+      caption: 'Latest Fashion Editorial',
+      date: 'March 2024',
       width: 800,
       height: 1000
     },
     {
       id: 3,
-      url: 'https://images.pexels.com/photos/5077039/pexels-photo-5077039.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296881/53885681037_6a705301cf_o_ztjyeg.jpg',
       alt: 'Behind the Scenes',
       category: 'bts',
-      caption: 'On the set of Citadel: Honey Bunny',
-      date: 'February 2025',
+      caption: 'Behind the Scenes',
+      date: 'March 2024',
       width: 1200,
       height: 800
     },
     {
       id: 4,
-      url: 'https://images.pexels.com/photos/6954162/pexels-photo-6954162.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296812/SRP_q8wmpl.jpg',
       alt: 'Film Still',
       category: 'films',
-      caption: 'As Raji in The Family Man 2',
-      date: '2021',
+      caption: 'Latest Film Project',
+      date: '2024',
       width: 1200,
       height: 900
     },
     {
       id: 5,
-      url: 'https://images.pexels.com/photos/3394231/pexels-photo-3394231.png?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      alt: 'Philanthropy Event',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295435/5_6185746542628962569_bgalhv.jpg',
+      alt: 'Fashion Event',
       category: 'events',
-      caption: 'At the Pratyusha Foundation Annual Gala',
-      date: 'April 2025',
+      caption: 'Fashion Event Appearance',
+      date: 'March 2024',
       width: 900,
       height: 1200
     },
     {
       id: 6,
-      url: 'https://images.pexels.com/photos/2916450/pexels-photo-2916450.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295799/5_6185746542628962570_c68nyo.jpg',
       alt: 'Magazine Cover',
       category: 'photoshoots',
-      caption: 'Filmfare Cover Shoot',
-      date: 'May 2025',
+      caption: 'Magazine Cover Shoot',
+      date: 'March 2024',
       width: 800,
       height: 1100
     },
     {
       id: 7,
-      url: 'https://images.pexels.com/photos/2513900/pexels-photo-2513900.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      alt: 'Award Ceremony',
-      category: 'events',
-      caption: 'Receiving Best Actress Award for Kushi',
-      date: 'December 2024',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297784/behance_download_1705218613069_toqclh.jpg',
+      alt: 'Fashion Editorial - Blue Saree',
+      category: 'fashion',
+      caption: 'Latest Fashion Editorial - Blue Saree',
+      date: 'March 2024',
       width: 1000,
       height: 800
     },
     {
       id: 8,
-      url: 'https://images.pexels.com/photos/2900115/pexels-photo-2900115.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296786/20231102_115421_zbia4t.jpg',
       alt: 'Brand Photoshoot',
       category: 'fashion',
-      caption: 'For Saaki Summer Collection',
-      date: 'April 2025',
+      caption: 'Brand Photoshoot',
+      date: 'March 2024',
       width: 800,
       height: 1200
     },
     {
       id: 9,
-      url: 'https://images.pexels.com/photos/6616354/pexels-photo-6616354.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      alt: 'Promotional Event',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297381/IMG_20231010_193941_idl7at.jpg',
+      alt: 'Fashion Event',
       category: 'events',
-      caption: 'Citadel: Honey Bunny Press Conference',
-      date: 'June 2025',
+      caption: 'Fashion Event Appearance',
+      date: 'October 2023',
       width: 1200,
       height: 800
     },
     {
       id: 10,
-      url: 'https://images.pexels.com/photos/6589901/pexels-photo-6589901.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      alt: 'Behind the Scenes',
-      category: 'bts',
-      caption: 'Rehearsing for action sequence',
-      date: 'March 2025',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297382/Samantha17_zxr8ah.jpg',
+      alt: 'Fashion Editorial',
+      category: 'fashion',
+      caption: 'Latest Fashion Editorial',
+      date: 'March 2024',
       width: 900,
       height: 1100
     },
     {
       id: 11,
-      url: 'https://images.pexels.com/photos/3379942/pexels-photo-3379942.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      alt: 'High Fashion Editorial',
-      category: 'photoshoots',
-      caption: 'For Harper\'s Bazaar India',
-      date: 'February 2025',
-      width: 800,
-      height: 1000
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297890/RDT_20230925_1145373619426103841407709_l5sply.png',
+      alt: 'Fashion Event',
+      category: 'events',
+      caption: 'Fashion Event Appearance',
+      date: 'September 2023',
+      width: 1200,
+      height: 800
     },
     {
       id: 12,
-      url: 'https://images.pexels.com/photos/6883793/pexels-photo-6883793.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      alt: 'Film Still',
-      category: 'films',
-      caption: 'As Shakuntala in Shaakuntalam',
-      date: '2023',
+      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296644/ee0bed145412067.629e2c026e891_1_wgw0tk.jpg',
+      alt: 'Fashion Editorial',
+      category: 'fashion',
+      caption: 'Latest Fashion Editorial',
+      date: 'March 2024',
       width: 1200,
       height: 900
     }
