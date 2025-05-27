@@ -180,18 +180,25 @@ interface Movie {
                     class="absolute inset-0 w-full h-full object-cover scale-110 blur-lg opacity-60 z-0" />
                   <img [src]="series.poster" [alt]="series.title"
                     class="relative w-full h-full transition-transform duration-500 group-hover:scale-110 object-cover rounded-lg shadow-lg z-10" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-deep-black/90 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 z-20">
+                    <span class="text-royal-gold font-inter text-sm">{{series.year}} • {{series.language}}</span>
+                    <h3 class="font-playfair text-xl font-bold text-ivory mb-2">{{series.title}}</h3>
+                    <p class="text-ivory/80 text-sm mb-4">{{series.role}}</p>
+                    <span class="inline-block px-3 py-1 bg-royal-gold/20 text-royal-gold rounded-full text-xs mb-2">Web Series</span>
+                    <button class="mt-auto px-4 py-2 bg-royal-gold text-deep-black rounded font-inter font-medium hover:bg-royal-gold/90 transition-colors" (click)="openMovieDetails(series)">View Details</button>
+                  </div>
                 </ng-container>
                 <ng-template #normalPosterBg>
                   <img [src]="series.poster" [alt]="series.title"
                     class="w-full h-full transition-transform duration-500 group-hover:scale-110 object-cover" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-deep-black/90 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                    <span class="text-royal-gold font-inter text-sm">{{series.year}} • {{series.language}}</span>
+                    <h3 class="font-playfair text-xl font-bold text-ivory mb-2">{{series.title}}</h3>
+                    <p class="text-ivory/80 text-sm mb-4">{{series.role}}</p>
+                    <span class="inline-block px-3 py-1 bg-royal-gold/20 text-royal-gold rounded-full text-xs mb-2">Web Series</span>
+                    <button class="mt-auto px-4 py-2 bg-royal-gold text-deep-black rounded font-inter font-medium hover:bg-royal-gold/90 transition-colors" (click)="openMovieDetails(series)">View Details</button>
+                  </div>
                 </ng-template>
-                <div class="absolute inset-0 bg-gradient-to-t from-deep-black/90 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                  <span class="text-royal-gold font-inter text-sm">{{series.year}} • {{series.language}}</span>
-                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">{{series.title}}</h3>
-                  <p class="text-ivory/80 text-sm mb-4">{{series.role}}</p>
-                  <span class="inline-block px-3 py-1 bg-royal-gold/20 text-royal-gold rounded-full text-xs mb-2">Web Series</span>
-                  <button class="mt-auto px-4 py-2 bg-royal-gold text-deep-black rounded font-inter font-medium hover:bg-royal-gold/90 transition-colors" (click)="openMovieDetails(series)">View Details</button>
-                </div>
               </div>
               <div class="sm:hidden bg-white dark:bg-charcoal p-4">
                 <span class="text-royal-gold font-inter text-sm">{{series.year}} • {{series.language}}</span>
@@ -393,7 +400,7 @@ export class FilmographyComponent implements OnInit {
     { id: 43, title: 'Yashoda', year: 2022, language: 'Telugu', genre: ['Action', 'Thriller'], role: 'Yashoda', director: 'Hari–Harish', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122614/Picsart_22-09-08_22-58-25-225_zupgqe.jpg', description: 'Released November 11, 2022.', trailer: '' },
     { id: 44, title: 'Shaakuntalam', year: 2023, language: 'Telugu', genre: ['Mythology', 'Drama', 'Romance'], role: 'Shakuntala', director: 'Gunasekhar', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122615/PicsArt_04-28-01.30.05_jdpk8h.jpg', description: 'Released April 14, 2023.', trailer: '' },
     { id: 45, title: 'Kushi', year: 2023, language: 'Telugu', genre: ['Romance', 'Comedy', 'Drama'], role: 'Aradhya', director: 'Shiva Nirvana', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122707/20220909_210838_vrhgsu.jpg', description: 'Released September 1, 2023.', trailer: '' },
-    { id: 46, title: 'Subham', year: 2025, language: 'Telugu', genre: ['Drama'], role: 'TBA', director: 'TBA', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748018718/subham-et00440249-1747030168_rsxwsc.avif', description: 'Expected May 9, 2025.', trailer: '' },
+    { id: 46, title: 'Subham', year: 2025, language: 'Telugu', genre: ['Drama'], role: 'Maata', director: 'TBA', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748018718/subham-et00440249-1747030168_rsxwsc.avif', description: 'Expected May 9, 2025.', trailer: '' },
     { id: 47, title: 'Maa Inti Bangaram', year: 2025, releaseDate: '2025-12-31', language: 'Telugu', genre: ['Drama'], role: 'TBA', director: 'TBA', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122616/Picsart_24-12-11_00-02-55-486_vk48af.png', description: 'Expected 2025.', trailer: '' }
   ];
 
