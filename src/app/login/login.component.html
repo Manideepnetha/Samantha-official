@@ -1,0 +1,135 @@
+<div class="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+  <!-- Background Image Overlay -->
+  <div class="absolute inset-0 bg-gradient-to-br from-black/40 via-purple-900/30 to-black/60"></div>
+  
+  <!-- Background Pattern -->
+  <div class="absolute inset-0 opacity-20">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+    <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
+    <div class="absolute bottom-1/4 left-1/3 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-2000"></div>
+  </div>
+
+  <!-- Floating Initials Watermark -->
+  <div class="floating-initials absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/5 text-[20rem] font-playfair font-bold select-none pointer-events-none z-0">
+    SRP
+  </div>
+
+  <!-- Main Content -->
+  <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      
+      <!-- Logo/Brand Section -->
+      <div #logoElement class="text-center mb-8">
+        <div class="inline-block p-4 glass-morphism rounded-full mb-4">
+          <img 
+            src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1750078010/54438703348_8217bd1be5_k_erddcp.jpg" 
+            alt="Logo" 
+            class="w-16 h-16 rounded-full object-cover"
+          />
+        </div>
+        <h1 class="text-3xl font-playfair font-bold text-white mb-2">Welcome Back</h1>
+        <p class="text-white/70 text-sm">Sign in to continue your journey</p>
+      </div>
+
+      <!-- Login Card -->
+      <div #loginCard class="glass-morphism rounded-2xl p-8 shadow-2xl">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+          
+          <!-- Email Field -->
+          <div class="form-field relative">
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="floating-label-input peer"
+              placeholder="Email"
+              (focus)="onInputFocus($event)"
+              (blur)="onInputBlur($event)"
+              [class.border-red-400]="getFieldError('email')"
+            />
+            <label for="email" class="floating-label peer-focus:floating-label-active peer-[:not(:placeholder-shown)]:floating-label-active">
+              Email Address
+            </label>
+            <div class="text-red-400 text-xs mt-1 min-h-[1rem]">
+              {{ getFieldError('email') }}
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="form-field relative">
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              class="floating-label-input peer"
+              placeholder="Password"
+              (focus)="onInputFocus($event)"
+              (blur)="onInputBlur($event)"
+              [class.border-red-400]="getFieldError('password')"
+            />
+            <label for="password" class="floating-label peer-focus:floating-label-active peer-[:not(:placeholder-shown)]:floating-label-active">
+              Password
+            </label>
+            <div class="text-red-400 text-xs mt-1 min-h-[1rem]">
+              {{ getFieldError('password') }}
+            </div>
+          </div>
+
+          <!-- Remember & Forgot -->
+          <div class="flex items-center justify-between text-sm">
+            <label class="flex items-center text-white/80">
+              <input type="checkbox" class="mr-2 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-purple-500">
+              Remember me
+            </label>
+            <a href="#" class="text-purple-300 hover:text-purple-200 transition-colors duration-200">
+              Forgot Password?
+            </a>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="submit-button w-full py-4 px-6 gradient-button text-white font-semibold rounded-xl shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-300/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="isLoading"
+          >
+            <span *ngIf="!isLoading" class="flex items-center justify-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+              </svg>
+              Sign In
+            </span>
+            <span *ngIf="isLoading" class="flex items-center justify-center">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Signing In...
+            </span>
+          </button>
+        </form>
+
+        <!-- Sign Up Link -->
+        <div class="mt-6 text-center">
+          <p class="text-white/70 text-sm">
+            Don't have an account? 
+            <a href="#" class="text-purple-300 hover:text-purple-200 font-semibold transition-colors duration-200">
+              Join Now
+            </a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Welcome Message -->
+      <div class="welcome-text text-center mt-8">
+        <p class="text-white/80 text-lg font-playfair italic leading-relaxed">
+          "Welcome to the world of timeless charm<br>and cinematic brilliance."
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decorative Elements -->
+  <div class="absolute top-10 right-10 w-2 h-2 bg-purple-400 rounded-full animate-ping"></div>
+  <div class="absolute bottom-10 left-10 w-1 h-1 bg-pink-400 rounded-full animate-ping delay-1000"></div>
+  <div class="absolute top-1/3 left-10 w-1.5 h-1.5 bg-indigo-400 rounded-full animate-ping delay-2000"></div>
+</div> 

@@ -1,0 +1,102 @@
+/* Add any custom styles for the login component here */
+/* For example, you can add styles for the glass-morphism effect, floating labels, etc. */
+
+/* Custom styles for enhanced visual effects */
+
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.floating-label-input:focus + .floating-label {
+  transform: translateY(-8px) scale(0.85);
+  color: #c084fc;
+}
+
+.floating-label-input:not(:placeholder-shown) + .floating-label {
+  transform: translateY(-8px) scale(0.85);
+  color: #c084fc;
+}
+
+.gradient-button {
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #8b5cf6 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.gradient-button:hover::before {
+  left: 100%;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.submit-button:hover {
+  box-shadow: 
+    0 0 30px rgba(168, 85, 247, 0.6),
+    0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .floating-initials {
+    font-size: 12rem;
+  }
+  
+  .glass-morphism {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+}
+
+/* Enhanced focus states for accessibility */
+.floating-label-input:focus {
+  box-shadow: 
+    0 0 0 3px rgba(168, 85, 247, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.5);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.7);
+} 
