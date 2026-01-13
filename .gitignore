@@ -1,3 +1,60 @@
-.angular
-node_modules
-.env
+# ===========================
+# FRONTEND (Angular / Node)
+# ===========================
+/node_modules
+/dist
+/dist-server
+/tmp
+/out-tsc
+/bazel-out
+/.angular/cache
+
+# IDE - VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/
+
+# IDE - IntelliJ / WebStorm
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+
+# ===========================
+# BACKEND (.NET / C#)
+# ===========================
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Cache
+.vs/
+.suo
+*.cache
+
+# Debug files
+*.pdb
+
+# Secrets & Local Config
+appsettings.Development.json
+*.lock.json
+# Note: appsettings.json SHOULD be committed as it contains structure/defaults
+
+# ===========================
+# SYSTEM / MISC
+# ===========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini

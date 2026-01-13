@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ApiService, Philanthropy } from '../../services/api.service';
 
 @Component({
   selector: 'app-philanthropy',
@@ -34,7 +35,7 @@ import { CommonModule } from '@angular/common';
               The Pratyusha Foundation is committed to creating sustainable change in the lives of underprivileged women and children through education, healthcare, and skill development programs.
             </p>
             
-            <!-- Impact Numbers -->
+            <!-- Impact Numbers (Hardcoded) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
               <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
                 <div class="text-5xl text-royal-gold mb-4">😊</div>
@@ -58,7 +59,7 @@ import { CommonModule } from '@angular/common';
         </div>
       </section>
 
-      <!-- Key Initiatives -->
+      <!-- Key Initiatives (Hardcoded) -->
       <section class="py-20 bg-white dark:bg-charcoal">
         <div class="container mx-auto px-4">
           <h2 class="text-3xl md:text-4xl font-playfair font-bold text-center text-charcoal dark:text-ivory mb-16">Key Initiatives</h2>
@@ -103,21 +104,23 @@ import { CommonModule } from '@angular/common';
         </div>
       </section>
 
-      <!-- Success Stories -->
+      <!-- Success Stories (Dynamic) -->
       <section class="py-20 bg-ivory dark:bg-deep-black">
         <div class="container mx-auto px-4">
           <h2 class="text-3xl md:text-4xl font-playfair font-bold text-center text-charcoal dark:text-ivory mb-16">Success Stories</h2>
           
-          <div class="flex justify-center">
-            <div class="bg-white dark:bg-charcoal p-10 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-2xl">
-              <img src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748291908/bg16_unojqa.jpg" alt="Success Story" class="w-full h-64 object-cover rounded-lg mb-6" />
-              <h3 class="font-playfair text-2xl font-bold mb-4 text-charcoal dark:text-ivory">Pratyusha Support: Founded by Samantha Ruth Prabhu</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-6 leading-relaxed">
-                Conceptualized by leading South Indian actress - Samantha Ruth Prabhu, Pratyusha Support has started its services in February 2014. Since then, we have been serving the underprivileged by delivering some unparalleled medical support to women and children, while fulfilling wishes of those children suffering from life-threatening medical conditions. We have been closely working with our partnered hospitals, Rainbow, Continental, Livlife, Ankura and Andhra Hospitals in Telangana and Andhra Pradesh states primarily.
+          <!-- Show loading state or placeholder if needed -->
+          <div *ngIf="stories.length === 0" class="text-center text-charcoal/50 dark:text-ivory/50">
+            Loading stories...
+          </div>
+
+          <div class="flex flex-col items-center gap-12">
+            <div *ngFor="let story of stories" class="bg-white dark:bg-charcoal p-10 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-2xl transform hover:scale-[1.01]">
+              <img *ngIf="story.imageUrl" [src]="story.imageUrl" [alt]="story.title" class="w-full h-64 object-cover rounded-lg mb-6" />
+              <h3 class="font-playfair text-2xl font-bold mb-4 text-charcoal dark:text-ivory">{{ story.title }}</h3>
+              <p class="text-charcoal/80 dark:text-ivory/80 mb-6 leading-relaxed whitespace-pre-line">
+                {{ story.description }}
               </p>
-              <blockquote class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90 text-lg">
-                "I wanted to create something that would outlive me—something that would continue to bring hope to people long after I'm gone. That's why I started Pratyusha Support."
-              </blockquote>
             </div>
           </div>
         </div>
@@ -165,16 +168,27 @@ export class PhilanthropyComponent implements OnInit {
   successMissionCount = 0;
   volunteerReachedCount = 0;
 
+  // Dynamic Content
+  stories: Philanthropy[] = [];
+
   private happyDonorsTarget = 754;
   private successMissionTarget = 675;
   private volunteerReachedTarget = 1248;
   private animationDuration = 2000; // milliseconds
   private animationStep = 10; // milliseconds
 
+  constructor(private apiService: ApiService) { }
+
   ngOnInit(): void {
+    // Start Animation (Static Stats)
     this.animateNumber('happyDonors', this.happyDonorsTarget);
     this.animateNumber('successMission', this.successMissionTarget);
     this.animateNumber('volunteerReached', this.volunteerReachedTarget);
+
+    // Fetch Stories (Dynamic)
+    this.apiService.getPhilanthropies().subscribe(data => {
+      this.stories = data.filter(i => i.type === 'Story');
+    });
   }
 
   animateNumber(property: string, target: number): void {

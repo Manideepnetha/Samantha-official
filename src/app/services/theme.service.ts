@@ -12,7 +12,11 @@ export class ThemeService {
     // Check if user has a theme preference saved in localStorage
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
-      this.darkModeSubject.next(savedTheme === 'dark');
+      this.setDarkMode(savedTheme === 'dark');
+    } else {
+      // Optional: Check system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.setDarkMode(prefersDark);
     }
   }
 
@@ -24,5 +28,12 @@ export class ThemeService {
   setDarkMode(isDark: boolean): void {
     this.darkModeSubject.next(isDark);
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+    // Apply class to HTML element
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }
 }

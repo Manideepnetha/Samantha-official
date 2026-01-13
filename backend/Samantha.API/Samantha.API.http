@@ -1,0 +1,6 @@
+@Samantha.API_HostAddress = http://localhost:5035
+
+GET {{Samantha.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

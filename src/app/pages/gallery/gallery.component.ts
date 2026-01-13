@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../services/api.service';
 
 interface GalleryImage {
   id: number;
@@ -156,132 +157,36 @@ export class GalleryComponent implements OnInit {
   ];
 
   selectedCategory: string = 'all';
-  images: GalleryImage[] = [
-    {
-      id: 1,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296933/Samantha_x_burberry_ml1yed.jpg',
-      alt: 'Samantha x Burberry',
-      category: 'fashion',
-      caption: 'Samantha x Burberry Collaboration',
-      date: 'March 2024',
-      width: 800,
-      height: 1200
-    },
-    {
-      id: 2,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748298223/d5wj1d4ydqe61_fr3adf.jpg',
-      alt: 'Fashion Editorial',
-      category: 'fashion',
-      caption: 'Latest Fashion Editorial',
-      date: 'March 2024',
-      width: 800,
-      height: 1000
-    },
-    {
-      id: 3,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297784/behance_download_1705218613069_toqclh.jpg',
-      alt: 'Fashion Editorial - Blue Saree',
-      category: 'fashion',
-      caption: 'Latest Fashion Editorial - Blue Saree',
-      date: 'March 2024',
-      width: 1000,
-      height: 800
-    },
-    {
-      id: 4,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297382/Samantha17_zxr8ah.jpg',
-      alt: 'Fashion Editorial',
-      category: 'fashion',
-      caption: 'Latest Fashion Editorial',
-      date: 'March 2024',
-      width: 900,
-      height: 1100
-    },
-    {
-      id: 5,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296644/ee0bed145412067.629e2c026e891_1_wgw0tk.jpg',
-      alt: 'Fashion Editorial',
-      category: 'fashion',
-      caption: 'Latest Fashion Editorial',
-      date: 'March 2024',
-      width: 1200,
-      height: 900
-    },
-    {
-      id: 6,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296812/SRP_q8wmpl.jpg',
-      alt: 'Film Still',
-      category: 'films',
-      caption: 'Latest Film Project',
-      date: '2024',
-      width: 1200,
-      height: 900
-    },
-    {
-      id: 7,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296881/53885681037_6a705301cf_o_ztjyeg.jpg',
-      alt: 'Behind the Scenes',
-      category: 'bts',
-      caption: 'Behind the Scenes',
-      date: 'March 2024',
-      width: 1200,
-      height: 800
-    },
-    {
-      id: 8,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295435/5_6185746542628962569_bgalhv.jpg',
-      alt: 'Fashion Event',
-      category: 'events',
-      caption: 'Fashion Event Appearance',
-      date: 'March 2024',
-      width: 900,
-      height: 1200
-    },
-    {
-      id: 9,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295799/5_6185746542628962570_c68nyo.jpg',
-      alt: 'Magazine Cover',
-      category: 'photoshoots',
-      caption: 'Magazine Cover Shoot',
-      date: 'March 2024',
-      width: 800,
-      height: 1100
-    },
-    {
-      id: 10,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297381/IMG_20231010_193941_idl7at.jpg',
-      alt: 'Fashion Event',
-      category: 'events',
-      caption: 'Fashion Event Appearance',
-      date: 'October 2023',
-      width: 1200,
-      height: 800
-    },
-    {
-      id: 11,
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297890/RDT_20230925_1145373619426103841407709_l5sply.png',
-      alt: 'Fashion Event',
-      category: 'events',
-      caption: 'Fashion Event Appearance',
-      date: 'September 2023',
-      width: 1200,
-      height: 800
-    }
-  ];
-
+  images: GalleryImage[] = [];
   filteredImages: GalleryImage[] = [];
   lightboxImage: GalleryImage | null = null;
   currentLightboxIndex: number = 0;
 
-  constructor() {}
+  constructor(private apiService: ApiService) { }
 
   ngOnInit(): void {
-    this.filteredImages = [...this.images];
+    this.apiService.getMediaGalleries().subscribe(data => {
+      // Filter out Home page items and map to internal structure
+      this.images = data
+        .filter(item => item.type !== 'Home')
+        .map(item => ({
+          id: item.id!,
+          url: item.imageUrl,
+          alt: item.altText || item.caption,
+          category: item.type,
+          caption: item.caption,
+          date: item.date,
+          width: 800, // Default width
+          height: 800 // Default height
+        }));
+
+      this.filteredImages = [...this.images];
+    });
   }
 
   filterByCategory(category: string): void {
     this.selectedCategory = category;
-    
+
     if (category === 'all') {
       this.filteredImages = [...this.images];
     } else {
@@ -302,13 +207,13 @@ export class GalleryComponent implements OnInit {
 
   navigateLightbox(direction: 'prev' | 'next', event: Event): void {
     event.stopPropagation(); // Prevent lightbox closing
-    
+
     if (direction === 'prev') {
       this.currentLightboxIndex = (this.currentLightboxIndex - 1 + this.filteredImages.length) % this.filteredImages.length;
     } else {
       this.currentLightboxIndex = (this.currentLightboxIndex + 1) % this.filteredImages.length;
     }
-    
+
     this.lightboxImage = this.filteredImages[this.currentLightboxIndex];
   }
 }

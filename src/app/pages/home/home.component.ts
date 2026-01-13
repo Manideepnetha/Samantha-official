@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { gsap } from 'gsap';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-home',
@@ -238,78 +239,47 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
   ];
 
-  latestNews = [
-    {
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181752/1KBvNGVxuMg-HD_gvqzhe.jpg',
-      date: 'May 15, 2025',
-      title: 'Galatta Interview',
-      excerpt: 'In this interview, Baradwaj Rangan has a candid conversation with Samantha for Shubham. They ate a lot, talked a lot, and had lots of fun. Samantha Ruth Prabhu Interview With Baradwaj Rangan | Food For Thought | Galatta Plus',
-      link: 'https://youtu.be/1KBvNGVxuMg?si=6c4pq5wmmkIocelt'
-    },
-    {
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181934/5SK0jFVolHU-HD_za0gfe.jpg',
-      date: 'April 28, 2025',
-      title: 'Celebrating 15 Years Of Samantha Promo',
-      excerpt: 'Celebrating 15 Years Of Samantha Promo | Apsara Awards 2025 | This Saturday at 5:30PM | Zee Telugu',
-      link: 'https://youtu.be/5SK0jFVolHU?si=IHIkUwZ-McsgR9Bb'
-    },
-    {
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748182251/oeK3C-9cbVc-HD_qzprbm.jpg',
-      date: 'April 10, 2025',
-      title: 'Samantha on health, stopping junk food ads, startups, struggles and childhood | Rethink India Ep.6',
-      excerpt: 'Samantha was one of the first people who supported me when I started Label Padhega India...',
-      link: 'https://youtu.be/oeK3C-9cbVc?si=dKNuBerq_MvuxsF_'
-    }
-  ];
+  latestNews: any[] = [];
+  upcomingProjects: any[] = [];
+  featuredGallery: any[] = [];
 
-  upcomingProjects = [
-    {
-      title: 'Rakt Brahmand',
-      type: 'Feature Film',
-      releaseDate: 'To be announced',
-      description: 'A thrilling new project.',
-      director: 'Rahi Anil Barve'
-    },
-    {
-      title: 'Maa Inti Bangaram',
-      type: 'Feature Film',
-      releaseDate: 'To be announced',
-      description: 'A heartwarming family drama.',
-      director: 'To be announced'
-    }
-  ];
-
-  featuredGallery = [
-    {
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045091/7fb8df223537765.67fa812e2e11a_y4wnfj.jpg',
-      alt: 'Samantha Ruth Prabhu portrait',
-      caption: 'Elegant Portrait'
-    },
-    {
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045106/behance_download_1696836520640_z70bkf.jpg',
-      alt: 'Samantha Ruth Prabhu in traditional attire',
-      caption: 'Traditional Look'
-    },
-    {
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045105/RDT_20230918_1518324927662270333256076_x6bzvb.png',
-      alt: 'Samantha Ruth Prabhu candid moment',
-      caption: 'Candid Moment'
-    },
-    {
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045289/Majili_aqbpbd.jpg',
-      alt: 'Samantha Ruth Prabhu in Majili',
-      caption: 'Majili Movie'
-    },
-    {
-      url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045346/Samantha29_clxsnm.jpg',
-      alt: 'Samantha Ruth Prabhu glamorous look',
-      caption: 'Glamorous Style'
-    }
-  ];
+  constructor(private apiService: ApiService) { }
 
   ngOnInit(): void {
     // Start the carousel rotations
     this.startCarousels();
+
+    // Fetch News
+    this.apiService.getNews().subscribe(data => {
+      this.latestNews = data.map(item => ({
+        ...item,
+        image: item.imageUrl // Map imageUrl -> image
+      }));
+    });
+
+    // Fetch Upcoming Projects
+    this.apiService.getMovies().subscribe(data => {
+      this.upcomingProjects = data
+        .filter(m => m.year >= 2025) // Filter for upcoming (includes 2025)
+        .map(m => ({
+          title: m.title,
+          type: 'Feature Film', // Hardcoded or derived from Genre
+          releaseDate: m.releaseDate,
+          description: m.description,
+          director: m.director
+        }));
+    });
+
+    // Fetch Gallery
+    this.apiService.getMediaGalleries().subscribe(data => {
+      this.featuredGallery = data
+        .filter(g => g.type === 'Home')
+        .map(g => ({
+          url: g.imageUrl, // Map imageUrl -> url
+          alt: g.altText,  // Map altText -> alt
+          caption: g.caption
+        }));
+    });
   }
 
   ngAfterViewInit(): void {
@@ -328,7 +298,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.roleInterval = setInterval(() => {
       this.currentRole = (this.currentRole + 1) % this.roles.length;
     }, 3000);
-    
+
     // Rotate slides every 5 seconds
     this.slideInterval = setInterval(() => {
       this.currentSlide = (this.currentSlide + 1) % this.heroSlides.length;
@@ -337,31 +307,28 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   initAnimations(): void {
     // Hero section animations
-    gsap.from('.typewriter h1', { 
-      duration: 1.5, 
-      opacity: 0, 
-      y: 50, 
-      ease: 'power3.out' 
+    gsap.from('.typewriter h1', {
+      duration: 1.5,
+      opacity: 0,
+      y: 50,
+      ease: 'power3.out'
     });
 
-    gsap.from('#role-text', { 
-      duration: 1, 
-      opacity: 0, 
-      y: 20, 
-      delay: 1, 
-      ease: 'power3.out' 
+    gsap.from('#role-text', {
+      duration: 1,
+      opacity: 0,
+      y: 20,
+      delay: 1,
+      ease: 'power3.out'
     });
 
-    gsap.from('.hero-section a', { 
-      duration: 1, 
-      opacity: 0, 
-      y: 30, 
-      stagger: 0.2, 
-      delay: 1.5, 
-      ease: 'power3.out' 
+    gsap.from('.hero-section a', {
+      duration: 1,
+      opacity: 0,
+      y: 30,
+      stagger: 0.2,
+      delay: 1.5,
+      ease: 'power3.out'
     });
-
-    // Scroll animations will be implemented with a scroll trigger plugin
-    // in a future enhancement
   }
 }

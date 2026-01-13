@@ -80,59 +80,59 @@ import { gsap } from 'gsap';
             <!-- Main Content -->
             <div class="md:col-span-2 space-y-8">
               <div class="prose prose-lg max-w-none dark:prose-invert">
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   Samantha Ruth Prabhu stands as one of Indian cinema's most versatile and acclaimed actresses, with a career spanning over a decade across Tamil and Telugu film industries. Born in Chennai to a Telugu father and a Malayali mother, Samantha's journey to stardom is a testament to her unwavering determination and exceptional talent.
                 </p>
                 
                 <h2 class="font-playfair text-2xl font-bold mt-8 mb-4 text-charcoal dark:text-ivory">Early Life & Education</h2>
                 
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   Raised in Chennai, Samantha completed her schooling at Holy Angels Anglo Indian Higher Secondary School and pursued a degree in Commerce at Stella Maris College. Her entry into the entertainment industry began through modeling during her college days, where her natural presence in front of the camera caught the attention of filmmakers.
                 </p>
                 
                 <h2 class="font-playfair text-2xl font-bold mt-8 mb-4 text-charcoal dark:text-ivory">Rise to Prominence</h2>
                 
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   Samantha's cinematic journey began with Gautham Menon's Telugu romantic drama "Ye Maaya Chesave" (2010), where her portrayal of Jessie, a complex character torn between love and family obligations, immediately established her as a performer of remarkable depth. This debut earned her the Filmfare Award for Best Female Debut – South, marking the beginning of an illustrious career.
                 </p>
                 
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   What followed was a series of powerful performances across diverse genres – from the heartwrenching "Eega" (2012) to the socially conscious "Mahanati" (2018). Her versatility shone through in commercial blockbusters like "Theri" (2016) and critically acclaimed films such as "Super Deluxe" (2019). With each role, Samantha pushed boundaries and challenged herself, refusing to be typecast.
                 </p>
                 
                 <h2 class="font-playfair text-2xl font-bold mt-8 mb-4 text-charcoal dark:text-ivory">Breaking New Ground</h2>
                 
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   Samantha's career took a revolutionary turn with her digital debut in "The Family Man 2" (2021), where she portrayed Raji, a Sri Lankan Tamil liberation fighter. This performance showcased her incredible range and commitment to her craft, earning unprecedented acclaim across India and internationally.
                 </p>
                 
                 <h2 class="font-playfair text-2xl font-bold mt-8 mb-4 text-charcoal dark:text-ivory">Beyond Cinema</h2>
                 
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   While her on-screen presence continues to captivate audiences, Samantha's influence extends far beyond cinema. In 2012, she established the Pratyusha Foundation, focusing on providing medical support, education, and other essential services to underprivileged women and children.
                 </p>
                 
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   As an entrepreneur, she launched her own fashion label, Saaki, which reflects her personal style philosophy of blending tradition with contemporary aesthetics. The brand embodies her commitment to sustainable fashion and ethical business practices.
                 </p>
                 
                 <h2 class="font-playfair text-2xl font-bold mt-8 mb-4 text-charcoal dark:text-ivory">Personal Journey & Resilience</h2>
                 
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   In 2022, Samantha revealed her diagnosis with Myositis, an autoimmune condition. With characteristic courage, she has shared her health journey openly, becoming an inspiration for millions facing similar challenges. Her candor about personal struggles has redefined celebrity vulnerability in the Indian context.
                 </p>
                 
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   Throughout personal and professional challenges, Samantha has maintained an unwavering commitment to her craft and her causes, emerging stronger with each chapter of her life.
                 </p>
                 
                 <h2 class="font-playfair text-2xl font-bold mt-8 mb-4 text-charcoal dark:text-ivory">Legacy in the Making</h2>
                 
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   As she continues to evolve as an artist, activist, and entrepreneur, Samantha Ruth Prabhu's legacy is characterized by her refusal to conform to industry norms and her determination to use her platform for meaningful change. Her journey represents the changing face of Indian cinema – one that embraces authenticity, diversity, and social responsibility.
                 </p>
                 
-                <p class="font-lora text-lg leading-relaxed">
+                <p class="font-lora text-lg leading-relaxed text-charcoal/90 dark:text-ivory/90">
                   With upcoming international projects and growing global recognition, Samantha stands at the threshold of a new chapter that promises to further cement her position as one of India's most significant cultural ambassadors.
                 </p>
               </div>
@@ -206,7 +206,7 @@ import { gsap } from 'gsap';
   styles: []
 })
 export class AboutComponent implements AfterViewInit {
-  constructor() {}
+  constructor() { }
 
   ngAfterViewInit(): void {
     this.initAnimations();
