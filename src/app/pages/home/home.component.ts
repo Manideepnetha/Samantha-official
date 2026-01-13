@@ -29,7 +29,7 @@ import { ApiService } from '../../services/api.service';
         </div>
 
         <!-- Hero Content -->
-        <div class="relative z-10 container mx-auto px-4 h-screen flex flex-col justify-center items-center text-center text-ivory mt-24">
+        <div class="relative z-10 container mx-auto px-4 min-h-screen flex flex-col justify-center items-center text-center text-ivory pt-32 pb-12">
           <div class="typewriter max-w-4xl mt-20">
             <h1 class="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-shadow">Samantha Ruth Prabhu</h1>
           </div>
