@@ -94,16 +94,19 @@ import { ApiService } from '../../services/api.service';
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div *ngFor="let project of upcomingProjects" 
-                 class="glass dark:bg-charcoal/40 rounded-lg p-6 hover-lift">
-              <h3 class="font-playfair text-xl font-bold mb-3 text-charcoal dark:text-ivory">{{project.title}}</h3>
-              <div class="flex items-center mb-4">
-                <span class="px-3 py-1 bg-royal-gold/10 text-royal-gold rounded-full text-sm">{{project.type}}</span>
-                <span class="ml-3 text-sm text-charcoal/70 dark:text-ivory/70">{{project.releaseDate}}</span>
-              </div>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-4">{{project.description}}</p>
-              <div class="flex items-center text-sm text-charcoal/70 dark:text-ivory/70">
-                <span class="font-medium text-royal-gold">Director:</span>
-                <span class="ml-2">{{project.director}}</span>
+                 class="glass dark:bg-charcoal/40 rounded-lg overflow-hidden hover-lift">
+              <img [src]="project.image" [alt]="project.title" class="w-full h-60 object-cover">
+              <div class="p-6">
+                <h3 class="font-playfair text-xl font-bold mb-3 text-charcoal dark:text-ivory">{{project.title}}</h3>
+                <div class="flex items-center mb-4">
+                  <span class="px-3 py-1 bg-royal-gold/10 text-royal-gold rounded-full text-sm">{{project.type}}</span>
+                  <span class="ml-3 text-sm text-charcoal/70 dark:text-ivory/70">{{project.releaseDate}}</span>
+                </div>
+                <p class="text-charcoal/80 dark:text-ivory/80 mb-4">{{project.description}}</p>
+                <div class="flex items-center text-sm text-charcoal/70 dark:text-ivory/70">
+                  <span class="font-medium text-royal-gold">Director:</span>
+                  <span class="ml-2">{{project.director}}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -266,7 +269,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
           type: 'Feature Film', // Hardcoded or derived from Genre
           releaseDate: m.releaseDate,
           description: m.description,
-          director: m.director
+          director: m.director,
+          // Placeholder image logic
+          image: m.title.toLowerCase().includes('bangaram')
+            ? 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg'
+            : (m.poster || 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748010072/8F9A7985_m86vsc.jpg')
         }));
     });
 

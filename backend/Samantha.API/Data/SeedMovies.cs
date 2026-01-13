@@ -9,6 +9,14 @@ public static class SeedMovies
     {
         if (context.Movies.Any())
         {
+            // Sync specific movie poster if needed
+            var movieToSync = context.Movies.FirstOrDefault(m => m.Title == "Maa Inti Bangaram");
+            if (movieToSync != null && movieToSync.Poster != "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg")
+            {
+                movieToSync.Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg";
+                // Also ensure year/description match if needed
+                context.SaveChanges();
+            }
             return;
         }
 
@@ -60,7 +68,7 @@ public static class SeedMovies
             new Movie { Title = "Shaakuntalam", Year = 2023, ReleaseDate = "2023-04-14", Language = "Telugu", Genre = new List<string> { "Mythology", "Drama", "Romance" }, Role = "Shakuntala", Director = "Gunasekhar", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122615/PicsArt_04-28-01.30.05_jdpk8h.jpg", Description = "Released April 14, 2023.", Trailer = "" },
             new Movie { Title = "Kushi", Year = 2023, ReleaseDate = "2023-09-01", Language = "Telugu", Genre = new List<string> { "Romance", "Comedy", "Drama" }, Role = "Aradhya", Director = "Shiva Nirvana", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122707/20220909_210838_vrhgsu.jpg", Description = "Released September 1, 2023.", Trailer = "" },
             new Movie { Title = "Subham", Year = 2025, ReleaseDate = "Expected May 9, 2025", Language = "Telugu", Genre = new List<string> { "Drama" }, Role = "Maata", Director = "TBA", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748018718/subham-et00440249-1747030168_rsxwsc.avif", Description = "Expected May 9, 2025.", Trailer = "" },
-            new Movie { Title = "Maa Inti Bangaram", Year = 2025, ReleaseDate = "Expected 2025", Language = "Telugu", Genre = new List<string> { "Drama" }, Role = "TBA", Director = "TBA", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122616/Picsart_24-12-11_00-02-55-486_vk48af.png", Description = "Expected 2025.", Trailer = "" },
+            new Movie { Title = "Maa Inti Bangaram", Year = 2025, ReleaseDate = "Expected 2025", Language = "Telugu", Genre = new List<string> { "Drama" }, Role = "TBA", Director = "TBA", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg", Description = "Expected 2025.", Trailer = "" },
             new Movie { Title = "The Family Man (Season 2)", Year = 2021, ReleaseDate = "2021-06-04", Language = "Hindi", Genre = new List<string> { "Action", "Thriller", "Drama" }, Role = "Raji", Director = "Raj & DK", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122617/IMG_20210808_132006_uoe7py.jpg", Description = "Web series. Released June 4, 2021. Samantha plays Raji in the acclaimed second season.", Trailer = "" },
             new Movie { Title = "Citadel: Honey Bunny", Year = 2024, ReleaseDate = "2024-11-06", Language = "Hindi", Genre = new List<string> { "Spy", "Thriller" }, Role = "TBA", Director = "Raj & DK", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122749/Picsart_24-11-07_07-15-26-570_tgv1zm.jpg", Description = "Web series. Scheduled for release November 6, 2024.", Trailer = "" },
             new Movie { Title = "Rakt Brahmand: The Bloody Kingdom", Year = 2025, ReleaseDate = "Scheduled for release in 2025", Language = "Hindi", Genre = new List<string> { "Crime", "Drama" }, Role = "TBA", Director = "TBA", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122747/20240727_100042_wgs661.jpg", Description = "Web series. Scheduled for release in 2025.", Trailer = "" }

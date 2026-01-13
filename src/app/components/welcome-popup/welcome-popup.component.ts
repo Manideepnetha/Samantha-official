@@ -1,261 +1,113 @@
-import { Component, OnInit, Output, EventEmitter, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { gsap } from 'gsap';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-welcome-popup',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, FormsModule],
     template: `
-    <div class="fixed inset-0 z-[9999] overflow-hidden font-serif cursor-none select-none bg-black" *ngIf="isVisible">
-      
-      <!-- LAYER 1: The Dark Room (Background) -->
-      <!-- A clearly visible but desaturated/dim version of the image so the screen isn't just empty black -->
-      <div class="absolute inset-0 z-0 opacity-30 grayscale filter contrast-125">
+    <div *ngIf="isVisible" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" (click)="closePopup()"></div>
+
+      <!-- Modal Content -->
+      <div class="relative z-10 bg-white dark:bg-charcoal w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 rounded shadow-2xl overflow-hidden border-2 border-white animate-fade-in-up">
+        
+        <!-- Close Button -->
+        <button (click)="closePopup()" class="absolute top-4 right-4 text-white/70 hover:text-white z-20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <!-- Left Side: Image -->
+        <div class="relative h-64 md:h-auto">
           <img 
-            src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768292203/samantha-irumbu-thirai-abhimanyudu-2018-wallpaper-532f8727be82e75426caaac4642ddf5a_amxj8k.jpg" 
-            alt="Samantha Dark" 
+            src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296812/SRP_q8wmpl.jpg" 
+            alt="Welcome" 
             class="w-full h-full object-cover"
           />
-      </div>
+        </div>
 
-      <!-- LAYER 2: The Spotlight Reveal (Foreground) -->
-      <!-- This layer is FULL COLOR and hidden by a mask. The mask follows the mouse. -->
-      <div #spotlightLayer class="absolute inset-0 z-10"
-           [style.mask-image]="'radial-gradient(circle ' + spotRadius + 'px at ' + mouseX + 'px ' + mouseY + 'px, black 0%, transparent 100%)'"
-           [style.-webkit-mask-image]="'radial-gradient(circle ' + spotRadius + 'px at ' + mouseX + 'px ' + mouseY + 'px, black 0%, transparent 100%)'">
-         
-         <img 
-            src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768292203/samantha-irumbu-thirai-abhimanyudu-2018-wallpaper-532f8727be82e75426caaac4642ddf5a_amxj8k.jpg" 
-            alt="Samantha Light" 
-            class="w-full h-full object-cover brightness-110 saturate-125"
-         />
-         
-         <!-- Content visible only in the light -->
-         <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <h1 class="text-center">
-                <span class="block text-xl md:text-3xl tracking-[1em] text-royal-gold uppercase mb-6 drop-shadow-lg font-cinzel">Do You</span>
-                <span class="block text-6xl md:text-9xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 via-yellow-400 to-yellow-600 drop-shadow-gold font-cinzel">
-                    LOVE ME?
-                </span>
-            </h1>
-         </div>
-
-         <!-- Golden Dust Motes overlay (only visible in light) -->
-         <canvas #dustCanvas class="absolute inset-0 pointer-events-none mix-blend-screen"></canvas>
-      </div>
-
-      <!-- LAYER 3: Interaction UI (Always faintly visible) -->
-      <div class="absolute bottom-20 inset-x-0 z-50 flex justify-center gap-24 pointer-events-auto">
+        <!-- Right Side: Content -->
+        <div class="p-8 md:p-12 bg-[#1a1a1a] text-white flex flex-col justify-center items-center text-center relative">
+           <!-- Font Link -->
+           <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
           
-          <!-- YES -->
-          <button #yesBtn 
-             class="group relative px-12 py-4 border border-white/20 hover:border-yellow-500/80 transition-all duration-500 rounded-sm overflow-hidden"
-             (mouseenter)="onHover('yes')"
-             (mouseleave)="onLeave()"
-             (click)="choose('yes')">
-             <div class="absolute inset-0 bg-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-             <span class="relative z-10 text-white font-cinzel tracking-[0.3em] group-hover:text-yellow-400 transition-colors duration-300">YES</span>
-          </button>
+          <!-- Logo/Header -->
+          <h2 class="font-playfair text-3xl font-bold uppercase tracking-widest mb-2 leading-none text-white/90">
+            Samantha<br>Official
+          </h2>
+          
+          <!-- Question State -->
+          <div *ngIf="!selection" class="w-full flex flex-col items-center animate-fade-in-up">
+              <h3 class="text-3xl md:text-4xl font-cinzel font-bold mb-8 mt-10 text-royal-gold tracking-wider leading-tight">
+                Do You<br>Love Me?
+              </h3>
+              
+              <div class="flex gap-6 justify-center w-full mt-4">
+                <button (click)="selectOption('yes')" class="group relative px-8 py-3 bg-transparent border border-white/30 hover:border-royal-gold rounded transition-all duration-300 overflow-hidden">
+                   <div class="absolute inset-0 bg-royal-gold/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                   <span class="relative font-cinzel font-bold tracking-widest text-[#d4af37]">YES</span>
+                </button>
+                
+                <button (click)="selectOption('no')" class="group relative px-8 py-3 bg-transparent border border-white/30 hover:border-white/60 rounded transition-all duration-300">
+                   <span class="relative font-cinzel font-bold tracking-widest text-white/70 group-hover:text-white">NO</span>
+                </button>
+              </div>
+          </div>
 
-          <!-- NO -->
-          <button #noBtn 
-             class="group relative px-12 py-4 border border-white/10 hover:border-white/40 transition-all duration-500 rounded-sm"
-             (mouseenter)="onHover('no')"
-             (mouseleave)="onLeave()"
-             (click)="choose('no')">
-             <span class="relative z-10 text-white/50 font-cinzel tracking-[0.3em] group-hover:text-white transition-colors duration-300">NO</span>
-          </button>
+          <!-- Yes State -->
+          <div *ngIf="selection === 'yes'" class="animate-fade-in-up mt-8">
+              <div class="text-6xl mb-4 animate-bounce">❤️</div>
+              <h3 class="text-2xl font-cinzel text-[#d4af37] mb-2">I Love You Too!</h3>
+              <p class="text-white/60 text-sm mb-6">Welcome to the community.</p>
+              <button (click)="closePopup()" class="px-6 py-2 bg-white/10 hover:bg-white/20 rounded text-sm tracking-widest transition-colors">ENTER SITE</button>
+          </div>
 
+           <!-- No State -->
+           <div *ngIf="selection === 'no'" class="animate-fade-in-up mt-8">
+              <div class="text-6xl mb-4 animate-pulse">💔</div>
+              <h3 class="text-xl font-cinzel text-white/50 mb-6">Oh... implies you are missing out.</h3>
+              <button (click)="closePopup()" class="underline text-white/30 hover:text-white/80 transition-colors text-sm">Enter Site Anyway</button>
+          </div>
+
+        </div>
       </div>
-
-      <!-- Custom Cursor Outline (Follows mouse outside mask) -->
-      <div #cursorRing class="pointer-events-none fixed top-0 left-0 w-12 h-12 rounded-full border border-white/30 z-[100] transition-transform duration-75"></div>
-
-      <!-- Audio -->
-      <audio #audioQuestion src="assets/audio/question.mp3" preload="auto"></audio>
-      <audio #audioYes src="assets/audio/response_yes.mp3" preload="auto"></audio>
-      <audio #audioNo src="assets/audio/response_no.mp3" preload="auto"></audio>
-
-      <!-- Font -->
-      <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
     </div>
   `,
     styles: [`
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+      animation: fadeInUp 0.5s ease-out forwards;
+    }
     .font-cinzel { font-family: 'Cinzel', serif; }
+    .font-playfair { font-family: 'Playfair Display', serif; }
     .text-royal-gold { color: #D4AF37; }
-    .drop-shadow-gold { filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5)); }
   `]
 })
-export class WelcomePopupComponent implements OnInit, AfterViewInit, OnDestroy {
+export class WelcomePopupComponent implements OnInit {
     @Output() close = new EventEmitter<void>();
-
-    @ViewChild('dustCanvas') dustCanvas!: ElementRef<HTMLCanvasElement>;
-    @ViewChild('cursorRing') cursorRing!: ElementRef;
-    @ViewChild('spotlightLayer') spotlightLayer!: ElementRef;
-
-    @ViewChild('audioQuestion') audioQuestion!: ElementRef<HTMLAudioElement>;
-    @ViewChild('audioYes') audioYes!: ElementRef<HTMLAudioElement>;
-    @ViewChild('audioNo') audioNo!: ElementRef<HTMLAudioElement>;
-
     isVisible = true;
-    mouseX = window.innerWidth / 2;
-    mouseY = window.innerHeight / 2;
-    spotRadius = 300; // Initial radius
-
-    ctx!: CanvasRenderingContext2D;
-    particles: DustParticle[] = [];
-    animationFrameId: any;
-    mouseListener: any;
+    selection: 'yes' | 'no' | null = null;
 
     ngOnInit() {
+        // Prevent body scroll when popup is open
         document.body.style.overflow = 'hidden';
     }
 
-    ngAfterViewInit() {
-        this.initCanvas();
-        this.initInteraction();
-
-        // Intro: Light starts small and closed
-        this.spotRadius = 0;
-        gsap.to(this, { spotRadius: 300, duration: 2.5, ease: 'power2.out', delay: 0.5 });
-
-        setTimeout(() => {
-            this.audioQuestion.nativeElement.play().catch(() => { });
-        }, 1000);
-
-        this.loop();
+    selectOption(option: 'yes' | 'no') {
+        this.selection = option;
     }
 
-    ngOnDestroy() {
-        document.body.style.overflow = '';
-        if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-        if (this.mouseListener) window.removeEventListener('mousemove', this.mouseListener);
-        window.removeEventListener('resize', this.onResize);
-    }
-
-    // --- 1. Canvas (Dust Motes) ---
-    initCanvas() {
-        this.ctx = this.dustCanvas.nativeElement.getContext('2d')!;
-        this.onResize();
-        window.addEventListener('resize', () => this.onResize());
-
-        // Create lots of small dust
-        for (let i = 0; i < 80; i++) this.particles.push(new DustParticle(window.innerWidth, window.innerHeight));
-    }
-
-    onResize() {
-        if (this.dustCanvas) {
-            this.dustCanvas.nativeElement.width = window.innerWidth;
-            this.dustCanvas.nativeElement.height = window.innerHeight;
-        }
-    }
-
-    // --- 2. Interaction ---
-    initInteraction() {
-        this.mouseListener = (e: MouseEvent) => {
-            this.mouseX = e.clientX;
-            this.mouseY = e.clientY;
-
-            gsap.to(this.cursorRing.nativeElement, {
-                x: this.mouseX - 24,
-                y: this.mouseY - 24,
-                duration: 0.1
-            });
-        };
-        window.addEventListener('mousemove', this.mouseListener);
-    }
-
-    loop() {
-        this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-        // Only verify distance against "light" logic implicitly by mask, but for canvas we draw all.
-        // The canvas itself is masked by the parent div! So we don't need complex distance checks.
-        // The dust will only appear where the light is. Perfect.
-
-        for (let i = 0; i < this.particles.length; i++) {
-            const p = this.particles[i];
-            p.update();
-            p.draw(this.ctx);
-        }
-        this.animationFrameId = requestAnimationFrame(() => this.loop());
-    }
-
-    onHover(type: 'yes' | 'no') {
-        if (type === 'yes') {
-            // Focus light
-            gsap.to(this, { spotRadius: 500, duration: 1, ease: 'power2.out' });
-            gsap.to(this.cursorRing.nativeElement, { scale: 1.5, borderColor: '#D4AF37' });
-        }
-    }
-
-    onLeave() {
-        gsap.to(this, { spotRadius: 300, duration: 1, ease: 'power2.out' });
-        gsap.to(this.cursorRing.nativeElement, { scale: 1, borderColor: 'rgba(255,255,255,0.3)' });
-    }
-
-    choose(choice: 'yes' | 'no') {
-        const audio = choice === 'yes' ? this.audioYes.nativeElement : this.audioNo.nativeElement;
-        audio.play();
-
-        if (choice === 'yes') {
-            // LIGHTS ON: Expand radius to fill screen
-            gsap.to(this, {
-                spotRadius: Math.max(window.innerWidth, window.innerHeight) * 1.5,
-                duration: 2,
-                ease: 'power2.inOut',
-                onComplete: () => this.finish()
-            });
-
-            // Fade out UI
-            gsap.to(['button', '.text-center'], { opacity: 0, duration: 0.5 });
-
-        } else {
-            // BLACKOUT: Shrink radius to 0
-            gsap.to(this, { spotRadius: 0, duration: 0.8, ease: 'power2.in' });
-            gsap.to(this.cursorRing.nativeElement, { opacity: 0, duration: 0.2 });
-            setTimeout(() => this.finish(), 1500);
-        }
-    }
-
-    finish() {
+    closePopup() {
         this.isVisible = false;
+        document.body.style.overflow = '';
         this.close.emit();
     }
 }
 
-class DustParticle {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    size: number;
-    alpha: number;
-
-    constructor(w: number, h: number) {
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
-        this.vx = (Math.random() - 0.5) * 0.5;
-        this.vy = (Math.random() - 0.5) * 0.5;
-        this.size = Math.random() * 2;
-        this.alpha = Math.random() * 0.5 + 0.2;
-    }
-
-    update() {
-        this.x += this.vx;
-        this.y += this.vy;
-
-        // Wrap
-        if (this.x < 0) this.x = window.innerWidth;
-        if (this.x > window.innerWidth) this.x = 0;
-        if (this.y < 0) this.y = window.innerHeight;
-        if (this.y > window.innerHeight) this.y = 0;
-    }
-
-    draw(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = `rgba(255, 255, 200, ${this.alpha})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-    }
-}
