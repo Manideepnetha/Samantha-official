@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 // Define the interface here to match Backend model
@@ -74,6 +74,28 @@ export class ApiService {
 
   constructor(private http: HttpClient, private router: Router) { }
 
+  // --- MOCK DATA FOR FALLBACK ---
+  private mockMovies: Movie[] = [
+    { id: 1, title: 'Maa Inti Bangaram', year: 2025, releaseDate: 'Expected 2025', language: 'Telugu', genre: ['Drama'], role: 'Lead', director: 'TBA', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg', description: 'A heartwarming family drama.' },
+    { id: 2, title: 'Subham', year: 2025, releaseDate: 'May 9 2025', language: 'Telugu', genre: ['Drama'], role: 'Maata', director: 'TBA', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748018718/subham-et00440249-1747030168_rsxwsc.avif', description: 'Expected May 9, 2025.' },
+    { id: 3, title: 'Rakt Brahmand', year: 2025, releaseDate: '2025', language: 'Hindi', genre: ['Fantasy'], role: 'Lead', director: 'Rahi Anil Barve', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122747/20240727_100042_wgs661.jpg', description: 'A thrilling fantasy series.' },
+    { id: 4, title: 'Kushi', year: 2023, releaseDate: 'Sep 1, 2023', language: 'Telugu', genre: ['Romance'], role: 'Aradhya', director: 'Shiva Nirvana', poster: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122707/20220909_210838_vrhgsu.jpg', description: 'A love story.' }
+  ];
+
+  private mockNews: NewsArticle[] = [
+    { id: 1, title: 'Galatta Interview', date: 'May 15, 2025', excerpt: 'Candid conversation with Baradwaj Rangan.', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181752/1KBvNGVxuMg-HD_gvqzhe.jpg', link: '#' },
+    { id: 2, title: 'Celebrating 15 Years', date: 'April 28, 2025', excerpt: 'Special Apsara Awards 2025 Promo.', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181934/5SK0jFVolHU-HD_za0gfe.jpg', link: '#' },
+    { id: 3, title: 'Health Talk', date: 'April 10, 2025', excerpt: 'Samantha on health and lifestyle.', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748182251/oeK3C-9cbVc-HD_qzprbm.jpg', link: '#' }
+  ];
+
+  private mockGallery: MediaGallery[] = [
+    { id: 1, caption: 'Elegant Portrait', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045091/7fb8df223537765.67fa812e2e11a_y4wnfj.jpg', type: 'Home' },
+    { id: 2, caption: 'Traditional Look', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045106/behance_download_1696836520640_z70bkf.jpg', type: 'Home' },
+    { id: 3, caption: 'Candid Moment', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045105/RDT_20230918_1518324927662270333256076_x6bzvb.png', type: 'Home' },
+    { id: 4, caption: 'Majili Movie', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045289/Majili_aqbpbd.jpg', type: 'Home' },
+    { id: 5, caption: 'Glamorous Style', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045346/Samantha29_clxsnm.jpg', type: 'Home' }
+  ];
+
   // Movies
   // Movies Authentication & CRUD
   private getHeaders() {
@@ -86,11 +108,16 @@ export class ApiService {
   }
 
   getMovies(): Observable<Movie[]> {
-    return this.http.get<Movie[]>(`${this.apiUrl}/movies`);
+    return this.http.get<Movie[]>(`${this.apiUrl}/movies`)
+      .pipe(catchError(() => of(this.mockMovies)));
   }
 
   getMovie(id: number): Observable<Movie> {
-    return this.http.get<Movie>(`${this.apiUrl}/movies/${id}`);
+    return this.http.get<Movie>(`${this.apiUrl}/movies/${id}`)
+      .pipe(catchError(() => {
+        const m = this.mockMovies.find(x => x.id === id);
+        return m ? of(m) : of({} as Movie);
+      }));
   }
 
   createMovie(movie: Movie): Observable<Movie> {
@@ -107,7 +134,8 @@ export class ApiService {
 
   // Awards
   getAwards(): Observable<Award[]> {
-    return this.http.get<Award[]>(`${this.apiUrl}/awards`);
+    return this.http.get<Award[]>(`${this.apiUrl}/awards`)
+      .pipe(catchError(() => of([]))); // Empty mock for now
   }
 
   createAward(award: Award): Observable<Award> {
@@ -124,7 +152,8 @@ export class ApiService {
 
   // Philanthropy
   getPhilanthropies(): Observable<Philanthropy[]> {
-    return this.http.get<Philanthropy[]>(`${this.apiUrl}/philanthropy`);
+    return this.http.get<Philanthropy[]>(`${this.apiUrl}/philanthropy`)
+      .pipe(catchError(() => of([])));
   }
 
   createPhilanthropy(philanthropy: Philanthropy): Observable<Philanthropy> {
@@ -141,7 +170,8 @@ export class ApiService {
 
   // News
   getNews(): Observable<NewsArticle[]> {
-    return this.http.get<NewsArticle[]>(`${this.apiUrl}/news`);
+    return this.http.get<NewsArticle[]>(`${this.apiUrl}/news`)
+      .pipe(catchError(() => of(this.mockNews)));
   }
 
   createNews(news: NewsArticle): Observable<NewsArticle> {
@@ -158,7 +188,8 @@ export class ApiService {
 
   // Media Gallery
   getMediaGalleries(): Observable<MediaGallery[]> {
-    return this.http.get<MediaGallery[]>(`${this.apiUrl}/mediagallery`);
+    return this.http.get<MediaGallery[]>(`${this.apiUrl}/mediagallery`)
+      .pipe(catchError(() => of(this.mockGallery)));
   }
 
   createMediaGallery(media: MediaGallery): Observable<MediaGallery> {
@@ -175,7 +206,8 @@ export class ApiService {
 
   // Fashion
   getFashion(): Observable<FashionItem[]> {
-    return this.http.get<FashionItem[]>(`${this.apiUrl}/fashion`);
+    return this.http.get<FashionItem[]>(`${this.apiUrl}/fashion`)
+      .pipe(catchError(() => of([])));
   }
 
   createFashion(fashion: FashionItem): Observable<FashionItem> {
@@ -191,6 +223,7 @@ export class ApiService {
   }
 
   // Auth Methods
+  // ... (keep auth methods as is, login will just fail on Vercel which is expected for Admin)
   login(credentials: { email: string, password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/login`, credentials)
       .pipe(
