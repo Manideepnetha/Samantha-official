@@ -83,33 +83,34 @@ export class ApiService {
   // --- MOCK DATA FOR FALLBACK ---
   // Movies
   // Movies Authentication & CRUD
-  private getHeaders() {
+  private getOptions() {
     const token = this.getToken();
     return {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token || ''}`,
+        'Bypass-Tunnel-Reminder': 'true'
       }
     };
   }
 
   getMovies(): Observable<Movie[]> {
-    return this.http.get<Movie[]>(`${this.apiUrl}/movies`);
+    return this.http.get<Movie[]>(`${this.apiUrl}/movies`, this.getOptions());
   }
 
   getMovie(id: number): Observable<Movie> {
-    return this.http.get<Movie>(`${this.apiUrl}/movies/${id}`);
+    return this.http.get<Movie>(`${this.apiUrl}/movies/${id}`, this.getOptions());
   }
 
   createMovie(movie: Movie): Observable<Movie> {
-    return this.http.post<Movie>(`${this.apiUrl}/movies`, movie, this.getHeaders());
+    return this.http.post<Movie>(`${this.apiUrl}/movies`, movie, this.getOptions());
   }
 
   updateMovie(id: number, movie: Movie): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/movies/${id}`, movie, this.getHeaders());
+    return this.http.put<void>(`${this.apiUrl}/movies/${id}`, movie, this.getOptions());
   }
 
   deleteMovie(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/movies/${id}`, this.getHeaders());
+    return this.http.delete<void>(`${this.apiUrl}/movies/${id}`, this.getOptions());
   }
 
   // Awards
