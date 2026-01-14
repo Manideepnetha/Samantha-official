@@ -75,7 +75,8 @@ export interface FashionItem {
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:5035/api';
+  // private apiUrl = 'http://localhost:5035/api';
+  private apiUrl = 'https://five-papers-follow.loca.lt/api';
 
   constructor(private http: HttpClient, private router: Router) { }
 
