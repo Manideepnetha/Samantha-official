@@ -1,0 +1,8 @@
+**/.dockerignore
+**/.env
+**/bin
+**/obj
+.git
+.vs
+*.log
+*.sql
