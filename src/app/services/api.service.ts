@@ -76,7 +76,7 @@ export interface FashionItem {
 })
 export class ApiService {
   // private apiUrl = 'http://localhost:5035/api';
-  private apiUrl = 'https://five-papers-follow.loca.lt/api';
+  private apiUrl = 'https://samantha-official-website-api.onrender.com/api';
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -119,15 +119,15 @@ export class ApiService {
   }
 
   createAward(award: Award): Observable<Award> {
-    return this.http.post<Award>(`${this.apiUrl}/awards`, award, this.getHeaders());
+    return this.http.post<Award>(`${this.apiUrl}/awards`, award, this.getOptions());
   }
 
   updateAward(id: number, award: Award): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/awards/${id}`, award, this.getHeaders());
+    return this.http.put<void>(`${this.apiUrl}/awards/${id}`, award, this.getOptions());
   }
 
   deleteAward(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/awards/${id}`, this.getHeaders());
+    return this.http.delete<void>(`${this.apiUrl}/awards/${id}`, this.getOptions());
   }
 
   // Philanthropy
@@ -136,15 +136,15 @@ export class ApiService {
   }
 
   createPhilanthropy(philanthropy: Philanthropy): Observable<Philanthropy> {
-    return this.http.post<Philanthropy>(`${this.apiUrl}/philanthropy`, philanthropy, this.getHeaders());
+    return this.http.post<Philanthropy>(`${this.apiUrl}/philanthropy`, philanthropy, this.getOptions());
   }
 
   updatePhilanthropy(id: number, philanthropy: Philanthropy): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/philanthropy/${id}`, philanthropy, this.getHeaders());
+    return this.http.put<void>(`${this.apiUrl}/philanthropy/${id}`, philanthropy, this.getOptions());
   }
 
   deletePhilanthropy(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/philanthropy/${id}`, this.getHeaders());
+    return this.http.delete<void>(`${this.apiUrl}/philanthropy/${id}`, this.getOptions());
   }
 
   // News
@@ -153,15 +153,15 @@ export class ApiService {
   }
 
   createNews(news: NewsArticle): Observable<NewsArticle> {
-    return this.http.post<NewsArticle>(`${this.apiUrl}/news`, news, this.getHeaders());
+    return this.http.post<NewsArticle>(`${this.apiUrl}/news`, news, this.getOptions());
   }
 
   updateNews(id: number, news: NewsArticle): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/news/${id}`, news, this.getHeaders());
+    return this.http.put<void>(`${this.apiUrl}/news/${id}`, news, this.getOptions());
   }
 
   deleteNews(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/news/${id}`, this.getHeaders());
+    return this.http.delete<void>(`${this.apiUrl}/news/${id}`, this.getOptions());
   }
 
   // Media Gallery
@@ -170,15 +170,15 @@ export class ApiService {
   }
 
   createMediaGallery(media: MediaGallery): Observable<MediaGallery> {
-    return this.http.post<MediaGallery>(`${this.apiUrl}/mediagallery`, media, this.getHeaders());
+    return this.http.post<MediaGallery>(`${this.apiUrl}/mediagallery`, media, this.getOptions());
   }
 
   updateMediaGallery(id: number, media: MediaGallery): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/mediagallery/${id}`, media, this.getHeaders());
+    return this.http.put<void>(`${this.apiUrl}/mediagallery/${id}`, media, this.getOptions());
   }
 
   deleteMediaGallery(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/mediagallery/${id}`, this.getHeaders());
+    return this.http.delete<void>(`${this.apiUrl}/mediagallery/${id}`, this.getOptions());
   }
 
   // Fashion
@@ -187,15 +187,15 @@ export class ApiService {
   }
 
   createFashion(fashion: FashionItem): Observable<FashionItem> {
-    return this.http.post<FashionItem>(`${this.apiUrl}/fashion`, fashion, this.getHeaders());
+    return this.http.post<FashionItem>(`${this.apiUrl}/fashion`, fashion, this.getOptions());
   }
 
   updateFashion(id: number, fashion: FashionItem): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/fashion/${id}`, fashion, this.getHeaders());
+    return this.http.put<void>(`${this.apiUrl}/fashion/${id}`, fashion, this.getOptions());
   }
 
   deleteFashion(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/fashion/${id}`, this.getHeaders());
+    return this.http.delete<void>(`${this.apiUrl}/fashion/${id}`, this.getOptions());
   }
 
   // Auth Methods
