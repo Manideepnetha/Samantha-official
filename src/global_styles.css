@@ -20,8 +20,8 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  border: 6px solid #ffffff;
-  /* The White Frame */
+  /* Frame only on Desktop (md+) */
+  @apply border-0 md:border-[6px] border-white;
   min-height: 100vh;
   box-sizing: border-box;
 }
@@ -34,7 +34,8 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  border: 6px solid #ffffff;
+  /* Frame only on Desktop (md+) */
+  @apply border-0 md:border-[6px] border-white;
   pointer-events: none;
   z-index: 9999;
 }
