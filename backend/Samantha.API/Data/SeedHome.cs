@@ -53,39 +53,8 @@ public static class SeedHome
             context.MediaGalleries.AddRange(gallery);
         }
 
-        // 3. Upcoming Movies
-        // Check if "Rakt Brahmand" exists, if not add it
-        if (!context.Movies.Any(m => m.Title == "Rakt Brahmand"))
-        {
-            context.Movies.Add(new Movie
-            {
-                Title = "Rakt Brahmand",
-                Year = 2026, // Future year
-                ReleaseDate = "To be announced",
-                Language = "Hindi/Telugu",
-                Genre = new List<string> { "Thriller", "Action" },
-                Role = "Lead",
-                Director = "Rahi Anil Barve",
-                Poster = "", // No poster yet or placeholder
-                Description = "A thrilling new project."
-            });
-        }
-
-        if (!context.Movies.Any(m => m.Title == "Maa Inti Bangaram"))
-        {
-            context.Movies.Add(new Movie
-            {
-                Title = "Maa Inti Bangaram",
-                Year = 2026,
-                ReleaseDate = "To be announced",
-                Language = "Telugu",
-                Genre = new List<string> { "Drama" },
-                Role = "Lead",
-                Director = "To be announced",
-                Poster = "",
-                Description = "A heartwarming family drama."
-            });
-        }
+        // 3. Upcoming Movies - removed to prevent reappearing after delete
+        // context.Movies.Add(...) logic removed.
 
         context.SaveChanges();
     }
