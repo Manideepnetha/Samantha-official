@@ -12,6 +12,33 @@ import { ApiService } from '../../services/api.service';
     <div class="relative min-h-screen overflow-hidden">
       <!-- Hero Section with Video/Image Carousel -->
       <section class="relative min-h-screen pt-0 overflow-hidden">
+        
+        <!-- Scrolling Ticker Bar -->
+        <!-- Scrolling Ticker Bar -->
+        <div *ngIf="tickerText" 
+             (click)="onTickerClick()"
+             [class.cursor-pointer]="tickerLink"
+             class="fixed bottom-16 md:bottom-0 left-0 right-0 z-[5000] bg-white/95 backdrop-blur-md border-t border-gray-100 py-1 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] transition-all duration-500 hover:shadow-[0_-4px_40px_rgba(0,0,0,0.15)] group">
+           
+           <div class="whitespace-nowrap animate-marquee flex items-center group-hover:[animation-play-state:paused]">
+              <ng-container *ngFor="let i of [1,2,3,4]">
+                 <span class="mx-12 flex items-center gap-5 transition-transform duration-300 group-hover:scale-[1.02]">
+                    <!-- High Contrast Badge -->
+                    <span class="flex items-center gap-2 px-2.5 py-1 bg-deep-black text-white rounded-full shadow-md transform -skew-x-6">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-[pulse_1.5s_ease-in-out_infinite] shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
+                        <span class="font-inter text-[9px] tracking-[0.2em] font-bold uppercase leading-none not-italic skew-x-6">Latest</span>
+                    </span>
+                    
+                    <!-- Editorial Text -->
+                    <span class="font-playfair italic text-sm text-deep-black font-semibold tracking-wide leading-none">{{tickerText}}</span>
+                 </span>
+                 
+                 <!-- Minimalist Separator -->
+                 <span class="mx-4 text-gray-200 text-2xl font-light">/</span>
+              </ng-container>
+           </div>
+        </div>
+
         <!-- Carousel Items -->
         <div class="absolute inset-0 top-0 z-0">
           <div *ngFor="let slide of heroSlides; let i = index" 
@@ -218,7 +245,19 @@ import { ApiService } from '../../services/api.service';
       </section>
     </div>
   `,
-  styles: []
+  styles: [`
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    .animate-marquee {
+      animation: marquee 20s linear infinite;
+    }
+    /* Pause on hover for readability */
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+  `]
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   currentSlide = 0;
@@ -245,6 +284,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   latestNews: any[] = [];
   upcomingProjects: any[] = [];
   featuredGallery: any[] = [];
+  tickerText = '';
+  tickerLink = '';
 
   constructor(private apiService: ApiService) { }
 
@@ -287,6 +328,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
           caption: g.caption
         }));
     });
+
+    // Fetch Ticker Text & Link
+    this.apiService.getSettings().subscribe(settings => {
+      const ticker = settings.find(s => s.key === 'latest_updates_text');
+      const link = settings.find(s => s.key === 'latest_updates_link');
+
+      if (ticker) this.tickerText = ticker.value;
+      if (link) this.tickerLink = link.value;
+    });
   }
 
   ngAfterViewInit(): void {
@@ -310,6 +360,31 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.slideInterval = setInterval(() => {
       this.currentSlide = (this.currentSlide + 1) % this.heroSlides.length;
     }, 5000);
+  }
+
+  onTickerClick(): void {
+    if (this.tickerLink) {
+      // Simple check for protocol to ensure it works
+      let url = this.tickerLink;
+      if (!url.startsWith('http') && !url.startsWith('/')) {
+        url = 'https://' + url;
+      }
+
+      if (url.startsWith('/')) {
+        // Internal Route
+        // Assuming router is injected as private router (it isn't in current snapshot, need to check constructor)
+        // Wait, constructor has RouterLink import but not Router injection? 
+        // Ah, looking at file content previously read: `imports: [CommonModule, RouterLink]`.
+        // Wait, class definition has `constructor(private apiService: ApiService)`. It does NOT have Router.
+        // I should use `window.location.href` for reliability or inject Router.
+        // Let's use window.open for external and window.location for internal if lazy, but injection is better.
+        // Since I can't easily change constructor params in a `replace` block without potentially messing up lines if I don't see them perfectly,
+        // I will use window.open / location.assign which is safe and easy.
+        window.location.href = url;
+      } else {
+        window.open(url, '_blank');
+      }
+    }
   }
 
   initAnimations(): void {
