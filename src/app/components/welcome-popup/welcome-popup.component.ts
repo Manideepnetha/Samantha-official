@@ -100,6 +100,8 @@ export class WelcomePopupComponent implements OnInit {
   noAudioUrl = '';
   enterAudioUrl = '';
 
+  private currentAudio: HTMLAudioElement | null = null;
+
   constructor(private apiService: ApiService) { }
 
   ngOnInit() {
@@ -117,22 +119,36 @@ export class WelcomePopupComponent implements OnInit {
     });
   }
 
+  stopAudio() {
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      this.currentAudio = null;
+    }
+  }
+
   selectOption(option: 'yes' | 'no') {
     this.selection = option;
+
+    // Stop previous audio
+    this.stopAudio();
 
     // Play Audio
     const url = option === 'yes' ? this.yesAudioUrl : this.noAudioUrl;
     if (url) {
-      const audio = new Audio(url);
-      audio.play().catch(e => console.error('Audio play failed', e));
+      this.currentAudio = new Audio(url);
+      this.currentAudio.play().catch(e => console.error('Audio play failed', e));
     }
   }
 
   onEnterSite() {
+    // Stop previous audio (e.g. Yes/No response audio)
+    this.stopAudio();
+
     // Play Enter Site Audio if available
     if (this.enterAudioUrl) {
-      const audio = new Audio(this.enterAudioUrl);
-      audio.play().catch(e => console.error('Audio play failed', e));
+      this.currentAudio = new Audio(this.enterAudioUrl);
+      this.currentAudio.play().catch(e => console.error('Audio play failed', e));
     }
     this.closePopup();
   }

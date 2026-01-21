@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, concat } from 'rxjs';
 import { tap, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
@@ -112,8 +112,32 @@ export class ApiService {
     };
   }
 
+  // --- STORAGE HELPERS ---
+  private saveToStorage(key: string, data: any) {
+    try {
+      localStorage.setItem(`cache_${key}`, JSON.stringify(data));
+    } catch (e) {
+      console.warn('LocalStorage save failed', e);
+    }
+  }
+
+  private loadFromStorage<T>(key: string): T | null {
+    try {
+      const item = localStorage.getItem(`cache_${key}`);
+      return item ? JSON.parse(item) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  private removeFromStorage(key: string) {
+    localStorage.removeItem(`cache_${key}`);
+  }
+
   // Helper to clear cache (call on create/update/delete)
   private clearCache(key: 'movies' | 'awards' | 'philanthropy' | 'news' | 'media' | 'fashion' | 'settings') {
+    // We clear both memory cache and storage cache to ensure fresh fetch
+    this.removeFromStorage(key);
     switch (key) {
       case 'movies': this.moviesCache$ = null; break;
       case 'awards': this.awardsCache$ = null; break;
@@ -127,10 +151,23 @@ export class ApiService {
 
   // --- MOVIES ---
   getMovies(): Observable<Movie[]> {
+    // Stale-While-Revalidate Pattern
+    const cached = this.loadFromStorage<Movie[]>('movies');
+
+    // Always setup the network request (shared)
     if (!this.moviesCache$) {
       this.moviesCache$ = this.http.get<Movie[]>(`${this.apiUrl}/movies`, this.getOptions())
-        .pipe(shareReplay(1));
+        .pipe(
+          tap(data => this.saveToStorage('movies', data)),
+          shareReplay(1)
+        );
     }
+
+    // If we have cached data, return it first, then the network response
+    if (cached) {
+      return concat(of(cached), this.moviesCache$);
+    }
+
     return this.moviesCache$;
   }
 
@@ -203,9 +240,18 @@ export class ApiService {
 
   // --- NEWS ---
   getNews(): Observable<NewsArticle[]> {
+    const cached = this.loadFromStorage<NewsArticle[]>('news');
+
     if (!this.newsCache$) {
       this.newsCache$ = this.http.get<NewsArticle[]>(`${this.apiUrl}/news`)
-        .pipe(shareReplay(1));
+        .pipe(
+          tap(data => this.saveToStorage('news', data)),
+          shareReplay(1)
+        );
+    }
+
+    if (cached) {
+      return concat(of(cached), this.newsCache$);
     }
     return this.newsCache$;
   }
@@ -227,9 +273,18 @@ export class ApiService {
 
   // --- MEDIA GALLERY ---
   getMediaGalleries(): Observable<MediaGallery[]> {
+    const cached = this.loadFromStorage<MediaGallery[]>('media');
+
     if (!this.mediaCache$) {
       this.mediaCache$ = this.http.get<MediaGallery[]>(`${this.apiUrl}/mediagallery`)
-        .pipe(shareReplay(1));
+        .pipe(
+          tap(data => this.saveToStorage('media', data)),
+          shareReplay(1)
+        );
+    }
+
+    if (cached) {
+      return concat(of(cached), this.mediaCache$);
     }
     return this.mediaCache$;
   }
@@ -280,9 +335,18 @@ export class ApiService {
 
   // --- SITE SETTINGS ---
   getSettings(): Observable<SiteSetting[]> {
+    const cached = this.loadFromStorage<SiteSetting[]>('settings');
+
     if (!this.settingsCache$) {
       this.settingsCache$ = this.http.get<SiteSetting[]>(`${this.apiUrl}/settings`, this.getOptions())
-        .pipe(shareReplay(1));
+        .pipe(
+          tap(data => this.saveToStorage('settings', data)),
+          shareReplay(1)
+        );
+    }
+
+    if (cached) {
+      return concat(of(cached), this.settingsCache$);
     }
     return this.settingsCache$;
   }
