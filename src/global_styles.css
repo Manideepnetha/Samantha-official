@@ -20,9 +20,31 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  border: 6px solid #ffffff;
+  /* The White Frame */
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
-h1, h2, h3, h4, h5, h6 {
+/* Ensure the border stays on top/visible */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 6px solid #ffffff;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   @apply font-playfair font-bold;
 }
 
@@ -53,12 +75,10 @@ h1, h2, h3, h4, h5, h6 {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    to right, 
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%);
   transform: rotate(30deg);
   animation: shimmer 3s infinite;
 }
@@ -67,6 +87,7 @@ h1, h2, h3, h4, h5, h6 {
   0% {
     transform: translateX(-100%) rotate(30deg);
   }
+
   100% {
     transform: translateX(100%) rotate(30deg);
   }
@@ -78,19 +99,31 @@ h1, h2, h3, h4, h5, h6 {
   border-right: .15em solid var(--royal-gold);
   white-space: nowrap;
   margin: 0 auto;
-  animation: 
+  animation:
     typing 3.5s steps(30, end),
     blink-caret .75s step-end infinite;
 }
 
 @keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
+  from {
+    width: 0
+  }
+
+  to {
+    width: 100%
+  }
 }
 
 @keyframes blink-caret {
-  from, to { border-color: transparent }
-  50% { border-color: var(--royal-gold) }
+
+  from,
+  to {
+    border-color: transparent
+  }
+
+  50% {
+    border-color: var(--royal-gold)
+  }
 }
 
 /* Custom scrollbar */
@@ -142,7 +175,7 @@ h1, h2, h3, h4, h5, h6 {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
@@ -171,13 +204,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .submit-button:hover {
-  box-shadow: 
+  box-shadow:
     0 0 30px rgba(168, 85, 247, 0.6),
     0 8px 25px rgba(0, 0, 0, 0.3);
 }
@@ -187,7 +228,7 @@ h1, h2, h3, h4, h5, h6 {
   .floating-initials {
     font-size: 12rem;
   }
-  
+
   .glass-morphism {
     margin: 1rem;
     padding: 1.5rem;
@@ -196,7 +237,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Enhanced focus states for accessibility */
 .floating-label-input:focus {
-  box-shadow: 
+  box-shadow:
     0 0 0 3px rgba(168, 85, 247, 0.3),
     0 4px 12px rgba(0, 0, 0, 0.2);
 }
