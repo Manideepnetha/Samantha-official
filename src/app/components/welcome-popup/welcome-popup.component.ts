@@ -1,12 +1,13 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../services/api.service';
 
 @Component({
-    selector: 'app-welcome-popup',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-welcome-popup',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
     <div *ngIf="isVisible" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       <!-- Backdrop -->
       <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" (click)="closePopup()"></div>
@@ -77,7 +78,7 @@ import { FormsModule } from '@angular/forms';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -91,23 +92,43 @@ import { FormsModule } from '@angular/forms';
   `]
 })
 export class WelcomePopupComponent implements OnInit {
-    @Output() close = new EventEmitter<void>();
-    isVisible = true;
-    selection: 'yes' | 'no' | null = null;
+  @Output() close = new EventEmitter<void>();
+  isVisible = true;
+  selection: 'yes' | 'no' | null = null;
 
-    ngOnInit() {
-        // Prevent body scroll when popup is open
-        document.body.style.overflow = 'hidden';
-    }
+  yesAudioUrl = '';
+  noAudioUrl = '';
 
-    selectOption(option: 'yes' | 'no') {
-        this.selection = option;
-    }
+  constructor(private apiService: ApiService) { }
 
-    closePopup() {
-        this.isVisible = false;
-        document.body.style.overflow = '';
-        this.close.emit();
+  ngOnInit() {
+    // Prevent body scroll when popup is open
+    document.body.style.overflow = 'hidden';
+
+    // Load Audio Settings
+    this.apiService.getSettings().subscribe(settings => {
+      const yes = settings.find(s => s.key === 'yes_audio');
+      const no = settings.find(s => s.key === 'no_audio');
+      if (yes) this.yesAudioUrl = yes.value;
+      if (no) this.noAudioUrl = no.value;
+    });
+  }
+
+  selectOption(option: 'yes' | 'no') {
+    this.selection = option;
+
+    // Play Audio
+    const url = option === 'yes' ? this.yesAudioUrl : this.noAudioUrl;
+    if (url) {
+      const audio = new Audio(url);
+      audio.play().catch(e => console.error('Audio play failed', e));
     }
+  }
+
+  closePopup() {
+    this.isVisible = false;
+    document.body.style.overflow = '';
+    this.close.emit();
+  }
 }
 

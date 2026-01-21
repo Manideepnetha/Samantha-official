@@ -14,17 +14,17 @@ module.exports = {
         'charcoal': '#2B2B2B',
         'lavender-mist': '#E6E0F8',
 
-        // Admin Premium Theme
-        'admin-dark': '#0a0a0a',      // Ultra dark base
-        'admin-card': '#141414',      // Card background
-        'admin-accent': '#6366f1',    // Indigo/Violet accent
+        // Admin Premium Theme (Official Light)
+        'admin-dark': '#F9FAFB',      // Light Gray Base
+        'admin-card': '#FFFFFF',      // White Cards
+        'admin-accent': '#D4AF37',    // Royal Gold
         'admin-success': '#10b981',   // Emerald
         'admin-warning': '#f59e0b',   // Amber
         'admin-danger': '#ef4444',    // Red
-        'admin-glass': 'rgba(255, 255, 255, 0.05)', // Glass effect
-        'admin-border': '#333333',
-        'admin-text-main': '#f3f4f6',
-        'admin-text-muted': '#9ca3af',
+        'admin-glass': 'rgba(255, 255, 255, 0.8)', // White Glass
+        'admin-border': '#E5E7EB',    // Light Border
+        'admin-text-main': '#111827', // Dark Text
+        'admin-text-muted': '#6B7280', // Gray Text
       },
       fontFamily: {
         'playfair': ['"Playfair Display"', 'serif'],

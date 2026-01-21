@@ -16,9 +16,7 @@ import { ApiService } from '../../../services/api.service';
         
         <!-- Brand -->
         <div class="h-20 flex items-center justify-center border-b border-admin-border relative overflow-hidden group">
-            <div [class.opacity-0]="!isSidebarOpen" class="absolute transition-opacity duration-300">
-                <h1 class="font-playfair font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-royal-gold to-white tracking-wider">SAMANTHA</h1>
-            </div>
+                <h1 class="font-playfair font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-royal-gold to-gray-800 tracking-wider">SAMANTHA</h1>
              <div [class.opacity-0]="isSidebarOpen" class="absolute transition-opacity duration-300">
                 <span class="font-playfair font-bold text-2xl text-royal-gold">S</span>
             </div>
@@ -32,10 +30,10 @@ import { ApiService } from '../../../services/api.service';
           <div *ngIf="isSidebarOpen" class="px-3 mb-2 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Overview</div>
 
           <a routerLink="/admin/dashboard" routerLinkActive="bg-admin-accent text-white shadow-neon" 
-             class="flex items-center px-3 py-3 rounded-xl text-admin-text-muted hover:bg-admin-glass hover:text-white transition-all group relative overflow-hidden">
+             class="flex items-center px-3 py-3 rounded-xl text-admin-text-muted hover:bg-admin-glass hover:text-admin-accent transition-all group relative overflow-hidden">
             <svg class="w-6 h-6 min-w-[24px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
             <span [class.opacity-0]="!isSidebarOpen" [class.translate-x-10]="!isSidebarOpen" class="ml-3 font-medium transition-all duration-300 whitespace-nowrap">Dashboard</span>
-            <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="absolute inset-0 bg-admin-accent/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </a>
 
           <div *ngIf="isSidebarOpen" class="px-3 mt-6 mb-2 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Content</div>
@@ -43,7 +41,7 @@ import { ApiService } from '../../../services/api.service';
           <!-- Menu Application Items -->
           <ng-container *ngFor="let item of menuItems">
              <a [routerLink]="item.link" routerLinkActive="bg-admin-accent text-white shadow-neon"
-                class="flex items-center px-3 py-3 rounded-xl text-admin-text-muted hover:bg-admin-glass hover:text-white transition-all group relative overflow-hidden">
+                class="flex items-center px-3 py-3 rounded-xl text-admin-text-muted hover:bg-admin-glass hover:text-admin-accent transition-all group relative overflow-hidden">
                 <span class="w-6 h-6 min-w-[24px] flex items-center justify-center min-h-[24px]" [innerHTML]="item.icon"></span>
                 <span [class.opacity-0]="!isSidebarOpen" [class.translate-x-10]="!isSidebarOpen" class="ml-3 font-medium transition-all duration-300 whitespace-nowrap">{{ item.label }}</span>
              </a>
@@ -58,10 +56,10 @@ import { ApiService } from '../../../services/api.service';
                   <div class="w-full h-full rounded-full bg-black flex items-center justify-center text-xs font-bold text-royal-gold">AD</div>
               </div>
               <div [class.opacity-0]="!isSidebarOpen" [class.w-0]="!isSidebarOpen" class="ml-3 text-left overflow-hidden transition-all duration-300">
-                  <p class="text-sm font-medium text-white truncate">Admin User</p>
+                  <p class="text-sm font-medium text-admin-text-main truncate">Admin User</p>
                   <p class="text-xs text-admin-text-muted truncate">admin&#64;samantha.com</p>
               </div>
-              <svg *ngIf="isSidebarOpen" class="w-4 h-4 ml-auto text-admin-text-muted group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+              <svg *ngIf="isSidebarOpen" class="w-4 h-4 ml-auto text-admin-text-muted group-hover:text-admin-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
            </button>
         </div>
       </aside>
@@ -76,13 +74,13 @@ import { ApiService } from '../../../services/api.service';
          <header class="h-20 sticky top-0 z-40 px-8 flex items-center justify-between backdrop-blur-md bg-admin-dark/80 border-b border-admin-border/50">
             <!-- Sidebar Toggle & Breadcrumb -->
             <div class="flex items-center gap-6">
-                <button (click)="toggleSidebar()" class="p-2 rounded-lg text-admin-text-muted hover:text-white hover:bg-admin-glass transition-colors">
+                <button (click)="toggleSidebar()" class="p-2 rounded-lg text-admin-text-muted hover:text-admin-accent hover:bg-admin-glass transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
                 </button>
                 <div class="hidden md:flex items-center text-sm font-medium text-admin-text-muted">
                     <span class="text-admin-accent">Admin</span>
                     <span class="mx-2">/</span>
-                    <span class="text-white">Dashboard</span>
+                    <span class="text-admin-text-main">Dashboard</span>
                 </div>
             </div>
 
@@ -99,7 +97,7 @@ import { ApiService } from '../../../services/api.service';
 
             <!-- Actions -->
             <div class="flex items-center gap-4">
-                <button class="p-2 relative rounded-lg text-admin-text-muted hover:text-white hover:bg-admin-glass transition-all">
+                <button class="p-2 relative rounded-lg text-admin-text-muted hover:text-admin-accent hover:bg-admin-glass transition-all">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                     <span class="absolute top-2 right-2 w-2 h-2 bg-admin-danger rounded-full border border-admin-dark animate-pulse"></span>
                 </button>
@@ -157,6 +155,11 @@ export class AdminLayoutComponent {
       label: 'Philanthropy',
       link: '/admin/philanthropy',
       icon: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>'
+    },
+    {
+      label: 'Settings',
+      link: '/admin/settings',
+      icon: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>'
     },
   ];
 

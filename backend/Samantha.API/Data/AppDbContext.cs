@@ -18,4 +18,5 @@ public class AppDbContext : DbContext
     public DbSet<NewsArticle> NewsArticles { get; set; }
     public DbSet<MediaGallery> MediaGalleries { get; set; }
     public DbSet<FashionItem> FashionItems { get; set; }
+    public DbSet<SiteSetting> SiteSettings { get; set; }
 }

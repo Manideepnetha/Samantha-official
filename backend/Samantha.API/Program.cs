@@ -105,6 +105,23 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 
+    // Auto-create SiteSettings table if missing (Production Safety)
+    try 
+    {
+        db.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS ""SiteSettings"" (
+                ""Id"" serial NOT NULL,
+                ""Key"" text NOT NULL,
+                ""Value"" text NOT NULL,
+                CONSTRAINT ""PK_SiteSettings"" PRIMARY KEY (""Id"")
+            );
+        ");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error checking/creating SiteSettings table: " + ex.Message);
+    }
+
     // Seed Movies
     SeedMovies.Initialize(db);
     // Seed Awards

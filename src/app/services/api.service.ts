@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { tap, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
-// ... (keep interfaces as they are, no changes needed to them)
 export interface Movie {
   id: number;
   title: string;
@@ -71,6 +70,21 @@ export interface FashionItem {
   type?: string;
 }
 
+export interface ContactMessage {
+  id?: number;
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+  submittedAt?: string;
+}
+
+export interface SiteSetting {
+  id: number;
+  key: string;
+  value: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -84,6 +98,7 @@ export class ApiService {
   private newsCache$: Observable<NewsArticle[]> | null = null;
   private mediaCache$: Observable<MediaGallery[]> | null = null;
   private fashionCache$: Observable<FashionItem[]> | null = null;
+  private settingsCache$: Observable<SiteSetting[]> | null = null;
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -98,7 +113,7 @@ export class ApiService {
   }
 
   // Helper to clear cache (call on create/update/delete)
-  private clearCache(key: 'movies' | 'awards' | 'philanthropy' | 'news' | 'media' | 'fashion') {
+  private clearCache(key: 'movies' | 'awards' | 'philanthropy' | 'news' | 'media' | 'fashion' | 'settings') {
     switch (key) {
       case 'movies': this.moviesCache$ = null; break;
       case 'awards': this.awardsCache$ = null; break;
@@ -106,6 +121,7 @@ export class ApiService {
       case 'news': this.newsCache$ = null; break;
       case 'media': this.mediaCache$ = null; break;
       case 'fashion': this.fashionCache$ = null; break;
+      case 'settings': this.settingsCache$ = null; break;
     }
   }
 
@@ -257,6 +273,29 @@ export class ApiService {
     return this.http.delete<void>(`${this.apiUrl}/fashion/${id}`, this.getOptions());
   }
 
+  // --- CONTACTS ---
+  getContactMessages(): Observable<ContactMessage[]> {
+    return this.http.get<ContactMessage[]>(`${this.apiUrl}/contact`, this.getOptions());
+  }
+
+  // --- SITE SETTINGS ---
+  getSettings(): Observable<SiteSetting[]> {
+    if (!this.settingsCache$) {
+      this.settingsCache$ = this.http.get<SiteSetting[]>(`${this.apiUrl}/settings`, this.getOptions())
+        .pipe(shareReplay(1));
+    }
+    return this.settingsCache$;
+  }
+
+  getSetting(key: string): Observable<SiteSetting> {
+    return this.http.get<SiteSetting>(`${this.apiUrl}/settings/${key}`, this.getOptions());
+  }
+
+  upsertSetting(setting: SiteSetting): Observable<SiteSetting> {
+    this.clearCache('settings');
+    return this.http.post<SiteSetting>(`${this.apiUrl}/settings`, setting, this.getOptions());
+  }
+
   // --- AUTH ---
   login(credentials: { email: string, password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/login`, credentials)
@@ -282,6 +321,7 @@ export class ApiService {
     this.clearCache('news');
     this.clearCache('media');
     this.clearCache('fashion');
+    this.clearCache('settings');
     this.router.navigate(['/login']);
   }
 

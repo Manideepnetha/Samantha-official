@@ -131,3 +131,10 @@ public class FashionItem
     public required string ImageUrl { get; set; }
     public string? Link { get; set; }
 }
+
+public class SiteSetting
+{
+    public int Id { get; set; }
+    public required string Key { get; set; }
+    public required string Value { get; set; }
+}

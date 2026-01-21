@@ -1,291 +1,335 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
-import { Chart, registerables, ChartConfiguration, ChartType } from 'chart.js';
+import { Chart, registerables, ChartConfiguration } from 'chart.js';
+import { ApiService, Movie, Award, Philanthropy, NewsArticle } from '../../../services/api.service';
+import { forkJoin } from 'rxjs';
 
 Chart.register(...registerables);
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, BaseChartDirective],
-  template: `
-    <div class="space-y-8 animate-float">
-      
-      <!-- Welcome Section -->
-      <div class="flex items-end justify-between">
-         <div>
-            <h2 class="text-3xl font-playfair font-bold text-white mb-2">Welcome back, Admin</h2>
-            <p class="text-admin-text-muted">Here's what's happening with your website today.</p>
-         </div>
-         <div class="flex gap-3">
-            <button class="px-4 py-2 bg-admin-card border border-admin-border text-admin-text-main rounded-lg hover:border-admin-accent transition-colors text-sm">Download Report</button>
-            <button class="px-4 py-2 bg-admin-accent text-white rounded-lg shadow-neon hover:bg-opacity-90 transition-all text-sm font-medium">Create Campaign</button>
-         </div>
-      </div>
-
-      <!-- KPI Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-         <!-- Card 1 -->
-         <div class="bg-admin-card border border-admin-border p-6 rounded-2xl relative overflow-hidden group hover:border-admin-accent/50 transition-all duration-300">
-            <div class="absolute inset-0 bg-gradient-to-br from-admin-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="p-2 bg-admin-dark rounded-lg text-admin-accent">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    </div>
-                    <span class="text-xs font-medium text-admin-success bg-admin-success/10 px-2 py-1 rounded-full">+12.5%</span>
-                </div>
-                <h3 class="text-3xl font-bold text-white mb-1">12,345</h3>
-                <p class="text-sm text-admin-text-muted">Total Visitors</p>
-            </div>
-         </div>
-
-         <!-- Card 2 -->
-         <div class="bg-admin-card border border-admin-border p-6 rounded-2xl relative overflow-hidden group hover:border-admin-warning/50 transition-all duration-300">
-            <div class="absolute inset-0 bg-gradient-to-br from-admin-warning/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="p-2 bg-admin-dark rounded-lg text-admin-warning">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    </div>
-                    <span class="text-xs font-medium text-admin-success bg-admin-success/10 px-2 py-1 rounded-full">+8.2%</span>
-                </div>
-                <h3 class="text-3xl font-bold text-white mb-1">45.2k</h3>
-                <p class="text-sm text-admin-text-muted">Page Views</p>
-            </div>
-         </div>
-
-         <!-- Card 3 -->
-         <div class="bg-admin-card border border-admin-border p-6 rounded-2xl relative overflow-hidden group hover:border-royal-gold/50 transition-all duration-300">
-             <div class="absolute inset-0 bg-gradient-to-br from-royal-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-             <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="p-2 bg-admin-dark rounded-lg text-royal-gold">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </div>
-                    <span class="text-xs font-medium text-admin-danger bg-admin-danger/10 px-2 py-1 rounded-full">-2.4%</span>
-                </div>
-                <h3 class="text-3xl font-bold text-white mb-1">$12.4k</h3>
-                <p class="text-sm text-admin-text-muted">Ad Revenue</p>
-             </div>
-         </div>
-
-         <!-- Card 4 -->
-         <div class="bg-admin-card border border-admin-border p-6 rounded-2xl relative overflow-hidden group hover:border-admin-success/50 transition-all duration-300">
-             <div class="absolute inset-0 bg-gradient-to-br from-admin-success/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-             <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="p-2 bg-admin-dark rounded-lg text-admin-success">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    </div>
-                    <span class="text-xs font-medium text-admin-success bg-admin-success/10 px-2 py-1 rounded-full">+24%</span>
-                </div>
-                <h3 class="text-3xl font-bold text-white mb-1">98.5%</h3>
-                <p class="text-sm text-admin-text-muted">Uptime</p>
-             </div>
-         </div>
-      </div>
-
-      <!-- Charts Section -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Main Chart -->
-          <div class="lg:col-span-2 bg-admin-card border border-admin-border rounded-2xl p-6">
-              <div class="flex justify-between items-center mb-6">
-                  <h3 class="text-lg font-bold text-white">Traffic Overview</h3>
-                  <select class="bg-admin-dark border border-admin-border text-admin-text-muted text-sm rounded-lg px-3 py-1 focus:outline-none">
-                      <option>Last 7 Days</option>
-                      <option>Last 30 Days</option>
-                      <option>This Year</option>
-                  </select>
-              </div>
-              <div class="h-[300px] w-full">
-                  <canvas baseChart
-                    [data]="lineChartData"
-                    [options]="lineChartOptions"
-                    [type]="'line'">
-                  </canvas>
-              </div>
+   selector: 'app-dashboard',
+   standalone: true,
+   imports: [CommonModule, BaseChartDirective],
+   template: `
+    <!-- Top Header / Welcome -->
+    <div class="mb-8 flex justify-between items-end">
+       <div>
+         <h1 class="text-4xl font-playfair font-bold text-admin-text-main">Overview</h1>
+         <p class="text-admin-text-muted mt-1">Welcome back, Samantha. Official Portfolio Status.</p>
+       </div>
+       <div class="flex gap-4">
+          <div class="flex -space-x-3">
+             <img class="w-10 h-10 rounded-full border-2 border-white" src="https://ui-avatars.com/api/?name=Admin+User&background=D4AF37&color=fff" alt="">
           </div>
-
-          <!-- Secondary Chart -->
-          <div class="bg-admin-card border border-admin-border rounded-2xl p-6 flex flex-col">
-              <h3 class="text-lg font-bold text-white mb-6">Device Usage</h3>
-              <div class="h-[250px] w-full flex-1 flex items-center justify-center relative">
-                   <canvas baseChart
-                    [data]="doughnutChartData"
-                    [options]="doughnutChartOptions"
-                    [type]="'doughnut'">
-                  </canvas>
-                  <!-- Center Text Overlay -->
-                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div class="text-center mt-2">
-                          <p class="text-2xl font-bold text-white">85%</p>
-                          <p class="text-xs text-admin-text-muted">Mobile</p>
-                      </div>
-                  </div>
-              </div>
-              <div class="mt-6 space-y-3">
-                  <div class="flex justify-between items-center">
-                      <div class="flex items-center gap-2">
-                          <span class="w-3 h-3 rounded-full bg-admin-accent"></span>
-                          <span class="text-sm text-admin-text-muted">Mobile</span>
-                      </div>
-                      <span class="text-sm font-medium text-white">65%</span>
-                  </div>
-                   <div class="flex justify-between items-center">
-                      <div class="flex items-center gap-2">
-                          <span class="w-3 h-3 rounded-full bg-admin-warning"></span>
-                          <span class="text-sm text-admin-text-muted">Desktop</span>
-                      </div>
-                      <span class="text-sm font-medium text-white">25%</span>
-                  </div>
-                   <div class="flex justify-between items-center">
-                      <div class="flex items-center gap-2">
-                          <span class="w-3 h-3 rounded-full bg-admin-success"></span>
-                          <span class="text-sm text-admin-text-muted">Tablet</span>
-                      </div>
-                      <span class="text-sm font-medium text-white">10%</span>
-                  </div>
-              </div>
-          </div>
-      </div>
-
-      <!-- Recent Activity Table -->
-      <div class="bg-admin-card border border-admin-border rounded-2xl overflow-hidden">
-          <div class="p-6 border-b border-admin-border flex justify-between items-center">
-              <h3 class="text-lg font-bold text-white">Recent Activity</h3>
-              <button class="text-sm text-admin-accent hover:text-white transition-colors">View All</button>
-          </div>
-          <div class="overflow-x-auto">
-              <table class="w-full text-left">
-                  <thead class="bg-admin-dark text-admin-text-muted text-xs uppercase tracking-wider">
-                      <tr>
-                          <th class="px-6 py-4 font-medium">User</th>
-                          <th class="px-6 py-4 font-medium">Action</th>
-                          <th class="px-6 py-4 font-medium">Date</th>
-                          <th class="px-6 py-4 font-medium">Status</th>
-                          <th class="px-6 py-4 font-medium text-right"></th>
-                      </tr>
-                  </thead>
-                  <tbody class="divide-y divide-admin-border text-sm">
-                      <tr class="hover:bg-admin-glass transition-colors group">
-                          <td class="px-6 py-4 text-white font-medium flex items-center gap-3">
-                              <div class="w-8 h-8 rounded-full bg-gray-700"></div>
-                              Sarah Johnson
-                          </td>
-                          <td class="px-6 py-4 text-admin-text-muted">Updated Gallery</td>
-                          <td class="px-6 py-4 text-admin-text-muted">2 mins ago</td>
-                          <td class="px-6 py-4">
-                              <span class="px-2 py-1 rounded-full text-xs font-medium bg-admin-success/10 text-admin-success border border-admin-success/20">Completed</span>
-                          </td>
-                          <td class="px-6 py-4 text-right">
-                              <button class="text-admin-text-muted hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
-                              </button>
-                          </td>
-                      </tr>
-                      <tr class="hover:bg-admin-glass transition-colors group">
-                          <td class="px-6 py-4 text-white font-medium flex items-center gap-3">
-                              <div class="w-8 h-8 rounded-full bg-gray-700"></div>
-                              Mike Chen
-                          </td>
-                          <td class="px-6 py-4 text-admin-text-muted">Added New Movie</td>
-                          <td class="px-6 py-4 text-admin-text-muted">1 hour ago</td>
-                          <td class="px-6 py-4">
-                              <span class="px-2 py-1 rounded-full text-xs font-medium bg-admin-warning/10 text-admin-warning border border-admin-warning/20">Pending</span>
-                          </td>
-                          <td class="px-6 py-4 text-right">
-                              <button class="text-admin-text-muted hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
-                              </button>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-          </div>
-      </div>
+          <button class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md text-gray-400 hover:text-admin-accent transition-colors border border-gray-100">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
+          </button>
+       </div>
     </div>
-  `
+
+    <!-- BENTO GRID LAYOUT -->
+    <div class="grid grid-cols-12 gap-8">
+      
+      <!-- CARD 1: Fan Engagement (Light Theme) -->
+      <!-- Wide Top Left -->
+      <div class="col-span-12 lg:col-span-8 bg-white rounded-[2.5rem] p-8 text-admin-text-main relative overflow-hidden group border border-admin-border shadow-sm">
+         <!-- Background Abstract -->
+         <div class="absolute top-0 right-0 w-64 h-64 bg-admin-accent/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+
+         <div class="flex justify-between items-start mb-8 relative z-10">
+            <div>
+               <h3 class="text-lg font-medium text-admin-accent mb-1 font-playfair">Fan Engagement</h3>
+               <p class="text-xs text-admin-text-muted">Real-time Stats</p>
+            </div>
+            <select class="bg-gray-50 border border-gray-200 text-sm rounded-full px-4 py-1 text-admin-text-main focus:ring-0 cursor-pointer hover:bg-gray-100 transition-colors">
+               <option class="text-black">Monthly</option>
+               <option class="text-black">Weekly</option>
+            </select>
+         </div>
+
+         <div class="flex items-end gap-12 relative z-10">
+            <div>
+               <div class="flex items-center gap-2 mb-2">
+                 <h2 class="text-5xl font-playfair font-bold text-admin-text-main">{{ totalInteraction }}</h2>
+                 <div class="w-8 h-8 rounded-full bg-admin-accent text-white flex items-center justify-center transform -rotate-45">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                 </div>
+               </div>
+               <p class="text-admin-text-muted p-1">Total Messages</p>
+            </div>
+            
+            <!-- Chart Area (Wide) -->
+            <div class="flex-1 h-[180px] w-full">
+                <canvas baseChart
+                  [data]="lineChartData"
+                  [options]="lineChartOptions"
+                  [type]="'line'">
+                </canvas>
+            </div>
+         </div>
+      </div>
+
+      <!-- CARD 2: Right Column Stack -->
+      <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+         
+         <!-- 2A: News Articles (White/Clean) -->
+         <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-admin-border flex items-center justify-between">
+            <div class="flex items-center gap-4">
+               <div class="w-12 h-12 rounded-full bg-admin-accent/10 text-admin-accent flex items-center justify-center border border-admin-accent/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
+               </div>
+               <div>
+                  <h4 class="font-bold text-admin-text-main font-playfair">News Articles</h4>
+                  <p class="text-xs text-admin-text-muted">{{ newsCount }} published</p>
+               </div>
+            </div>
+         </div>
+
+         <!-- 2B: Upcoming (Light/Gold) -->
+         <div class="flex-1 bg-white rounded-[2.5rem] p-6 relative overflow-hidden flex flex-col justify-between border border-admin-border shadow-sm">
+            <div class="flex justify-between items-start">
+               <h3 class="font-bold text-admin-text-main font-playfair">Upcoming</h3>
+               <span class="w-8 h-8 rounded-full bg-admin-accent flex items-center justify-center text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+               </span>
+            </div>
+            <div class="mt-4 space-y-3">
+               <!-- Dynamic Recent Updates -->
+               <div *ngFor="let item of recentItems; let i = index" class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                  <div class="text-xs text-admin-text-muted mb-1">New Update</div>
+                  <div class="font-bold text-admin-text-main truncate font-playfair">{{ item.title || item.movie || 'Update' }}</div>
+               </div>
+               <div *ngIf="recentItems.length === 0" class="text-sm text-gray-500">No recent updates</div>
+            </div>
+         </div>
+
+      </div>
+
+      <!-- CARD 3: Impact Overview (Gold Text on White or Gold Background? User said 'remove dark theme'. White card with Gold accents is safest "Official Light" look, but fully Gold card is premium.) -->
+      <!-- Let's try White Card with Gold Gradient Text/Borders for elegance -->
+      <div class="col-span-12 lg:col-span-7 bg-white rounded-[2.5rem] p-8 text-admin-text-main relative border border-admin-border shadow-sm">
+         <div class="absolute top-4 right-4 flex gap-2">
+            <button class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-600">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <button class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-600">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
+         </div>
+
+         <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-admin-accent flex items-center justify-center shadow-lg shadow-admin-accent/30">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
+            <h3 class="text-xl font-bold font-playfair">Impact Overview</h3>
+         </div>
+
+         <div class="grid grid-cols-2 gap-8 items-end">
+            <div>
+               <p class="text-sm font-medium opacity-80 mb-1">Donations Raised</p>
+               <h2 class="text-4xl font-playfair font-bold text-admin-accent">₹{{ totalDonations | number:'1.0-0' }}</h2>
+               <div class="text-xs mt-2 font-medium bg-gray-100 inline-block px-2 py-1 rounded-lg text-gray-600">Target: ₹10,00,000</div>
+            </div>
+            
+            <!-- Simple Semi-Circle Gauge Visual -->
+            <div class="relative h-24 flex items-end justify-center">
+               <div class="w-40 h-20 rounded-t-full bg-gray-100 relative overflow-hidden">
+                  <div class="absolute bottom-0 left-0 w-full h-full bg-admin-accent origin-bottom transform rotate-45 transition-transform duration-1000"></div>
+               </div>
+               <div class="absolute bottom-0 w-4 h-4 bg-white rounded-full z-10 border-2 border-admin-accent"></div>
+            </div>
+         </div>
+      </div>
+
+      <!-- CARD 4: Content Forecast -->
+      <!-- Bottom Right -->
+      <div class="col-span-12 lg:col-span-5 bg-white border border-admin-border rounded-[2.5rem] p-8 text-admin-text-main relative overflow-hidden shadow-sm">
+         <div class="flex justify-between items-start mb-6">
+            <div>
+               <p class="text-xs text-gray-400 uppercase tracking-widest font-bold">Content Reach</p>
+               <h3 class="text-3xl font-bold mt-1 font-playfair">{{ totalContent | number:'1.0-0' }}</h3>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-admin-accent/10 flex items-center justify-center text-admin-accent transform rotate-45">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+            </div>
+         </div>
+
+         <div class="space-y-6 relative">
+             <div class="absolute left-[7px] top-2 bottom-2 w-[1px] bg-gray-100"></div>
+             
+             <div class="relative pl-6">
+                <div class="absolute left-0 top-1.5 w-3.5 h-3.5 rounded-full border-2 border-admin-accent bg-white"></div>
+                <p class="text-xs text-gray-500 font-bold mb-1">Movies</p>
+                <p class="font-medium text-sm">{{ movieCount }} Films Released</p>
+                <div class="mt-2 text-xs bg-admin-accent/10 text-admin-accent inline-block px-2 py-0.5 rounded">Active</div>
+             </div>
+
+             <div class="relative pl-6">
+                <div class="absolute left-0 top-1.5 w-3.5 h-3.5 rounded-full border-2 border-admin-accent bg-white"></div>
+                <p class="text-xs text-gray-500 font-bold mb-1">Awards</p>
+                <p class="font-medium text-sm">{{ awardCount }} Awards Won</p>
+             </div>
+         </div>
+         
+         <div class="absolute bottom-0 right-0 left-0 h-16 opacity-10">
+             <svg viewBox="0 0 100 20" class="w-full h-full" preserveAspectRatio="none">
+                 <path d="M0 20 L0 15 Q10 10 20 15 T40 10 T60 15 T80 5 T100 10 V20 Z" fill="#D4AF37" />
+             </svg>
+         </div>
+      </div>
+
+    </div>
+  `,
+   styles: [`
+    /* No custom CSS needed, utilizing Tailwind arbitrary values */
+  `]
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
 
-  public lineChartData: ChartConfiguration<'line'>['data'] = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    datasets: [
-      {
-        data: [65, 59, 80, 81, 56, 55, 40],
-        label: 'Sessions',
-        fill: true,
-        tension: 0.4, // Smooth curves
-        borderColor: '#6366f1',
-        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-        pointBackgroundColor: '#6366f1',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: '#6366f1'
+   // Stats
+   totalInteraction = 0;
+   totalDonations = 0;
+   totalContent = 0;
+
+   movieCount = 0;
+   awardCount = 0;
+   newsCount = 0;
+
+   recentItems: any[] = [];
+
+   // Chart Properties (Light Theme)
+   public lineChartData: ChartConfiguration['data'] = {
+      labels: [],
+      datasets: [
+         {
+            data: [],
+            label: 'Messages',
+            fill: true,
+            tension: 0.4,
+            borderColor: '#D4AF37', // Official Royal Gold
+            backgroundColor: 'rgba(212, 175, 55, 0.1)',
+            pointBackgroundColor: '#D4AF37',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#D4AF37'
+         }
+      ]
+   };
+
+   public lineChartOptions: ChartConfiguration['options'] = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+         legend: { display: false },
+         tooltip: {
+            backgroundColor: '#FFFFFF', // White tooltip
+            titleColor: '#111827',     // Dark title
+            bodyColor: '#4B5563',      // Gray body
+            borderColor: '#E5E7EB',
+            borderWidth: 1,
+            padding: 10
+         }
       },
-      {
-        data: [28, 48, 40, 19, 86, 27, 90],
-        label: 'Conversions',
-        fill: true,
-        tension: 0.4,
-        borderColor: '#D4AF37', // Royal Gold
-        backgroundColor: 'rgba(212, 175, 55, 0.1)',
-        pointBackgroundColor: '#D4AF37',
-        pointBorderColor: '#fff',
+      scales: {
+         x: {
+            grid: { display: false },
+            ticks: { color: '#9CA3AF' } // Gray-400
+         },
+         y: {
+            grid: { color: '#F3F4F6', display: true }, // Light grid lines
+            ticks: { display: false },
+            border: { display: false }
+         }
       }
-    ]
-  };
+   };
 
-  public lineChartOptions: ChartConfiguration<'line'>['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: '#141414',
-        titleColor: '#fff',
-        bodyColor: '#9ca3af',
-        borderColor: '#333',
-        borderWidth: 1,
-        padding: 10
+   constructor(private apiService: ApiService) { }
+
+   ngOnInit() {
+      this.fetchData();
+   }
+
+   fetchData() {
+      forkJoin({
+         movies: this.apiService.getMovies(),
+         awards: this.apiService.getAwards(),
+         philanthropy: this.apiService.getPhilanthropies(),
+         news: this.apiService.getNews(),
+         contacts: this.apiService.getContactMessages()
+      }).subscribe({
+         next: (res) => {
+            // 1. Counts
+            this.movieCount = res.movies.length;
+            this.awardCount = res.awards.length;
+            this.newsCount = res.news.length;
+
+            // 2. Total Content
+            this.totalContent = this.movieCount + this.awardCount + this.newsCount;
+
+            // 3. Real Fan Engagement (Contact Messages)
+            this.totalInteraction = res.contacts.length;
+            this.processChartData(res.contacts);
+
+            // 4. Donations
+            this.totalDonations = res.philanthropy.reduce((sum, item) => sum + (item.value || 0), 0);
+
+            // 5. Recent Items
+            const lastMovie = res.movies.length > 0 ? res.movies[res.movies.length - 1] : null;
+            const lastAward = res.awards.length > 0 ? res.awards[res.awards.length - 1] : null;
+
+            this.recentItems = [];
+            if (lastMovie) this.recentItems.push({ title: `New Movie: ${lastMovie.title}`, date: 'Just now' });
+            if (lastAward) this.recentItems.push({ title: `Award: ${lastAward.title}`, date: 'Recently' });
+         },
+         error: (err) => {
+            console.error('Failed to load dashboard stats', err);
+         }
+      });
+   }
+
+   processChartData(contacts: any[]) {
+      // Group messages by Month (Last 6 months logic)
+      const monthCounts = new Map<string, number>();
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      // Initialize current month and prev 5
+      const today = new Date();
+      const labels = [];
+      for (let i = 5; i >= 0; i--) {
+         const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+         const monthName = months[d.getMonth()];
+         labels.push(monthName);
+         monthCounts.set(monthName, 0);
       }
-    },
-    scales: {
-      x: {
-        grid: { display: false, color: '#333' },
-        ticks: { color: '#9ca3af' }
-      },
-      y: {
-        grid: { color: '#333', display: true }, // dashed?
-        ticks: { color: '#9ca3af' },
-        border: { display: false }
-      }
-    }
-  };
 
+      // Sort contacts into buckets
+      contacts.forEach(c => {
+         if (!c.submittedAt) return;
+         const d = new Date(c.submittedAt);
+         const monthName = months[d.getMonth()];
+         if (monthCounts.has(monthName)) {
+            monthCounts.set(monthName, (monthCounts.get(monthName) || 0) + 1);
+         }
+      });
 
-  public doughnutChartData: ChartConfiguration<'doughnut'>['data'] = {
-    labels: ['Mobile', 'Desktop', 'Tablet'],
-    datasets: [
-      {
-        data: [350, 450, 100],
-        backgroundColor: ['#6366f1', '#f59e0b', '#10b981'],
-        hoverBackgroundColor: ['#4f46e5', '#d97706', '#059669'],
-        borderWidth: 0,
-        hoverOffset: 4
-      }
-    ]
-  };
+      const data = labels.map(label => monthCounts.get(label) || 0);
 
-  public doughnutChartOptions: ChartConfiguration<'doughnut'>['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    cutout: '75%', // Thinner ring
-    plugins: {
-      legend: { display: false }
-    }
-  };
-
+      // Update Chart with Official Colors
+      this.lineChartData = {
+         labels: labels,
+         datasets: [{
+            data: data,
+            label: 'Messages',
+            fill: true,
+            tension: 0.4,
+            borderColor: '#D4AF37',
+            backgroundColor: 'rgba(212, 175, 55, 0.1)',
+            pointBackgroundColor: '#D4AF37',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#D4AF37'
+         }]
+      };
+   }
 }
