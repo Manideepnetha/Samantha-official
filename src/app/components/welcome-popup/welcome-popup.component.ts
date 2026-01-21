@@ -23,11 +23,11 @@ import { ApiService } from '../../services/api.service';
         </button>
 
         <!-- Left Side: Image -->
-        <div class="relative h-64 md:h-auto">
+        <div class="relative h-72 md:h-auto">
           <img 
             src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296812/SRP_q8wmpl.jpg" 
             alt="Welcome" 
-            class="w-full h-full object-cover"
+            class="w-full h-full object-cover object-top"
           />
         </div>
 
