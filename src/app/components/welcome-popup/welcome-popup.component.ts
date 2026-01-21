@@ -64,14 +64,14 @@ import { ApiService } from '../../services/api.service';
               <div class="text-6xl mb-4 animate-bounce">❤️</div>
               <h3 class="text-2xl font-cinzel text-[#d4af37] mb-2">I Love You Too!</h3>
               <p class="text-white/60 text-sm mb-6">Welcome to the community.</p>
-              <button (click)="closePopup()" class="px-6 py-2 bg-white/10 hover:bg-white/20 rounded text-sm tracking-widest transition-colors">ENTER SITE</button>
+              <button (click)="onEnterSite()" class="px-6 py-2 bg-white/10 hover:bg-white/20 rounded text-sm tracking-widest transition-colors">ENTER SITE</button>
           </div>
 
            <!-- No State -->
            <div *ngIf="selection === 'no'" class="animate-fade-in-up mt-8">
               <div class="text-6xl mb-4 animate-pulse">💔</div>
               <h3 class="text-xl font-cinzel text-white/50 mb-6">Oh... implies you are missing out.</h3>
-              <button (click)="closePopup()" class="underline text-white/30 hover:text-white/80 transition-colors text-sm">Enter Site Anyway</button>
+              <button (click)="onEnterSite()" class="underline text-white/30 hover:text-white/80 transition-colors text-sm">Enter Site Anyway</button>
           </div>
 
         </div>
@@ -98,6 +98,7 @@ export class WelcomePopupComponent implements OnInit {
 
   yesAudioUrl = '';
   noAudioUrl = '';
+  enterAudioUrl = '';
 
   constructor(private apiService: ApiService) { }
 
@@ -109,8 +110,10 @@ export class WelcomePopupComponent implements OnInit {
     this.apiService.getSettings().subscribe(settings => {
       const yes = settings.find(s => s.key === 'yes_audio');
       const no = settings.find(s => s.key === 'no_audio');
+      const enter = settings.find(s => s.key === 'enter_site_audio');
       if (yes) this.yesAudioUrl = yes.value;
       if (no) this.noAudioUrl = no.value;
+      if (enter) this.enterAudioUrl = enter.value;
     });
   }
 
@@ -123,6 +126,15 @@ export class WelcomePopupComponent implements OnInit {
       const audio = new Audio(url);
       audio.play().catch(e => console.error('Audio play failed', e));
     }
+  }
+
+  onEnterSite() {
+    // Play Enter Site Audio if available
+    if (this.enterAudioUrl) {
+      const audio = new Audio(this.enterAudioUrl);
+      audio.play().catch(e => console.error('Audio play failed', e));
+    }
+    this.closePopup();
   }
 
   closePopup() {
