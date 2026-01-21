@@ -18,7 +18,7 @@ import { ApiService } from '../../services/api.service';
         <div *ngIf="tickerText" 
              (click)="onTickerClick()"
              [class.cursor-pointer]="tickerLink"
-             class="fixed bottom-16 md:bottom-0 left-0 right-0 z-[5000] bg-white/95 backdrop-blur-md border-t border-gray-100 py-1 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] transition-all duration-500 hover:shadow-[0_-4px_40px_rgba(0,0,0,0.15)] group">
+             class="fixed bottom-28 md:bottom-0 left-0 right-0 z-[5000] bg-white/95 backdrop-blur-md border-t border-gray-100 py-1 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] transition-all duration-500 hover:shadow-[0_-4px_40px_rgba(0,0,0,0.15)] group">
            
            <div class="whitespace-nowrap animate-marquee flex items-center group-hover:[animation-play-state:paused]">
               <ng-container *ngFor="let i of [1,2,3,4]">
