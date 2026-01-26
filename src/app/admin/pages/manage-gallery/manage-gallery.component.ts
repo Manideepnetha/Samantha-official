@@ -4,10 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ApiService, MediaGallery } from '../../../services/api.service';
 
 @Component({
-    selector: 'app-manage-gallery',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-manage-gallery',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-playfair font-bold text-charcoal dark:text-ivory">Manage Media Gallery</h2>
@@ -83,8 +83,23 @@ import { ApiService, MediaGallery } from '../../../services/api.service';
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-charcoal dark:text-ivory mb-1">Image URL</label>
-              <input [(ngModel)]="currentMedia.imageUrl" type="text" class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 bg-transparent text-charcoal dark:text-ivory focus:border-royal-gold outline-none">
+              <label class="block text-sm font-medium text-charcoal dark:text-ivory mb-1">Gallery Image</label>
+              <div class="flex gap-2 mb-2">
+                <input [(ngModel)]="currentMedia.imageUrl" type="text" placeholder="Paste link or upload..." class="flex-1 p-2 rounded border border-gray-300 dark:border-gray-600 bg-transparent text-charcoal dark:text-ivory focus:border-royal-gold outline-none">
+                <button (click)="fileInput.click()" [disabled]="isUploading" class="px-3 py-2 bg-royal-gold/10 hover:bg-royal-gold/20 text-royal-gold rounded text-xs font-semibold transition-all flex items-center gap-2">
+                  <svg *ngIf="!isUploading" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <div *ngIf="isUploading" class="w-4 h-4 border-2 border-royal-gold border-t-transparent rounded-full animate-spin"></div>
+                  {{ isUploading ? 'Uploading...' : 'Upload Image' }}
+                </button>
+                <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+              </div>
+
+              <!-- Preview Area -->
+              <div *ngIf="currentMedia.imageUrl" class="mt-2 relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-video bg-gray-50 dark:bg-deep-black/20">
+                <img [src]="currentMedia.imageUrl" class="w-full h-full object-cover" alt="Preview">
+              </div>
             </div>
 
             <div>
@@ -103,75 +118,110 @@ import { ApiService, MediaGallery } from '../../../services/api.service';
       </div>
     </div>
   `,
-    styles: []
+  styles: []
 })
 export class ManageGalleryComponent implements OnInit {
-    galleryList: MediaGallery[] = [];
-    isModalOpen = false;
-    isEditing = false;
-    currentMedia: MediaGallery = { caption: '', imageUrl: '', type: 'fashion', date: '' };
+  galleryList: MediaGallery[] = [];
+  isModalOpen = false;
+  isEditing = false;
+  isUploading = false;
+  currentMedia: MediaGallery = { caption: '', imageUrl: '', type: 'fashion', date: '' };
 
-    categories = [
-        { value: 'all', label: 'All' },
-        { value: 'films', label: 'Films' },
-        { value: 'events', label: 'Events' },
-        { value: 'fashion', label: 'Fashion' },
-        { value: 'bts', label: 'BTS' },
-        { value: 'photoshoots', label: 'Photoshoots' }
-    ];
-    filterCategory = 'all';
+  categories = [
+    { value: 'all', label: 'All' },
+    { value: 'Hero', label: 'Hero Slides' },
+    { value: 'films', label: 'Films' },
+    { value: 'events', label: 'Events' },
+    { value: 'fashion', label: 'Fashion' },
+    { value: 'bts', label: 'BTS' },
+    { value: 'photoshoots', label: 'Photoshoots' }
+  ];
+  filterCategory = 'all';
 
-    constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService) { }
 
-    ngOnInit(): void {
-        this.loadGallery();
-    }
+  ngOnInit(): void {
+    this.loadGallery();
+  }
 
-    loadGallery(): void {
-        this.apiService.getMediaGalleries().subscribe(data => {
-            // Exclude 'Home' type items as they are managed in Home Page admin
-            this.galleryList = data.filter(item => item.type !== 'Home');
-        });
-    }
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
 
-    get filteredGallery() {
-        if (this.filterCategory === 'all') return this.galleryList;
-        return this.galleryList.filter(item => item.type === this.filterCategory);
-    }
+    this.isUploading = true;
 
-    openModal(): void {
-        this.isModalOpen = true;
-        this.isEditing = false;
-        this.currentMedia = { caption: '', imageUrl: '', type: 'fashion', date: '' };
-    }
+    // Cloudinary Upload Logic
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'ml_default');
+    formData.append('cloud_name', 'dpnd6ve1e');
 
-    closeModal(): void {
-        this.isModalOpen = false;
-    }
-
-    editMedia(media: MediaGallery): void {
-        this.isEditing = true;
-        this.currentMedia = { ...media };
-        this.isModalOpen = true;
-    }
-
-    saveMedia(): void {
-        if (this.isEditing && this.currentMedia.id) {
-            this.apiService.updateMediaGallery(this.currentMedia.id, this.currentMedia).subscribe(() => {
-                this.loadGallery();
-                this.closeModal();
-            });
+    fetch(`https://api.cloudinary.com/v1_1/dpnd6ve1e/image/upload`, {
+      method: 'POST',
+      body: formData
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (res.secure_url) {
+          this.currentMedia.imageUrl = res.secure_url;
         } else {
-            this.apiService.createMediaGallery(this.currentMedia).subscribe(() => {
-                this.loadGallery();
-                this.closeModal();
-            });
+          alert('Upload failed. Please ensure your Cloudinary "Unsigned Upload Preset" is named "ml_default".');
         }
-    }
+      })
+      .catch(err => {
+        console.error('Upload error:', err);
+        alert('Error connecting to Cloudinary.');
+      })
+      .finally(() => {
+        this.isUploading = false;
+      });
+  }
 
-    deleteMedia(id: number): void {
-        if (confirm('Delete this image?')) {
-            this.apiService.deleteMediaGallery(id).subscribe(() => this.loadGallery());
-        }
+  loadGallery(): void {
+    this.apiService.getMediaGalleries().subscribe(data => {
+      // Exclude 'Home' type items as they are managed in Home Page admin
+      this.galleryList = data.filter(item => item.type !== 'Home');
+    });
+  }
+
+  get filteredGallery() {
+    if (this.filterCategory === 'all') return this.galleryList;
+    return this.galleryList.filter(item => item.type === this.filterCategory);
+  }
+
+  openModal(): void {
+    this.isModalOpen = true;
+    this.isEditing = false;
+    this.currentMedia = { caption: '', imageUrl: '', type: 'fashion', date: '' };
+  }
+
+  closeModal(): void {
+    this.isModalOpen = false;
+  }
+
+  editMedia(media: MediaGallery): void {
+    this.isEditing = true;
+    this.currentMedia = { ...media };
+    this.isModalOpen = true;
+  }
+
+  saveMedia(): void {
+    if (this.isEditing && this.currentMedia.id) {
+      this.apiService.updateMediaGallery(this.currentMedia.id, this.currentMedia).subscribe(() => {
+        this.loadGallery();
+        this.closeModal();
+      });
+    } else {
+      this.apiService.createMediaGallery(this.currentMedia).subscribe(() => {
+        this.loadGallery();
+        this.closeModal();
+      });
     }
+  }
+
+  deleteMedia(id: number): void {
+    if (confirm('Delete this image?')) {
+      this.apiService.deleteMediaGallery(id).subscribe(() => this.loadGallery());
+    }
+  }
 }

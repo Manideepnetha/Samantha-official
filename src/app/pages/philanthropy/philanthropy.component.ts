@@ -36,69 +36,35 @@ import { ApiService, Philanthropy } from '../../services/api.service';
             </p>
             
             <!-- Impact Numbers (Hardcoded) -->
+            <!-- Impact Numbers (Dynamic) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-              <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
-                <div class="text-5xl text-royal-gold mb-4">😊</div>
-                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">{{ happyDonorsCount | number:'1.0-0' }}</div>
-                <div class="text-charcoal/80 dark:text-ivory/80">Happy Donors</div>
-              </div>
-
-              <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
-                <div class="text-5xl text-royal-gold mb-4">🚀</div>
-                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">{{ successMissionCount | number:'1.0-0' }}</div>
-                <div class="text-charcoal/80 dark:text-ivory/80">Success Mission</div>
-              </div>
-
-              <div class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
-                <div class="text-5xl text-royal-gold mb-4">👤+</div>
-                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">{{ volunteerReachedCount | number:'1.0-0' }}</div>
-                <div class="text-charcoal/80 dark:text-ivory/80">Volunteer Reached</div>
+              <div *ngFor="let stat of stats" class="p-6 bg-white dark:bg-charcoal rounded-lg hover-lift text-center">
+                <div class="text-5xl text-royal-gold mb-4">{{stat.icon}}</div>
+                <div class="text-4xl font-playfair font-bold text-charcoal dark:text-ivory mb-2">{{ stat.currentValue || 0 | number:'1.0-0' }}</div>
+                <div class="text-charcoal/80 dark:text-ivory/80">{{stat.title}}</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Key Initiatives (Hardcoded) -->
+      <!-- Key Initiatives (Dynamic) -->
       <section class="py-20 bg-white dark:bg-charcoal">
         <div class="container mx-auto px-4">
           <h2 class="text-3xl md:text-4xl font-playfair font-bold text-center text-charcoal dark:text-ivory mb-16">Key Initiatives</h2>
           
+          <!-- Loading State -->
+          <div *ngIf="initiatives.length === 0" class="text-center text-charcoal/50 dark:text-ivory/50">
+             Loading initiatives...
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <!-- Sponsor for Health -->
-            <div class="bg-ivory dark:bg-deep-black p-8 rounded-lg hover-lift">
-              <div class="w-16 h-16 bg-royal-gold/10 rounded-full flex items-center justify-center mb-6">
-                <span class="text-3xl text-royal-gold">😊</span>
-              </div>
-              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Sponsor for Health</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">So far, Pratyusha Support has sponsored for more than 150 critical surgeries for the underprivileged. This being our main objective, we have always intended to provide good health and support to the children and their families.</p>
-            </div>
-
-            <!-- Awareness Campaigns -->
-            <div class="bg-ivory dark:bg-deep-black p-8 rounded-lg hover-lift">
-              <div class="w-16 h-16 bg-royal-gold/10 rounded-full flex items-center justify-center mb-6">
-                <span class="text-3xl text-royal-gold">🚀</span>
-              </div>
-              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Awareness Campaigns</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">These days, its important for children and women to be aware of various day to day issues happening in the society. Team Pratyusha Support works towards creating awareness on various sensitive topics at Government Schools, Orphanages and other Societies.</p>
-            </div>
-
-            <!-- Shelter for Poor -->
-            <div class="bg-ivory dark:bg-deep-black p-8 rounded-lg hover-lift">
-              <div class="w-16 h-16 bg-royal-gold/10 rounded-full flex items-center justify-center mb-6">
-                <span class="text-3xl text-royal-gold">🏠</span>
-              </div>
-              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Shelter for Poor</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">Associated full-time with Pyaram Vijayabharathi Vidyasagar Charitable Trust, located in Nadargul, Adibatla Village. Sheltering about 28 orphan kids at the moment and providing them with education, health and other necessary amenities.</p>
-            </div>
-
-            <!-- Wish come True -->
-            <div class="bg-ivory dark:bg-deep-black p-8 rounded-lg hover-lift">
-              <div class="w-16 h-16 bg-royal-gold/10 rounded-full flex items-center justify-center mb-6">
-                <span class="text-3xl text-royal-gold">✨</span>
-              </div>
-              <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">Wish come True</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80 mb-6">A special initiative by the team where we fulfill the wishes of those unfortunate children with life-threatening ailments.</p>
+            <div *ngFor="let item of initiatives" class="bg-ivory dark:bg-deep-black p-8 rounded-lg hover-lift">
+               <div class="w-16 h-16 bg-royal-gold/10 rounded-full flex items-center justify-center mb-6">
+                 <span class="text-3xl text-royal-gold">{{item.icon}}</span>
+               </div>
+               <h3 class="font-playfair text-xl font-bold mb-4 text-charcoal dark:text-ivory">{{item.title}}</h3>
+               <p class="text-charcoal/80 dark:text-ivory/80 mb-6">{{item.description}}</p>
             </div>
           </div>
         </div>
@@ -164,54 +130,109 @@ import { ApiService, Philanthropy } from '../../services/api.service';
   styles: []
 })
 export class PhilanthropyComponent implements OnInit {
-  happyDonorsCount = 0;
-  successMissionCount = 0;
-  volunteerReachedCount = 0;
-
   // Dynamic Content
   stories: Philanthropy[] = [];
+  initiatives: Philanthropy[] = [];
+  stats: (Philanthropy & { currentValue?: number })[] = [];
+  isLoading = true;
 
-  private happyDonorsTarget = 754;
-  private successMissionTarget = 675;
-  private volunteerReachedTarget = 1248;
   private animationDuration = 2000; // milliseconds
   private animationStep = 10; // milliseconds
 
   constructor(private apiService: ApiService) { }
 
   ngOnInit(): void {
-    // Start Animation (Static Stats)
-    this.animateNumber('happyDonors', this.happyDonorsTarget);
-    this.animateNumber('successMission', this.successMissionTarget);
-    this.animateNumber('volunteerReached', this.volunteerReachedTarget);
+    // Default/Fallback Data
+    const defaultStats: (Philanthropy & { currentValue?: number })[] = [
+      { id: 1, title: 'Lives Touched', value: 10000, icon: '❤️', type: 'Stat', currentValue: 0 },
+      { id: 2, title: 'Surgeries Funded', value: 150, icon: '🏥', type: 'Stat', currentValue: 0 },
+      { id: 3, title: 'Health Camps', value: 50, icon: '🩺', type: 'Stat', currentValue: 0 }
+    ];
 
-    // Fetch Stories (Dynamic)
-    this.apiService.getPhilanthropies().subscribe(data => {
-      this.stories = data.filter(i => i.type === 'Story');
+    const defaultInitiatives: Philanthropy[] = [
+      {
+        title: 'Healthcare Support',
+        description: 'Providing financial aid for critical medical treatments and surgeries for underprivileged children and women.',
+        icon: '🏥',
+        type: 'Initiative'
+      },
+      {
+        title: 'Child Welfare',
+        description: 'Ensuring proper nutrition, vaccination, and healthcare for infants and children.',
+        icon: '👶',
+        type: 'Initiative'
+      },
+      {
+        title: 'Women Empowerment',
+        description: 'Supporting skill development and vocational training to help women become financially independent.',
+        icon: '👩‍🎓',
+        type: 'Initiative'
+      },
+      {
+        title: 'Community Outreach',
+        description: 'Organizing health camps and awareness drives in rural and underserved communities.',
+        icon: '🤝',
+        type: 'Initiative'
+      }
+    ];
+
+    const defaultStories: Philanthropy[] = [
+      {
+        title: 'A New Lease on Life',
+        description: 'Little Ananya was diagnosed with a congenital heart defect. Through the foundation, she received the life-saving surgery she needed and is now a healthy, active child.',
+        imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+        type: 'Story'
+      },
+      {
+        title: 'Empowering Lakshmi',
+        description: 'Lakshmi, a single mother, joined our tailoring vocational program. Today, she runs her own boutique and supports her family with dignity.',
+        imageUrl: 'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+        type: 'Story'
+      }
+    ];
+
+    // Initialize with defaults immediately (loading state handles UI flicker if needed, 
+    // but here we want to show something if API fails or returns nothing)
+    this.stats = defaultStats;
+    this.initiatives = defaultInitiatives;
+    this.stories = defaultStories;
+
+    // Fetch All Data
+    this.apiService.getPhilanthropies().subscribe({
+      next: (data) => {
+        if (data && data.length > 0) {
+          const apiStories = data.filter(i => i.type === 'Story');
+          const apiInitiatives = data.filter(i => i.type === 'Initiative');
+          const apiStats = data.filter(i => i.type === 'Stat');
+
+          if (apiStories.length > 0) this.stories = apiStories;
+          if (apiInitiatives.length > 0) this.initiatives = apiInitiatives;
+          if (apiStats.length > 0) {
+            this.stats = apiStats.map(s => ({ ...s, currentValue: 0 }));
+          }
+        }
+        this.isLoading = false;
+        // Trigger animations for stats after loading (whether default or api)
+        this.stats.forEach(stat => this.animateStat(stat));
+      },
+      error: (err) => {
+        console.error('Failed to load philanthropy data', err);
+        this.isLoading = false;
+        // Run animations on defaults
+        this.stats.forEach(stat => this.animateStat(stat));
+      }
     });
   }
 
-  animateNumber(property: string, target: number): void {
-    const increment = target / (this.animationDuration / this.animationStep);
+  animateStat(stat: Philanthropy & { currentValue?: number }): void {
+    const target = stat.value || 0;
+    const increment = Math.ceil(target / (this.animationDuration / this.animationStep));
+
     const timer = setInterval(() => {
-      if (property === 'happyDonors') {
-        this.happyDonorsCount += increment;
-        if (this.happyDonorsCount >= target) {
-          this.happyDonorsCount = target;
-          clearInterval(timer);
-        }
-      } else if (property === 'successMission') {
-        this.successMissionCount += increment;
-        if (this.successMissionCount >= target) {
-          this.successMissionCount = target;
-          clearInterval(timer);
-        }
-      } else if (property === 'volunteerReached') {
-        this.volunteerReachedCount += increment;
-        if (this.volunteerReachedCount >= target) {
-          this.volunteerReachedCount = target;
-          clearInterval(timer);
-        }
+      stat.currentValue = (stat.currentValue || 0) + increment;
+      if (stat.currentValue >= target) {
+        stat.currentValue = target;
+        clearInterval(timer);
       }
     }, this.animationStep);
   }

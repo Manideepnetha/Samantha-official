@@ -142,11 +142,12 @@ export class WelcomePopupComponent implements OnInit {
   }
 
   onEnterSite() {
-    // Stop previous audio (e.g. Yes/No response audio)
+    // Stop previous audio
     this.stopAudio();
 
-    // Play Enter Site Audio if available
-    if (this.enterAudioUrl) {
+    // Only play "Enter Site Anyway" audio if user selected 'no' (or didn't select 'yes')
+    // If they selected 'yes', we just let them in silently (or stop the 'yes' audio)
+    if (this.selection !== 'yes' && this.enterAudioUrl) {
       this.currentAudio = new Audio(this.enterAudioUrl);
       this.currentAudio.play().catch(e => console.error('Audio play failed', e));
     }

@@ -4,14 +4,14 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
-  selector: 'app-navbar',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    RouterLinkActive
-  ],
-  template: `
+   selector: 'app-navbar',
+   standalone: true,
+   imports: [
+      CommonModule,
+      RouterLink,
+      RouterLinkActive
+   ],
+   template: `
     <!-- ======================= -->
     <!-- DESKTOP NAVBAR (Top Tab) -->
     <!-- ======================= -->
@@ -137,7 +137,7 @@ import { ThemeService } from '../../services/theme.service';
        </div>
     </div>
   `,
-  styles: [`
+   styles: [`
     @keyframes slide-in {
       from { transform: translateY(-10px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
@@ -146,39 +146,41 @@ import { ThemeService } from '../../services/theme.service';
   `]
 })
 export class NavbarComponent {
-  @Output() themeToggle = new EventEmitter<void>();
+   @Output() themeToggle = new EventEmitter<void>();
 
-  scrolled = false;
-  isMobileMenuOpen = false;
-  isDarkMode = false;
+   scrolled = false;
+   isMobileMenuOpen = false;
+   isDarkMode = false;
 
-  navItems = [
-    { label: 'Home', route: '/', exact: true },
-    { label: 'About', route: '/about', exact: false },
-    { label: 'Films', route: '/filmography', exact: false },
-    { label: 'Awards', route: '/awards', exact: false },
-    { label: 'Philanthropy', route: '/philanthropy', exact: false },
-    { label: 'Gallery', route: '/gallery', exact: false },
-    { label: 'Contact', route: '/contact', exact: false }
-  ];
+   navItems = [
+      { label: 'Home', route: '/', exact: true },
+      { label: 'About', route: '/about', exact: false },
+      { label: 'Films', route: '/filmography', exact: false },
+      { label: 'Awards', route: '/awards', exact: false },
+      { label: 'Fashion', route: '/fashion', exact: false },
+      { label: 'Philanthropy', route: '/philanthropy', exact: false },
+      { label: 'Press', route: '/media', exact: false },
+      { label: 'Gallery', route: '/gallery', exact: false },
+      { label: 'Contact', route: '/contact', exact: false }
+   ];
 
-  constructor(private themeService: ThemeService) {
-    this.themeService.isDarkMode$.subscribe(isDark => {
-      this.isDarkMode = isDark;
-    });
-  }
+   constructor(private themeService: ThemeService) {
+      this.themeService.isDarkMode$.subscribe(isDark => {
+         this.isDarkMode = isDark;
+      });
+   }
 
-  @HostListener('window:scroll', [])
-  onWindowScroll() {
-    this.scrolled = window.scrollY > 20;
-  }
+   @HostListener('window:scroll', [])
+   onWindowScroll() {
+      this.scrolled = window.scrollY > 20;
+   }
 
-  toggleMobileMenu() {
-    this.isMobileMenuOpen = !this.isMobileMenuOpen;
-    document.body.style.overflow = this.isMobileMenuOpen ? 'hidden' : '';
-  }
+   toggleMobileMenu() {
+      this.isMobileMenuOpen = !this.isMobileMenuOpen;
+      document.body.style.overflow = this.isMobileMenuOpen ? 'hidden' : '';
+   }
 
-  toggleTheme() {
-    this.themeService.toggleDarkMode();
-  }
+   toggleTheme() {
+      this.themeService.toggleDarkMode();
+   }
 }

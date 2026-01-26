@@ -318,15 +318,32 @@ export class HomeComponent implements OnInit, AfterViewInit {
         }));
     });
 
-    // Fetch Gallery
+    // Fetch Gallery & Hero Slides
     this.apiService.getMediaGalleries().subscribe(data => {
+      // 1. Featured Gallery
       this.featuredGallery = data
         .filter(g => g.type === 'Home')
         .map(g => ({
-          url: g.imageUrl, // Map imageUrl -> url
-          alt: g.altText,  // Map altText -> alt
+          url: g.imageUrl,
+          alt: g.altText,
           caption: g.caption
         }));
+
+      // 2. Dynamic Hero Slides
+      const dynamicHeroSlides = data.filter(g => g.type === 'Hero');
+      if (dynamicHeroSlides.length > 0) {
+        this.heroSlides = dynamicHeroSlides.map(g => ({
+          image: g.imageUrl,
+          role: g.caption || 'Icon'
+        }));
+
+        // Update roles array for rotating text
+        this.roles = this.heroSlides.map(s => s.role);
+
+        // Reset counters to prevent index out of bounds
+        this.currentSlide = 0;
+        this.currentRole = 0;
+      }
     });
 
     // Fetch Ticker Text & Link

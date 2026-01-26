@@ -53,6 +53,33 @@ public static class SeedHome
             context.MediaGalleries.AddRange(gallery);
         }
 
+        // 2b. Hero Slides
+        if (!context.MediaGalleries.Any(m => m.Type == "Hero"))
+        {
+            var heroSlides = new List<MediaGallery>
+            {
+                new MediaGallery { 
+                    Caption = "Actress", 
+                    ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008414/8F9A7087_koclpw.jpg", 
+                    Type = "Hero",
+                    AltText = "Samantha Ruth Prabhu - Actress"
+                },
+                new MediaGallery { 
+                    Caption = "Icon", 
+                    ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008413/PAND7159_k4qlvo.jpg", 
+                    Type = "Hero",
+                    AltText = "Samantha Ruth Prabhu - Icon"
+                },
+                new MediaGallery { 
+                    Caption = "Philanthropist", 
+                    ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008412/DSC_9143-1_ayf7fl.jpg", 
+                    Type = "Hero",
+                    AltText = "Samantha Ruth Prabhu - Philanthropist"
+                }
+            };
+            context.MediaGalleries.AddRange(heroSlides);
+        }
+
         // 3. Upcoming Movies - removed to prevent reappearing after delete
         // context.Movies.Add(...) logic removed.
 
