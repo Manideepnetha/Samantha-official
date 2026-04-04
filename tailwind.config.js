@@ -14,17 +14,17 @@ module.exports = {
         'charcoal': '#2B2B2B',
         'lavender-mist': '#E6E0F8',
 
-        // Admin Premium Theme (Official Light)
-        'admin-dark': '#F9FAFB',      // Light Gray Base
-        'admin-card': '#FFFFFF',      // White Cards
-        'admin-accent': '#D4AF37',    // Royal Gold
-        'admin-success': '#10b981',   // Emerald
-        'admin-warning': '#f59e0b',   // Amber
-        'admin-danger': '#ef4444',    // Red
-        'admin-glass': 'rgba(255, 255, 255, 0.8)', // White Glass
-        'admin-border': '#E5E7EB',    // Light Border
-        'admin-text-main': '#111827', // Dark Text
-        'admin-text-muted': '#6B7280', // Gray Text
+        // Admin Editorial Theme
+        'admin-dark': '#090504',
+        'admin-card': '#120907',
+        'admin-accent': '#D7B18A',
+        'admin-success': '#72b196',
+        'admin-warning': '#d9a55b',
+        'admin-danger': '#d98b87',
+        'admin-glass': 'rgba(243, 232, 220, 0.05)',
+        'admin-border': 'rgba(228, 196, 163, 0.18)',
+        'admin-text-main': '#F6ECDF',
+        'admin-text-muted': 'rgba(243, 232, 220, 0.68)',
       },
       fontFamily: {
         'playfair': ['"Playfair Display"', 'serif'],

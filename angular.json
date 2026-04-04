@@ -27,7 +27,9 @@
           },
           "options": {
             "assets": [
-              "src/assets"
+              "src/assets",
+              { "glob": "robots.txt", "input": "src/assets", "output": "/" },
+              { "glob": "sitemap.xml", "input": "src/assets", "output": "/" }
             ],
             "index": "src/index.html",
             "browser": "src/main.ts",

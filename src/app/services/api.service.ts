@@ -76,6 +76,8 @@ export interface ContactMessage {
   email: string;
   subject?: string;
   message: string;
+  category?: string;
+  metadataJson?: string;
   submittedAt?: string;
 }
 
@@ -89,7 +91,7 @@ export interface SiteSetting {
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'https://samantha-official-website-api.onrender.com/api';
+  private apiUrl = this.resolveApiUrl();
 
   // --- CACHE VARIABLES ---
   private moviesCache$: Observable<Movie[]> | null = null;
@@ -99,17 +101,42 @@ export class ApiService {
   private mediaCache$: Observable<MediaGallery[]> | null = null;
   private fashionCache$: Observable<FashionItem[]> | null = null;
   private settingsCache$: Observable<SiteSetting[]> | null = null;
+  private pageContentCache = new Map<string, Observable<unknown>>();
 
   constructor(private http: HttpClient, private router: Router) { }
 
   private getOptions() {
     const token = this.getToken();
+    const headers: Record<string, string> = {
+      'Bypass-Tunnel-Reminder': 'true'
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return {
+      headers
+    };
+  }
+
+  private getPublicOptions() {
     return {
       headers: {
-        'Authorization': `Bearer ${token || ''}`,
         'Bypass-Tunnel-Reminder': 'true'
       }
     };
+  }
+
+  private resolveApiUrl(): string {
+    if (typeof window !== 'undefined') {
+      const { hostname } = window.location;
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5035/api';
+      }
+    }
+
+    return 'https://samantha-official-website-api.onrender.com/api';
   }
 
   // --- STORAGE HELPERS ---
@@ -134,6 +161,19 @@ export class ApiService {
     localStorage.removeItem(`cache_${key}`);
   }
 
+  private clearPageContentCache(key?: string) {
+    if (key) {
+      this.pageContentCache.delete(key);
+      this.removeFromStorage(`pagecontent_${key}`);
+      return;
+    }
+
+    this.pageContentCache.clear();
+    Object.keys(localStorage)
+      .filter(storageKey => storageKey.startsWith('cache_pagecontent_'))
+      .forEach(storageKey => localStorage.removeItem(storageKey));
+  }
+
   // Helper to clear cache (call on create/update/delete)
   private clearCache(key: 'movies' | 'awards' | 'philanthropy' | 'news' | 'media' | 'fashion' | 'settings') {
     // We clear both memory cache and storage cache to ensure fresh fetch
@@ -147,6 +187,21 @@ export class ApiService {
       case 'fashion': this.fashionCache$ = null; break;
       case 'settings': this.settingsCache$ = null; break;
     }
+  }
+
+  clearAllCachedContent() {
+    this.moviesCache$ = null;
+    this.awardsCache$ = null;
+    this.philanthropyCache$ = null;
+    this.newsCache$ = null;
+    this.mediaCache$ = null;
+    this.fashionCache$ = null;
+    this.settingsCache$ = null;
+    this.clearPageContentCache();
+
+    Object.keys(localStorage)
+      .filter(key => key.startsWith('cache_'))
+      .forEach(key => localStorage.removeItem(key));
   }
 
   // --- MOVIES ---
@@ -329,8 +384,17 @@ export class ApiService {
   }
 
   // --- CONTACTS ---
+  submitContactMessage(message: ContactMessage): Observable<ContactMessage> {
+    return this.http.post<ContactMessage>(`${this.apiUrl}/contact`, message, this.getPublicOptions());
+  }
+
   getContactMessages(): Observable<ContactMessage[]> {
     return this.http.get<ContactMessage[]>(`${this.apiUrl}/contact`, this.getOptions());
+  }
+
+  // --- BLOGS ---
+  getBlogs(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/blogs`);
   }
 
   // --- SITE SETTINGS ---
@@ -360,6 +424,39 @@ export class ApiService {
     return this.http.post<SiteSetting>(`${this.apiUrl}/settings`, setting, this.getOptions());
   }
 
+  // --- PAGE CONTENT ---
+  getPageContent<T>(key: string): Observable<T> {
+    const storageKey = `pagecontent_${key}`;
+    const cached = this.loadFromStorage<T>(storageKey);
+
+    if (!this.pageContentCache.has(key)) {
+      const request$ = this.http.get<T>(`${this.apiUrl}/pagecontent/${encodeURIComponent(key)}`, this.getPublicOptions())
+        .pipe(
+          tap(data => this.saveToStorage(storageKey, data)),
+          shareReplay(1)
+        );
+
+      this.pageContentCache.set(key, request$);
+    }
+
+    const request$ = this.pageContentCache.get(key) as Observable<T>;
+    if (cached) {
+      return concat(of(cached), request$);
+    }
+
+    return request$;
+  }
+
+  upsertPageContent<T>(key: string, content: T): Observable<any> {
+    this.clearPageContentCache(key);
+    return this.http.post(`${this.apiUrl}/pagecontent/${encodeURIComponent(key)}`, content, this.getOptions());
+  }
+
+  syncSiteContent(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/contentsync/refresh`, {}, this.getOptions())
+      .pipe(tap(() => this.clearAllCachedContent()));
+  }
+
   // --- AUTH ---
   login(credentials: { email: string, password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/login`, credentials)
@@ -378,14 +475,7 @@ export class ApiService {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    // Clear all caches on logout to ensure data security/freshness
-    this.clearCache('movies');
-    this.clearCache('awards');
-    this.clearCache('philanthropy');
-    this.clearCache('news');
-    this.clearCache('media');
-    this.clearCache('fashion');
-    this.clearCache('settings');
+    this.clearAllCachedContent();
     this.router.navigate(['/login']);
   }
 

@@ -122,15 +122,53 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Error checking/creating SiteSettings table: " + ex.Message);
     }
 
-    // Seed Movies
-    SeedMovies.Initialize(db);
-    // Seed Awards
-    SeedAwards.Initialize(db);
-    // Seed Philanthropy
-    SeedPhilanthropy.Initialize(db);
-    SeedHome.Initialize(db);
-    SeedFashion.Initialize(db);
-    SeedGallery.Initialize(db);
+    try
+    {
+        db.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS ""PageContents"" (
+                ""Id"" serial NOT NULL,
+                ""Key"" text NOT NULL,
+                ""ContentJson"" text NOT NULL,
+                ""Description"" text NULL,
+                ""UpdatedAt"" timestamp with time zone NOT NULL DEFAULT NOW(),
+                CONSTRAINT ""PK_PageContents"" PRIMARY KEY (""Id"")
+            );
+
+            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_PageContents_Key"" ON ""PageContents"" (""Key"");
+
+            ALTER TABLE IF EXISTS ""ContactMessages"" ADD COLUMN IF NOT EXISTS ""Category"" text;
+            ALTER TABLE IF EXISTS ""ContactMessages"" ADD COLUMN IF NOT EXISTS ""MetadataJson"" text;
+        ");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error checking/creating content sync tables: " + ex.Message);
+    }
+
+    // Create QuizEntries table
+    try
+    {
+        db.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS ""QuizEntries"" (
+                ""Id"" serial NOT NULL,
+                ""Name"" text NOT NULL,
+                ""Email"" text NOT NULL,
+                ""City"" text NULL,
+                ""Score"" integer NOT NULL DEFAULT 0,
+                ""TotalQuestions"" integer NOT NULL DEFAULT 0,
+                ""TimeTakenSeconds"" integer NOT NULL DEFAULT 0,
+                ""SubmittedAt"" timestamp with time zone NOT NULL DEFAULT NOW(),
+                CONSTRAINT ""PK_QuizEntries"" PRIMARY KEY (""Id"")
+            );
+            CREATE INDEX IF NOT EXISTS ""IX_QuizEntries_Email"" ON ""QuizEntries"" (""Email"");
+        ");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error creating QuizEntries table: " + ex.Message);
+    }
+
+    FrontendContentSync.EnsureSeeded(db);
 }
 
 app.Run();

@@ -19,4 +19,6 @@ public class AppDbContext : DbContext
     public DbSet<MediaGallery> MediaGalleries { get; set; }
     public DbSet<FashionItem> FashionItems { get; set; }
     public DbSet<SiteSetting> SiteSettings { get; set; }
+    public DbSet<PageContent> PageContents { get; set; }
+    public DbSet<QuizEntry> QuizEntries { get; set; }
 }

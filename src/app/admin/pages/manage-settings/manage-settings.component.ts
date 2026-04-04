@@ -8,129 +8,92 @@ import { ApiService, SiteSetting } from '../../../services/api.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="p-6">
-      <div class="mb-8">
-        <h1 class="text-3xl font-playfair font-bold text-admin-text-main">Site Settings</h1>
-        <p class="text-admin-text-muted mt-2">Configure global website behavior and assets.</p>
+    <div class="sr-admin-page">
+      <div class="sr-admin-page-header">
+        <div>
+          <span class="sr-kicker">Settings</span>
+          <h1 class="sr-admin-title">Site Settings</h1>
+          <p class="sr-admin-subtitle">Configure global audio behavior and homepage ticker content from the same editorial control surface.</p>
+        </div>
       </div>
 
-      <div class="bg-admin-card rounded-2xl shadow-sm border border-admin-border p-8 max-w-3xl">
-        <h2 class="text-xl font-bold text-admin-text-main mb-6 border-b border-gray-100 pb-2">"Do You Love Me?" Popup Audio</h2>
-        
-        <div class="space-y-6">
-          <!-- Yes Audio -->
+      <div class="sr-surface p-6 md:p-8">
+        <div class="sr-admin-toolbar">
           <div>
-            <label class="block text-sm font-semibold text-gray-600 mb-2">
-              'Yes' Response Audio URL
-              <span class="text-xs font-normal text-gray-400 ml-2">(Plays when user clicks YES)</span>
-            </label>
-            <div class="flex gap-2">
-              <input [(ngModel)]="yesAudio" type="text" placeholder="https://example.com/audio/love_song.mp3" 
-                     class="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-admin-text-main focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
-              <button (click)="saveSetting('yes_audio', yesAudio)" 
-                      class="px-6 py-2 bg-admin-accent text-white font-bold rounded-lg hover:bg-yellow-600 transition-colors shadow-md">
-                Save
-              </button>
-            </div>
-            <p *ngIf="yesAudio" class="mt-2 text-xs text-green-600 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-              Current: {{ yesAudio }}
-            </p>
+            <span class="sr-kicker">Popup Audio</span>
+            <h2 class="sr-card-title mt-2">"Do You Love Me?" Popup</h2>
           </div>
-
-          <!-- No Audio -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-600 mb-2">
-              'No' Response Audio URL
-              <span class="text-xs font-normal text-gray-400 ml-2">(Plays when user clicks NO)</span>
-            </label>
-            <div class="flex gap-2">
-              <input [(ngModel)]="noAudio" type="text" placeholder="https://example.com/audio/sad_song.mp3" 
-                     class="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-admin-text-main focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
-              <button (click)="saveSetting('no_audio', noAudio)" 
-                      class="px-6 py-2 bg-gray-800 text-white font-bold rounded-lg hover:bg-black transition-colors shadow-md">
-                Save
-              </button>
-            </div>
-             <p *ngIf="noAudio" class="mt-2 text-xs text-green-600 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-              Current: {{ noAudio }}
-            </p>
-          </div>
-
-          <!-- Enter Site Anyway Audio -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-600 mb-2">
-              'Enter Site' Audio URL
-              <span class="text-xs font-normal text-gray-400 ml-2">(Plays when user clicks 'Enter Site Anyway')</span>
-            </label>
-            <div class="flex gap-2">
-              <input [(ngModel)]="enterAudio" type="text" placeholder="https://example.com/audio/enter_site.mp3" 
-                     class="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-admin-text-main focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
-              <button (click)="saveSetting('enter_site_audio', enterAudio)" 
-                      class="px-6 py-2 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-800 transition-colors shadow-md">
-                Save
-              </button>
-            </div>
-             <p *ngIf="enterAudio" class="mt-2 text-xs text-green-600 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-              Current: {{ enterAudio }}
-            </p>
-          </div>
-          
-           <!-- Latest Updates Ticker -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-600 mb-2">
-              Latest Updates Ticker
-              <span class="text-xs font-normal text-gray-400 ml-2">(Scrolling text on Home Page. Leave text empty to hide.)</span>
-            </label>
-            
-            <!-- Ticker Text -->
-            <div class="flex gap-2 mb-3">
-              <input [(ngModel)]="tickerText" type="text" placeholder="Breaking News: Samantha wins Best Actress! Watch the interview now." 
-                     class="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-admin-text-main focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
-              <button (click)="saveSetting('latest_updates_text', tickerText)" 
-                      class="px-6 py-2 bg-royal-gold text-deep-black font-bold rounded-lg hover:bg-yellow-600 transition-colors shadow-md">
-                Save Text
-              </button>
-            </div>
-
-            <!-- Ticker Link -->
-             <label class="block text-xs font-semibold text-gray-500 mb-1 ml-1">
-              Destination URL (Optional)
-            </label>
-            <div class="flex gap-2">
-              <input [(ngModel)]="tickerLink" type="text" placeholder="https://youtube.com/watch?v=..." 
-                     class="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm text-admin-text-main focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
-              <button (click)="saveSetting('latest_updates_link', tickerLink)" 
-                      class="px-6 py-2 bg-gray-700 text-white font-bold rounded-lg hover:bg-black transition-colors shadow-md text-sm">
-                Save Link
-              </button>
-            </div>
-
-             <div class="mt-2 text-xs text-green-600">
-                <p *ngIf="tickerText" class="flex items-center mb-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                  Current Text: {{ tickerText }}
-                </p>
-                <p *ngIf="tickerLink" class="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                  Current Link: {{ tickerLink }}
-                </p>
-             </div>
-          </div>
-
         </div>
 
-        <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
-           <p class="text-sm text-blue-800 font-medium">💡 Tip: Upload your audio files to a cloud service (like Cloudinary, Dropbox, or AWS S3) and paste the direct public link here.</p>
+        <div class="mt-8 space-y-8">
+          <div class="grid gap-3">
+            <label class="sr-field-label">'Yes' Response Audio URL</label>
+            <div class="flex flex-col gap-3 md:flex-row">
+              <input [(ngModel)]="yesAudio" type="text" placeholder="https://example.com/audio/love_song.mp3" class="sr-input flex-1">
+              <button (click)="saveSetting('yes_audio', yesAudio)" class="sr-button whitespace-nowrap">Save</button>
+            </div>
+            <p *ngIf="yesAudio" class="sr-card-text">Current: {{ yesAudio }}</p>
+          </div>
+
+          <div class="grid gap-3">
+            <label class="sr-field-label">'No' Response Audio URL</label>
+            <div class="flex flex-col gap-3 md:flex-row">
+              <input [(ngModel)]="noAudio" type="text" placeholder="https://example.com/audio/sad_song.mp3" class="sr-input flex-1">
+              <button (click)="saveSetting('no_audio', noAudio)" class="sr-button-outline whitespace-nowrap">Save</button>
+            </div>
+            <p *ngIf="noAudio" class="sr-card-text">Current: {{ noAudio }}</p>
+          </div>
+
+          <div class="grid gap-3">
+            <label class="sr-field-label">'Enter Site' Audio URL</label>
+            <div class="flex flex-col gap-3 md:flex-row">
+              <input [(ngModel)]="enterAudio" type="text" placeholder="https://example.com/audio/enter_site.mp3" class="sr-input flex-1">
+              <button (click)="saveSetting('enter_site_audio', enterAudio)" class="sr-button-outline whitespace-nowrap">Save</button>
+            </div>
+            <p *ngIf="enterAudio" class="sr-card-text">Current: {{ enterAudio }}</p>
+          </div>
+
+          <div class="sr-divider"></div>
+
+          <div class="space-y-5">
+            <div>
+              <span class="sr-kicker">Ticker</span>
+              <h3 class="sr-card-title mt-2">Latest Updates Strip</h3>
+              <p class="sr-card-text mt-3">Control the scrolling homepage message and its destination link. Leave the text empty if you want the ticker hidden.</p>
+            </div>
+
+            <div class="grid gap-3">
+              <label class="sr-field-label">Ticker Text</label>
+              <div class="flex flex-col gap-3 md:flex-row">
+                <input [(ngModel)]="tickerText" type="text" placeholder="Breaking News: Samantha wins Best Actress!" class="sr-input flex-1">
+                <button (click)="saveSetting('latest_updates_text', tickerText)" class="sr-button whitespace-nowrap">Save Text</button>
+              </div>
+            </div>
+
+            <div class="grid gap-3">
+              <label class="sr-field-label">Destination URL</label>
+              <div class="flex flex-col gap-3 md:flex-row">
+                <input [(ngModel)]="tickerLink" type="text" placeholder="https://youtube.com/watch?v=..." class="sr-input flex-1">
+                <button (click)="saveSetting('latest_updates_link', tickerLink)" class="sr-button-outline whitespace-nowrap">Save Link</button>
+              </div>
+            </div>
+
+            <div class="sr-admin-note">
+              <p *ngIf="tickerText">Current Text: {{ tickerText }}</p>
+              <p *ngIf="tickerLink" class="mt-2">Current Link: {{ tickerLink }}</p>
+              <p *ngIf="!tickerText && !tickerLink">No ticker content has been saved yet.</p>
+            </div>
+          </div>
+
+          <div class="sr-admin-note">
+            Tip: Host audio files on a public cloud URL such as Cloudinary, Dropbox, or S3, then paste the direct link here so the popup can stream them reliably.
+          </div>
         </div>
       </div>
     </div>
   `
 })
 export class ManageSettingsComponent implements OnInit {
-
   yesAudio = '';
   noAudio = '';
   enterAudio = '';
@@ -165,7 +128,6 @@ export class ManageSettingsComponent implements OnInit {
   saveSetting(key: string, value: string) {
     if (!value) return;
 
-    // We pass 0 as ID since upsert logic in backend handles it based on key
     const setting: SiteSetting = { id: 0, key, value };
 
     this.apiService.upsertSetting(setting).subscribe({

@@ -8,263 +8,364 @@ import { ApiService, NewsArticle, MediaGallery, Movie } from '../../../services/
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="space-y-6">
-      <!-- Tabs -->
-      <div class="bg-white dark:bg-charcoal rounded-lg shadow p-4 flex gap-4 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
-        <button 
-          *ngFor="let tab of tabs" 
+    <div class="sr-admin-page">
+      <div class="sr-admin-page-header">
+        <div>
+          <span class="sr-kicker">Homepage</span>
+          <h1 class="sr-admin-title">Manage Home Screen</h1>
+          <p class="sr-admin-subtitle">Control the hero reel, highlight cards, upcoming projects, and featured gallery moments from one editorial workspace.</p>
+        </div>
+      </div>
+
+      <div class="sr-tabbar">
+        <button
+          *ngFor="let tab of tabs"
           (click)="activeTab = tab"
-          [class.bg-royal-gold]="activeTab === tab"
-          [class.text-deep-black]="activeTab === tab"
-          [class.text-gray-600]="activeTab !== tab"
-          [class.dark:text-gray-400]="activeTab !== tab"
-          class="px-4 py-2 rounded-lg font-medium transition-colors hover:bg-gray-100 dark:hover:bg-white/10 whitespace-nowrap"
+          [class.is-active]="activeTab === tab"
+          class="sr-tab"
         >
           {{ tab }}
         </button>
       </div>
 
-      <!-- Hero Slides (Screensaver) -->
-      <div *ngIf="activeTab === 'Hero Slides'" class="bg-white dark:bg-charcoal rounded-lg shadow p-6">
-        <div class="flex justify-between items-center mb-6">
+      <section *ngIf="activeTab === 'Hero Slides'" class="sr-surface p-6 md:p-7">
+        <div class="sr-admin-toolbar">
           <div>
-            <h2 class="text-xl font-playfair font-bold text-charcoal dark:text-ivory">Hero Slides</h2>
-            <p class="text-sm text-gray-500 mt-1">Manage the large images on the homepage hero section.</p>
+            <span class="sr-kicker">Hero</span>
+            <h2 class="sr-card-title mt-2">Hero Slides</h2>
+            <p class="sr-card-text mt-3">Manage the large visual frames and role text that set the tone on the homepage.</p>
           </div>
-          <button (click)="openHeroModal()" class="px-4 py-2 bg-royal-gold text-deep-black rounded hover-lift font-medium">Add Slide</button>
-        </div>
-        
-        <table class="w-full text-left">
-          <thead>
-            <tr class="text-charcoal dark:text-ivory border-b border-gray-200 dark:border-gray-700">
-              <th class="p-3">Image</th>
-              <th class="p-3">Role Text</th>
-              <th class="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let slide of heroSlides" class="border-b border-gray-100 dark:border-gray-800">
-              <td class="p-3"><img [src]="slide.imageUrl" class="w-20 h-12 object-cover rounded shadow-sm"></td>
-              <td class="p-3 text-charcoal dark:text-ivory font-medium">{{ slide.caption }}</td>
-              <td class="p-3">
-                <button (click)="editHero(slide)" class="text-royal-gold mr-3 hover:underline">Edit</button>
-                <button (click)="deleteGallery(slide.id!)" class="text-red-500 hover:underline">Delete</button>
-              </td>
-            </tr>
-            <tr *ngIf="heroSlides.length === 0">
-              <td colspan="3" class="p-8 text-center text-gray-500 italic">No dynamic slides found. Using default hardcoded slides on homepage.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Highlights (News) -->
-      <div *ngIf="activeTab === 'Highlights'" class="bg-white dark:bg-charcoal rounded-lg shadow p-6">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-playfair font-bold text-charcoal dark:text-ivory">Highlights</h2>
-          <button (click)="openNewsModal()" class="px-4 py-2 bg-royal-gold text-deep-black rounded hover-lift font-medium">Add Highlight</button>
-        </div>
-        
-        <table class="w-full text-left">
-          <thead>
-            <tr class="text-charcoal dark:text-ivory border-b border-gray-200 dark:border-gray-700">
-              <th class="p-3">Image</th>
-              <th class="p-3">Date</th>
-              <th class="p-3">Title</th>
-              <th class="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let news of newsList" class="border-b border-gray-100 dark:border-gray-800">
-              <td class="p-3"><img [src]="news.imageUrl" class="w-16 h-10 object-cover rounded"></td>
-              <td class="p-3 text-gray-600 dark:text-gray-300">{{ news.date }}</td>
-              <td class="p-3 text-charcoal dark:text-ivory">{{ news.title }}</td>
-              <td class="p-3">
-                <button (click)="editNews(news)" class="text-royal-gold mr-3">Edit</button>
-                <button (click)="deleteNews(news.id!)" class="text-red-500">Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Upcoming Projects (Movies >= 2025) -->
-      <div *ngIf="activeTab === 'Upcoming Projects'" class="bg-white dark:bg-charcoal rounded-lg shadow p-6">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-playfair font-bold text-charcoal dark:text-ivory">Upcoming Projects (2025+)</h2>
-          <button (click)="openMovieModal()" class="px-4 py-2 bg-royal-gold text-deep-black rounded hover-lift font-medium">Add Project</button>
+          <button (click)="openHeroModal()" class="sr-button">Add Slide</button>
         </div>
 
-        <table class="w-full text-left">
-          <thead>
-            <tr class="text-charcoal dark:text-ivory border-b border-gray-200 dark:border-gray-700">
-              <th class="p-3">Poster</th>
-              <th class="p-3">Title</th>
-              <th class="p-3">Year</th>
-              <th class="p-3">Director</th>
-              <th class="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let movie of upcomingMovies" class="border-b border-gray-100 dark:border-gray-800">
-              <td class="p-3"><img [src]="movie.poster || 'assets/placeholder.jpg'" class="w-10 h-14 object-cover rounded"></td>
-              <td class="p-3 text-charcoal dark:text-ivory font-medium">{{ movie.title }}</td>
-              <td class="p-3 text-gray-600 dark:text-gray-300">{{ movie.year }}</td>
-              <td class="p-3 text-gray-600 dark:text-gray-300">{{ movie.director }}</td>
-              <td class="p-3">
-                <button (click)="editMovie(movie)" class="text-royal-gold mr-3">Edit</button>
-                <button (click)="deleteMovie(movie.id)" class="text-red-500">Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        <div class="sr-admin-table-scroll mt-6">
+          <table class="sr-admin-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Role Text</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let slide of heroSlides">
+                <td><img [src]="slide.imageUrl" class="sr-admin-thumb" alt="Slide"></td>
+                <td class="sr-admin-title-cell">{{ slide.caption }}</td>
+                <td>
+                  <div class="sr-admin-actions">
+                    <button (click)="editHero(slide)" class="sr-admin-action">Edit</button>
+                    <button (click)="deleteGallery(slide.id!)" class="sr-admin-action-danger">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="heroSlides.length === 0" class="sr-admin-empty-row">
+                <td colspan="3">No dynamic hero slides yet. The homepage will fall back to its default slides.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      <!-- Featured Gallery -->
-      <div *ngIf="activeTab === 'Featured Gallery'" class="bg-white dark:bg-charcoal rounded-lg shadow p-6">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-playfair font-bold text-charcoal dark:text-ivory">Featured Gallery</h2>
-          <button (click)="openGalleryModal()" class="px-4 py-2 bg-royal-gold text-deep-black rounded hover-lift font-medium">Add Image</button>
-        </div>
-
-        <table class="w-full text-left">
-          <thead>
-            <tr class="text-charcoal dark:text-ivory border-b border-gray-200 dark:border-gray-700">
-              <th class="p-3">Image</th>
-              <th class="p-3">Caption</th>
-              <th class="p-3">Type</th>
-              <th class="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let media of galleryList" class="border-b border-gray-100 dark:border-gray-800">
-              <td class="p-3"><img [src]="media.imageUrl" class="w-16 h-10 object-cover rounded"></td>
-              <td class="p-3 text-charcoal dark:text-ivory">{{ media.caption }}</td>
-              <td class="p-3 text-gray-600 dark:text-gray-300">{{ media.type }}</td>
-              <td class="p-3">
-                <button (click)="editGallery(media)" class="text-royal-gold mr-3">Edit</button>
-                <button (click)="deleteGallery(media.id!)" class="text-red-500">Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Modals -->
-    <!-- News Modal -->
-    <div *ngIf="isNewsModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white dark:bg-charcoal rounded-lg shadow-xl w-full max-w-lg p-6">
-        <h3 class="text-xl font-bold mb-4 text-charcoal dark:text-ivory">{{ newsItem.id ? 'Edit' : 'Add' }} Highlight</h3>
-        <div class="space-y-4">
-          <input [(ngModel)]="newsItem.title" placeholder="Title" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-          <input [(ngModel)]="newsItem.date" placeholder="Date (e.g. May 15, 2025)" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-          <textarea [(ngModel)]="newsItem.excerpt" placeholder="Excerpt" rows="3" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"></textarea>
-          
-          <div class="flex gap-2">
-            <input [(ngModel)]="newsItem.imageUrl" placeholder="Image URL" class="flex-1 p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-            <button (click)="fileInput.click()" [disabled]="isUploading" class="px-3 py-1 bg-royal-gold/10 text-royal-gold rounded-lg text-xs font-semibold whitespace-nowrap">
-              {{ isUploading ? 'Uploading...' : 'Upload' }}
-            </button>
-            <input #fileInput type="file" (change)="onFileSelected($event, 'news')" accept="image/*" class="hidden">
-          </div>
-          <div *ngIf="newsItem.imageUrl" class="mt-2 h-24 w-full rounded overflow-hidden border border-gray-200 dark:border-gray-700">
-            <img [src]="newsItem.imageUrl" class="w-full h-full object-cover">
-          </div>
-          
-          <input [(ngModel)]="newsItem.link" placeholder="Link URL" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-        </div>
-        <div class="mt-6 flex justify-end gap-3">
-          <button (click)="isNewsModalOpen = false" class="px-4 py-2 text-gray-600 dark:text-gray-400">Cancel</button>
-          <button (click)="saveNews()" class="px-4 py-2 bg-royal-gold text-deep-black rounded font-medium">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Movie Modal (Upcoming) -->
-    <div *ngIf="isMovieModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white dark:bg-charcoal rounded-lg shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-        <h3 class="text-xl font-bold mb-4 text-charcoal dark:text-ivory">{{ movieItem.id ? 'Edit' : 'Add' }} Project</h3>
-        <div class="space-y-4">
-          <input [(ngModel)]="movieItem.title" placeholder="Title" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-          <input [(ngModel)]="movieItem.year" type="number" placeholder="Year" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-          <input [(ngModel)]="movieItem.director" placeholder="Director" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-          <textarea [(ngModel)]="movieItem.description" placeholder="Description" rows="2" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"></textarea>
-          
-          <div class="flex gap-2">
-            <input [(ngModel)]="movieItem.poster" placeholder="Poster URL" class="flex-1 p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-            <button (click)="movieFileInput.click()" [disabled]="isUploading" class="px-3 py-1 bg-royal-gold/10 text-royal-gold rounded-lg text-xs font-semibold whitespace-nowrap">
-              {{ isUploading ? 'Uploading...' : 'Upload' }}
-            </button>
-            <input #movieFileInput type="file" (change)="onFileSelected($event, 'movie')" accept="image/*" class="hidden">
-          </div>
-          <div *ngIf="movieItem.poster" class="mt-2 h-32 w-24 rounded overflow-hidden border border-gray-200 dark:border-gray-700">
-            <img [src]="movieItem.poster" class="w-full h-full object-cover">
-          </div>
-        </div>
-        <div class="mt-6 flex justify-end gap-3">
-          <button (click)="isMovieModalOpen = false" class="px-4 py-2 text-gray-600 dark:text-gray-400">Cancel</button>
-          <button (click)="saveMovie()" class="px-4 py-2 bg-royal-gold text-deep-black rounded font-medium">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gallery Modal -->
-    <div *ngIf="isGalleryModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white dark:bg-charcoal rounded-lg shadow-xl w-full max-w-lg p-6">
-        <h3 class="text-xl font-bold mb-4 text-charcoal dark:text-ivory">{{ galleryItem.id ? 'Edit' : 'Add' }} Image</h3>
-        <div class="space-y-4">
-          <input [(ngModel)]="galleryItem.caption" placeholder="Caption" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-          
-          <div class="flex gap-2">
-            <input [(ngModel)]="galleryItem.imageUrl" placeholder="Image URL" class="flex-1 p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-            <button (click)="galleryFileInput.click()" [disabled]="isUploading" class="px-3 py-1 bg-royal-gold/10 text-royal-gold rounded-lg text-xs font-semibold whitespace-nowrap">
-              {{ isUploading ? 'Uploading...' : 'Upload' }}
-            </button>
-            <input #galleryFileInput type="file" (change)="onFileSelected($event, 'gallery')" accept="image/*" class="hidden">
-          </div>
-          <div *ngIf="galleryItem.imageUrl" class="mt-2 h-24 w-full rounded overflow-hidden border border-gray-200 dark:border-gray-700">
-            <img [src]="galleryItem.imageUrl" class="w-full h-full object-cover">
-          </div>
-
-          <select [(ngModel)]="galleryItem.type" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-            <option value="Home" class="dark:bg-charcoal">Home</option>
-            <option value="General" class="dark:bg-charcoal">General</option>
-          </select>
-        </div>
-        <div class="mt-6 flex justify-end gap-3">
-          <button (click)="isGalleryModalOpen = false" class="px-4 py-2 text-gray-600">Cancel</button>
-          <button (click)="saveGallery()" class="px-4 py-2 bg-royal-gold text-deep-black rounded">Save</button>
-        </div>
-      </div>
-    </div>
-    <!-- Hero Modal -->
-    <div *ngIf="isHeroModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white dark:bg-charcoal rounded-lg shadow-xl w-full max-w-lg p-6">
-        <h3 class="text-xl font-bold mb-4 text-charcoal dark:text-ivory">{{ heroItem.id ? 'Edit' : 'Add' }} Hero Slide</h3>
-        <div class="space-y-4">
+      <section *ngIf="activeTab === 'Highlights'" class="sr-surface p-6 md:p-7">
+        <div class="sr-admin-toolbar">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role Text (e.g. Actress, Philanthropist)</label>
-            <input [(ngModel)]="heroItem.caption" placeholder="Role description" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
+            <span class="sr-kicker">Highlights</span>
+            <h2 class="sr-card-title mt-2">Homepage Highlights</h2>
+            <p class="sr-card-text mt-3">Pick the stories and headlines that should feel freshest on the landing page.</p>
           </div>
-          
+          <button (click)="openNewsModal()" class="sr-button">Add Highlight</button>
+        </div>
+
+        <div class="sr-admin-table-scroll mt-6">
+          <table class="sr-admin-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let news of newsList">
+                <td><img [src]="news.imageUrl" class="sr-admin-thumb" alt="Highlight"></td>
+                <td>{{ news.date }}</td>
+                <td class="sr-admin-title-cell">{{ news.title }}</td>
+                <td>
+                  <div class="sr-admin-actions">
+                    <button (click)="editNews(news)" class="sr-admin-action">Edit</button>
+                    <button (click)="deleteNews(news.id!)" class="sr-admin-action-danger">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="newsList.length === 0" class="sr-admin-empty-row">
+                <td colspan="4">No homepage highlights yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section *ngIf="activeTab === 'Upcoming Projects'" class="sr-surface p-6 md:p-7">
+        <div class="sr-admin-toolbar">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Image</label>
-            <div class="flex gap-2">
-              <input [(ngModel)]="heroItem.imageUrl" placeholder="Image URL" class="flex-1 p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
-              <button (click)="heroFileInput.click()" [disabled]="isUploading" class="px-4 py-2 bg-royal-gold/10 text-royal-gold rounded-lg text-xs font-semibold whitespace-nowrap">
-                {{ isUploading ? 'Uploading...' : 'Upload' }}
-              </button>
-              <input #heroFileInput type="file" (change)="onFileSelected($event, 'hero')" accept="image/*" class="hidden">
+            <span class="sr-kicker">Projects</span>
+            <h2 class="sr-card-title mt-2">Upcoming Projects</h2>
+            <p class="sr-card-text mt-3">Feature upcoming films and collaborations that deserve priority placement on the homepage.</p>
+          </div>
+          <button (click)="openMovieModal()" class="sr-button">Add Project</button>
+        </div>
+
+        <div class="sr-admin-table-scroll mt-6">
+          <table class="sr-admin-table">
+            <thead>
+              <tr>
+                <th>Poster</th>
+                <th>Title</th>
+                <th>Year</th>
+                <th>Director</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let movie of upcomingMovies">
+                <td><img [src]="movie.poster || 'assets/placeholder.jpg'" class="sr-admin-thumb is-poster" alt="Poster"></td>
+                <td class="sr-admin-title-cell">{{ movie.title }}</td>
+                <td>{{ movie.year }}</td>
+                <td>{{ movie.director }}</td>
+                <td>
+                  <div class="sr-admin-actions">
+                    <button (click)="editMovie(movie)" class="sr-admin-action">Edit</button>
+                    <button (click)="deleteMovie(movie.id)" class="sr-admin-action-danger">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="upcomingMovies.length === 0" class="sr-admin-empty-row">
+                <td colspan="5">No upcoming projects are being featured right now.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section *ngIf="activeTab === 'Featured Gallery'" class="sr-surface p-6 md:p-7">
+        <div class="sr-admin-toolbar">
+          <div>
+            <span class="sr-kicker">Gallery</span>
+            <h2 class="sr-card-title mt-2">Featured Gallery</h2>
+            <p class="sr-card-text mt-3">Choose the stills and portraits that should appear in the homepage showcase.</p>
+          </div>
+          <button (click)="openGalleryModal()" class="sr-button">Add Image</button>
+        </div>
+
+        <div class="sr-admin-table-scroll mt-6">
+          <table class="sr-admin-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Caption</th>
+                <th>Type</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let media of galleryList">
+                <td><img [src]="media.imageUrl" class="sr-admin-thumb" alt="Gallery"></td>
+                <td class="sr-admin-title-cell">{{ media.caption }}</td>
+                <td><span class="sr-admin-badge is-accent">{{ media.type }}</span></td>
+                <td>
+                  <div class="sr-admin-actions">
+                    <button (click)="editGallery(media)" class="sr-admin-action">Edit</button>
+                    <button (click)="deleteGallery(media.id!)" class="sr-admin-action-danger">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="galleryList.length === 0" class="sr-admin-empty-row">
+                <td colspan="4">No featured gallery images yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div *ngIf="isNewsModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
+        <div class="sr-modal-panel w-full max-w-2xl p-6 md:p-7">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <span class="sr-kicker">{{ newsItem.id ? 'Editing' : 'Creating' }}</span>
+              <h3 class="sr-card-title mt-2">{{ newsItem.id ? 'Edit Highlight' : 'Add Highlight' }}</h3>
             </div>
-            <div *ngIf="heroItem.imageUrl" class="mt-2 h-40 w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <img [src]="heroItem.imageUrl" class="w-full h-full object-cover">
+            <button type="button" (click)="isNewsModalOpen = false" class="sr-close-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="mt-6 space-y-4">
+            <div>
+              <label class="sr-field-label">Title</label>
+              <input [(ngModel)]="newsItem.title" class="sr-input">
+            </div>
+            <div>
+              <label class="sr-field-label">Date</label>
+              <input [(ngModel)]="newsItem.date" class="sr-input" placeholder="May 15, 2025">
+            </div>
+            <div>
+              <label class="sr-field-label">Excerpt</label>
+              <textarea [(ngModel)]="newsItem.excerpt" rows="4" class="sr-textarea"></textarea>
+            </div>
+            <div>
+              <label class="sr-field-label">Image</label>
+              <div class="flex flex-col gap-3 md:flex-row">
+                <input [(ngModel)]="newsItem.imageUrl" class="sr-input flex-1" placeholder="Image URL">
+                <button type="button" (click)="fileInput.click()" [disabled]="isUploading" class="sr-button-outline whitespace-nowrap px-5">{{ isUploading ? 'Uploading...' : 'Upload' }}</button>
+                <input #fileInput type="file" (change)="onFileSelected($event, 'news')" accept="image/*" class="hidden">
+              </div>
+              <div *ngIf="newsItem.imageUrl" class="mt-4 overflow-hidden rounded-[1.3rem] border border-[rgba(228,196,163,0.14)] bg-[rgba(243,232,220,0.04)] p-3">
+                <img [src]="newsItem.imageUrl" class="sr-admin-thumb h-40 w-full max-w-md" alt="Preview">
+              </div>
+            </div>
+            <div>
+              <label class="sr-field-label">Link URL</label>
+              <input [(ngModel)]="newsItem.link" class="sr-input">
             </div>
           </div>
+          <div class="mt-8 flex justify-end gap-3">
+            <button type="button" (click)="isNewsModalOpen = false" class="sr-button-ghost">Cancel</button>
+            <button type="button" (click)="saveNews()" class="sr-button">Save</button>
+          </div>
         </div>
-        <div class="mt-6 flex justify-end gap-3">
-          <button (click)="isHeroModalOpen = false" class="px-4 py-2 text-gray-600 dark:text-gray-400">Cancel</button>
-          <button (click)="saveHero()" class="px-4 py-2 bg-royal-gold text-deep-black rounded font-medium shadow-md shadow-royal-gold/20 hover:bg-royal-gold/90">Save Slide</button>
+      </div>
+
+      <div *ngIf="isMovieModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
+        <div class="sr-modal-panel w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6 md:p-7">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <span class="sr-kicker">{{ movieItem.id ? 'Editing' : 'Creating' }}</span>
+              <h3 class="sr-card-title mt-2">{{ movieItem.id ? 'Edit Project' : 'Add Project' }}</h3>
+            </div>
+            <button type="button" (click)="isMovieModalOpen = false" class="sr-close-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="mt-6 space-y-4">
+            <div>
+              <label class="sr-field-label">Title</label>
+              <input [(ngModel)]="movieItem.title" class="sr-input">
+            </div>
+            <div class="grid gap-4 md:grid-cols-2">
+              <div>
+                <label class="sr-field-label">Year</label>
+                <input [(ngModel)]="movieItem.year" type="number" class="sr-input">
+              </div>
+              <div>
+                <label class="sr-field-label">Director</label>
+                <input [(ngModel)]="movieItem.director" class="sr-input">
+              </div>
+            </div>
+            <div>
+              <label class="sr-field-label">Description</label>
+              <textarea [(ngModel)]="movieItem.description" rows="4" class="sr-textarea"></textarea>
+            </div>
+            <div>
+              <label class="sr-field-label">Poster</label>
+              <div class="flex flex-col gap-3 md:flex-row">
+                <input [(ngModel)]="movieItem.poster" class="sr-input flex-1" placeholder="Poster URL">
+                <button type="button" (click)="movieFileInput.click()" [disabled]="isUploading" class="sr-button-outline whitespace-nowrap px-5">{{ isUploading ? 'Uploading...' : 'Upload' }}</button>
+                <input #movieFileInput type="file" (change)="onFileSelected($event, 'movie')" accept="image/*" class="hidden">
+              </div>
+              <div *ngIf="movieItem.poster" class="mt-4 overflow-hidden rounded-[1.3rem] border border-[rgba(228,196,163,0.14)] bg-[rgba(243,232,220,0.04)] p-3">
+                <img [src]="movieItem.poster" class="sr-admin-thumb is-poster h-52 w-36" alt="Preview">
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 flex justify-end gap-3">
+            <button type="button" (click)="isMovieModalOpen = false" class="sr-button-ghost">Cancel</button>
+            <button type="button" (click)="saveMovie()" class="sr-button">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isGalleryModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
+        <div class="sr-modal-panel w-full max-w-2xl p-6 md:p-7">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <span class="sr-kicker">{{ galleryItem.id ? 'Editing' : 'Creating' }}</span>
+              <h3 class="sr-card-title mt-2">{{ galleryItem.id ? 'Edit Image' : 'Add Image' }}</h3>
+            </div>
+            <button type="button" (click)="isGalleryModalOpen = false" class="sr-close-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="mt-6 space-y-4">
+            <div>
+              <label class="sr-field-label">Caption</label>
+              <input [(ngModel)]="galleryItem.caption" class="sr-input">
+            </div>
+            <div>
+              <label class="sr-field-label">Image</label>
+              <div class="flex flex-col gap-3 md:flex-row">
+                <input [(ngModel)]="galleryItem.imageUrl" class="sr-input flex-1" placeholder="Image URL">
+                <button type="button" (click)="galleryFileInput.click()" [disabled]="isUploading" class="sr-button-outline whitespace-nowrap px-5">{{ isUploading ? 'Uploading...' : 'Upload' }}</button>
+                <input #galleryFileInput type="file" (change)="onFileSelected($event, 'gallery')" accept="image/*" class="hidden">
+              </div>
+              <div *ngIf="galleryItem.imageUrl" class="mt-4 overflow-hidden rounded-[1.3rem] border border-[rgba(228,196,163,0.14)] bg-[rgba(243,232,220,0.04)] p-3">
+                <img [src]="galleryItem.imageUrl" class="sr-admin-thumb h-40 w-full max-w-md" alt="Preview">
+              </div>
+            </div>
+            <div>
+              <label class="sr-field-label">Type</label>
+              <select [(ngModel)]="galleryItem.type" class="sr-select">
+                <option value="Home">Home</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-8 flex justify-end gap-3">
+            <button type="button" (click)="isGalleryModalOpen = false" class="sr-button-ghost">Cancel</button>
+            <button type="button" (click)="saveGallery()" class="sr-button">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isHeroModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
+        <div class="sr-modal-panel w-full max-w-2xl p-6 md:p-7">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <span class="sr-kicker">{{ heroItem.id ? 'Editing' : 'Creating' }}</span>
+              <h3 class="sr-card-title mt-2">{{ heroItem.id ? 'Edit Hero Slide' : 'Add Hero Slide' }}</h3>
+            </div>
+            <button type="button" (click)="isHeroModalOpen = false" class="sr-close-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="mt-6 space-y-4">
+            <div>
+              <label class="sr-field-label">Role Text</label>
+              <input [(ngModel)]="heroItem.caption" class="sr-input" placeholder="Actress, Producer, Philanthropist">
+            </div>
+            <div>
+              <label class="sr-field-label">Image</label>
+              <div class="flex flex-col gap-3 md:flex-row">
+                <input [(ngModel)]="heroItem.imageUrl" class="sr-input flex-1" placeholder="Image URL">
+                <button type="button" (click)="heroFileInput.click()" [disabled]="isUploading" class="sr-button-outline whitespace-nowrap px-5">{{ isUploading ? 'Uploading...' : 'Upload' }}</button>
+                <input #heroFileInput type="file" (change)="onFileSelected($event, 'hero')" accept="image/*" class="hidden">
+              </div>
+              <div *ngIf="heroItem.imageUrl" class="mt-4 overflow-hidden rounded-[1.3rem] border border-[rgba(228,196,163,0.14)] bg-[rgba(243,232,220,0.04)] p-3">
+                <img [src]="heroItem.imageUrl" class="sr-admin-thumb h-48 w-full max-w-md" alt="Preview">
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 flex justify-end gap-3">
+            <button type="button" (click)="isHeroModalOpen = false" class="sr-button-ghost">Cancel</button>
+            <button type="button" (click)="saveHero()" class="sr-button">Save Slide</button>
+          </div>
         </div>
       </div>
     </div>
@@ -275,19 +376,16 @@ export class ManageHomeComponent implements OnInit {
   tabs = ['Hero Slides', 'Highlights', 'Upcoming Projects', 'Featured Gallery'];
   activeTab = 'Hero Slides';
 
-  // Data Lists
   heroSlides: MediaGallery[] = [];
   newsList: NewsArticle[] = [];
   upcomingMovies: Movie[] = [];
   galleryList: MediaGallery[] = [];
 
-  // Edit Items
   heroItem: MediaGallery = this.getEmptyGallery('Hero');
   newsItem: NewsArticle = this.getEmptyNews();
   movieItem: Movie = this.getEmptyMovie();
   galleryItem: MediaGallery = this.getEmptyGallery('Home');
 
-  // Modal States
   isHeroModalOpen = false;
   isNewsModalOpen = false;
   isMovieModalOpen = false;
@@ -306,7 +404,6 @@ export class ManageHomeComponent implements OnInit {
 
     this.isUploading = true;
 
-    // Cloudinary Upload Logic
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', 'ml_default');
@@ -345,7 +442,6 @@ export class ManageHomeComponent implements OnInit {
     });
   }
 
-  // --- News ---
   getEmptyNews(): NewsArticle { return { title: '', excerpt: '', date: '', imageUrl: '', link: '' }; }
 
   openNewsModal() { this.newsItem = this.getEmptyNews(); this.isNewsModalOpen = true; }
@@ -364,7 +460,6 @@ export class ManageHomeComponent implements OnInit {
     if (confirm('Delete?')) this.apiService.deleteNews(id).subscribe(() => this.loadAll());
   }
 
-  // --- Movies ---
   getEmptyMovie(): Movie {
     return { id: 0, title: '', year: 2026, language: 'Telugu', genre: [], role: '', director: '', poster: '', description: '' };
   }
@@ -374,8 +469,6 @@ export class ManageHomeComponent implements OnInit {
   editMovie(item: Movie) { this.movieItem = JSON.parse(JSON.stringify(item)); this.isMovieModalOpen = true; }
 
   saveMovie() {
-    // If genre is string for quick edit (not implemented in simple template, assume array handling or just simple)
-    // For simplicity, we kept it simple in template.
     if (this.movieItem.id) {
       this.apiService.updateMovie(this.movieItem.id, this.movieItem).subscribe(() => { this.loadAll(); this.isMovieModalOpen = false; });
     } else {
@@ -387,7 +480,6 @@ export class ManageHomeComponent implements OnInit {
     if (confirm('Delete Project?')) this.apiService.deleteMovie(id).subscribe(() => this.loadAll());
   }
 
-  // --- Gallery & Hero ---
   getEmptyGallery(type: string = 'Home'): MediaGallery { return { caption: '', imageUrl: '', type: type }; }
 
   openHeroModal() { this.heroItem = this.getEmptyGallery('Hero'); this.isHeroModalOpen = true; }

@@ -61,8 +61,13 @@ export const routes: Routes = [
       },
       {
         path: 'contact',
-        loadComponent: () => import('./pages/contact/contact.component').then(c => c.ContactComponent),
-        title: 'Contact | Samantha Ruth Prabhu'
+        loadComponent: () => import('./pages/fan-zone/fan-zone.component').then(c => c.FanZoneComponent),
+        title: 'Fan Zone | Samantha Ruth Prabhu'
+      },
+      {
+        path: 'blog',
+        loadComponent: () => import('./pages/blog/blog.component').then(c => c.BlogComponent),
+        title: 'Blog | Samantha Ruth Prabhu'
       }
     ]
   },

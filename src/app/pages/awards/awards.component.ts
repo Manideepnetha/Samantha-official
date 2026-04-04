@@ -7,67 +7,75 @@ import { ApiService, Award } from '../../services/api.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="min-h-screen bg-ivory dark:bg-deep-black">
-      <!-- Hero Section -->
-      <section class="relative h-[50vh] overflow-hidden">
-        <div class="absolute inset-0">
-          <img 
-            src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748038033/ad7ccf187002995.6580064d3e931_ajzyv5.jpg" 
-            alt="Awards & Milestones" 
-            class="w-full h-full object-cover object-[center_top_30%]" 
-          />
-          <div class="absolute inset-0 bg-gradient-to-b from-deep-black/80 to-deep-black/40"></div>
-        </div>
-        
-        <div class="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center">
-          <span class="inline-block text-royal-gold font-inter text-sm uppercase tracking-wider mb-2">Recognition</span>
-          <h1 class="text-4xl md:text-6xl font-playfair font-bold text-ivory mb-6 text-shadow">Awards & Milestones</h1>
-          <p class="text-xl md:text-2xl text-ivory/90 font-lora italic max-w-3xl">Celebrating moments of excellence and recognition throughout Samantha's illustrious career.</p>
-        </div>
-      </section>
+    <div class="sr-page">
+      <section class="sr-hero-shell">
+        <div class="sr-hero-frame">
+          <div class="sr-hero-panel min-h-[540px]">
+            <div class="sr-hero-media">
+              <img
+                src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748038033/ad7ccf187002995.6580064d3e931_ajzyv5.jpg"
+                alt="Awards & Milestones"
+                class="object-[center_top_26%]"
+              />
+            </div>
 
-      <!-- Awards Timeline -->
-      <section class="py-20 bg-ivory dark:bg-deep-black">
-        <div class="container mx-auto px-4">
-          <div *ngIf="timelineAwards.length === 0" class="text-center text-charcoal/50 dark:text-ivory/50">
-             Loading awards...
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div *ngFor="let award of timelineAwards" class="relative pl-8 sm:pl-32 py-6 group">
-              <div class="font-playfair text-2xl text-royal-gold font-bold mb-1 sm:mb-0 sm:absolute sm:left-0 sm:top-6">{{ award.year }}</div>
-              <div class="absolute left-2 sm:left-20 top-0 h-full w-0.5 bg-royal-gold/30"></div>
-              <div class="absolute left-0 sm:left-[4.5rem] top-8 w-6 h-6 bg-royal-gold rounded-full"></div>
-              <div class="bg-white dark:bg-charcoal p-5 rounded-lg shadow-md hover-lift">
-                <h3 class="font-playfair text-xl font-bold mb-2 text-charcoal dark:text-ivory">{{ award.title }}</h3>
-                <p class="text-charcoal/80 dark:text-ivory/80 mb-3">{{ award.description }}</p>
-                <blockquote *ngIf="award.quote" class="border-l-4 border-royal-gold pl-4 italic text-charcoal/90 dark:text-ivory/90">
-                  "{{ award.quote }}"
-                </blockquote>
-              </div>
+            <div class="sr-hero-copy max-w-3xl">
+              <span class="sr-kicker">Recognition</span>
+              <h1 class="sr-hero-title">Awards & Milestones</h1>
+              <p class="sr-hero-subtitle">
+                Celebrating moments of excellence and recognition throughout Samantha's illustrious career.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Awards Gallery -->
-      <section class="py-20 bg-white dark:bg-charcoal">
-        <div class="container mx-auto px-4">
-          <h2 class="text-3xl md:text-4xl font-playfair font-bold text-center text-charcoal dark:text-ivory mb-16">Award Gallery</h2>
-          
-          <div *ngIf="galleryAwards.length === 0" class="text-center text-charcoal/50 dark:text-ivory/50">
-             Loading gallery...
-          </div>
+      <section class="sr-section">
+        <div class="sr-section-heading">
+          <span class="sr-kicker">Timeline</span>
+          <h2>Recognition Over Time</h2>
+          <p>Major honors, defining moments, and milestones mapped into an editorial timeline without changing the underlying award data.</p>
+        </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div *ngFor="let item of galleryAwards" class="relative group overflow-hidden rounded-lg hover-lift">
-              <img [src]="item.imageUrl" [alt]="item.title" class="w-full aspect-[3/4] object-cover" />
-              <div class="absolute inset-0 bg-gradient-to-t from-deep-black/80 via-deep-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                <div>
-                  <h3 class="font-playfair text-xl font-bold text-ivory mb-2">{{ item.title }}</h3>
-                  <p class="text-ivory/90">{{ item.year }}</p>
-                </div>
-              </div>
+        <div *ngIf="timelineAwards.length === 0" class="sr-empty-state">
+          Loading awards...
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2" *ngIf="timelineAwards.length > 0">
+          <div *ngFor="let award of timelineAwards" class="sr-surface p-6 md:p-7 sr-hover-card h-full">
+            <div class="sr-meta mb-4 text-base">{{ award.year }}</div>
+            <div>
+              <h3 class="sr-card-title mb-3">{{ award.title }}</h3>
+              <p class="sr-card-text">{{ award.description }}</p>
+              <blockquote *ngIf="award.quote" class="mt-4 border-l border-[rgba(228,196,163,0.28)] pl-4 font-['Cormorant_Garamond'] text-2xl italic text-[#f6ecdf]">
+                "{{ award.quote }}"
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sr-section pb-12">
+        <div class="sr-section-heading">
+          <span class="sr-kicker">Gallery</span>
+          <h2>Award Gallery</h2>
+          <p>A visual archive of celebrated moments presented in the same premium style as the homepage.</p>
+        </div>
+
+        <div *ngIf="galleryAwards.length === 0" class="sr-empty-state">
+          Loading gallery...
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3" *ngIf="galleryAwards.length > 0">
+          <div *ngFor="let item of galleryAwards" class="sr-surface overflow-hidden sr-hover-card group">
+            <div class="relative aspect-[3/4] overflow-hidden">
+              <img [src]="item.imageUrl" [alt]="item.title" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-t from-[rgba(8,4,4,0.84)] via-transparent to-transparent"></div>
+            </div>
+            <div class="p-6">
+              <span class="sr-meta">{{ item.year }}</span>
+              <h3 class="sr-card-title mt-3 mb-2">{{ item.title }}</h3>
+              <p class="sr-card-text">{{ item.category || 'Award recognition' }}</p>
             </div>
           </div>
         </div>
@@ -84,12 +92,10 @@ export class AwardsComponent implements OnInit {
 
   ngOnInit(): void {
     this.apiService.getAwards().subscribe(data => {
-      // Sort by year descending for timeline
       this.timelineAwards = data
         .filter(a => a.type === 'Timeline')
         .sort((a, b) => b.year - a.year);
 
-      // Gallery items (sorting optional, keeping default or by year)
       this.galleryAwards = data
         .filter(a => a.type === 'Gallery')
         .sort((a, b) => b.year - a.year);

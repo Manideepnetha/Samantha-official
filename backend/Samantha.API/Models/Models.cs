@@ -61,6 +61,8 @@ public class ContactMessage
     public required string Email { get; set; }
     public required string Subject { get; set; }
     public required string Message { get; set; }
+    public string? Category { get; set; }
+    public string? MetadataJson { get; set; }
     public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 }
 
@@ -137,4 +139,25 @@ public class SiteSetting
     public int Id { get; set; }
     public required string Key { get; set; }
     public required string Value { get; set; }
+}
+
+public class QuizEntry
+{
+    public int Id { get; set; }
+    public required string Name { get; set; }
+    public required string Email { get; set; }
+    public string? City { get; set; }
+    public int Score { get; set; }
+    public int TotalQuestions { get; set; }
+    public int TimeTakenSeconds { get; set; }
+    public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class PageContent
+{
+    public int Id { get; set; }
+    public required string Key { get; set; }
+    public required string ContentJson { get; set; }
+    public string? Description { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

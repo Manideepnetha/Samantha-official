@@ -7,32 +7,64 @@ import { ApiService, FashionItem } from '../../services/api.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="min-h-screen bg-ivory dark:bg-deep-black py-20">
-      <div class="container mx-auto px-4">
-        <!-- Header Section -->
-        <div class="text-center mb-16">
-          <span class="inline-block text-royal-gold font-inter text-sm uppercase tracking-wider mb-2">Fashion & Style</span>
-          <h1 class="text-4xl md:text-5xl font-playfair font-bold text-charcoal dark:text-ivory">Fashion Journey</h1>
-        </div>
-
-        <!-- Fashion Content -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <a *ngFor="let item of fashionItems" [href]="item.link" target="_blank" rel="noopener noreferrer" class="block rounded-lg overflow-hidden hover-lift relative h-[400px]">
-            <div class="absolute bottom-[-30px] left-0 right-0">
-              <img 
-                [src]="item.imageUrl"
-                [alt]="item.title"
-                class="w-full h-[500px] object-cover"
+    <div class="sr-page">
+      <section class="sr-hero-shell">
+        <div class="sr-hero-frame">
+          <div class="sr-hero-panel min-h-[500px]">
+            <div class="sr-hero-media">
+              <img
+                src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045346/Samantha29_clxsnm.jpg"
+                alt="Fashion & Style"
+                class="object-[center_18%]"
               />
             </div>
-            <div class="p-6 bg-white dark:bg-charcoal absolute bottom-0 left-0 right-0">
-              <span class="text-sm text-royal-gold">{{ item.date }}</span>
-              <h3 class="font-playfair text-xl font-bold mt-2 mb-3 text-charcoal dark:text-ivory">{{ item.title }}</h3>
-              <p class="text-charcoal/80 dark:text-ivory/80">{{ item.description }}</p>
+
+            <div class="sr-hero-copy max-w-3xl">
+              <span class="sr-kicker">Fashion & Style</span>
+              <h1 class="sr-hero-title">Fashion Journey</h1>
+              <p class="sr-hero-subtitle">
+                Editorial looks, memorable appearances, and signature style moments gathered from the existing fashion feed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sr-section pb-12">
+        <div class="sr-section-heading">
+          <span class="sr-kicker">Style Notes</span>
+          <h2>Looks That Defined the Era</h2>
+          <p>The same fashion entries remain here, reframed into a richer magazine-like presentation.</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <a
+            *ngFor="let item of fashionItems"
+            [href]="item.link"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="sr-surface overflow-hidden sr-hover-card group block"
+          >
+            <div class="relative h-[420px] overflow-hidden">
+              <img
+                [src]="item.imageUrl"
+                [alt]="item.title"
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-[rgba(8,4,4,0.8)] via-transparent to-transparent"></div>
+            </div>
+            <div class="p-6">
+              <span class="sr-meta">{{ item.date }}</span>
+              <h3 class="sr-card-title mt-3 mb-3">{{ item.title }}</h3>
+              <p class="sr-card-text">{{ item.description }}</p>
             </div>
           </a>
+
+          <div *ngIf="fashionItems.length === 0" class="sr-empty-state md:col-span-2 xl:col-span-3">
+            Fashion entries will appear here once they are added.
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   `,
   styles: []
@@ -47,4 +79,4 @@ export class FashionComponent implements OnInit {
       this.fashionItems = data;
     });
   }
-} 
+}

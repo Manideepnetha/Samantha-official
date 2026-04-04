@@ -8,111 +8,105 @@ import { ApiService, MediaGallery } from '../../../services/api.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-playfair font-bold text-charcoal dark:text-ivory">Manage Media Gallery</h2>
-        <button (click)="openModal()" class="px-4 py-2 bg-royal-gold text-deep-black rounded hover-lift font-medium">
-          Add Image
-        </button>
+    <div class="sr-admin-page">
+      <div class="sr-admin-page-header">
+        <div>
+          <span class="sr-kicker">Gallery</span>
+          <h1 class="sr-admin-title">Manage Media Gallery</h1>
+          <p class="sr-admin-subtitle">Organize the main gallery across categories while keeping homepage-specific images in their own space.</p>
+        </div>
+        <button (click)="openModal()" class="sr-button">Add Image</button>
       </div>
 
-      <!-- Filters -->
-      <div class="flex gap-2 mb-6">
-        <button 
-          *ngFor="let cat of categories" 
+      <div class="flex flex-wrap gap-3">
+        <button
+          *ngFor="let cat of categories"
           (click)="filterCategory = cat.value"
-          [class.bg-royal-gold]="filterCategory === cat.value"
-          [class.dark:text-deep-black]="filterCategory === cat.value"
-          class="px-3 py-1 rounded border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-white/10"
+          [class.is-active]="filterCategory === cat.value"
+          class="sr-chip"
         >
           {{ cat.label }}
         </button>
       </div>
 
-      <!-- Table -->
-      <div class="overflow-x-auto bg-white dark:bg-charcoal rounded-lg shadow">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-100 dark:bg-deep-black/50 text-charcoal dark:text-ivory">
-              <th class="p-4 border-b border-gray-200 dark:border-gray-700">Image</th>
-              <th class="p-4 border-b border-gray-200 dark:border-gray-700">Date</th>
-              <th class="p-4 border-b border-gray-200 dark:border-gray-700">Caption</th>
-              <th class="p-4 border-b border-gray-200 dark:border-gray-700">Category</th>
-              <th class="p-4 border-b border-gray-200 dark:border-gray-700">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let media of filteredGallery" class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/5">
-              <td class="p-4">
-                <img [src]="media.imageUrl" class="w-16 h-10 object-cover rounded" alt="Thumbnail">
-              </td>
-              <td class="p-4 text-charcoal/80 dark:text-ivory/80">{{ media.date }}</td>
-              <td class="p-4 text-charcoal dark:text-ivory font-medium">{{ media.caption }}</td>
-              <td class="p-4 text-charcoal/80 dark:text-ivory/80">{{ media.type }}</td>
-              <td class="p-4">
-                <button (click)="editMedia(media)" class="text-royal-gold hover:text-royal-gold/80 mr-3">Edit</button>
-                <button (click)="deleteMedia(media.id!)" class="text-red-500 hover:text-red-400">Delete</button>
-              </td>
-            </tr>
-            <tr *ngIf="filteredGallery.length === 0">
-              <td colspan="5" class="p-8 text-center text-gray-500">No images found in this category.</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="sr-surface sr-admin-table-wrap">
+        <div class="sr-admin-table-scroll">
+          <table class="sr-admin-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Date</th>
+                <th>Caption</th>
+                <th>Category</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let media of filteredGallery">
+                <td><img [src]="media.imageUrl" class="sr-admin-thumb" alt="Gallery item"></td>
+                <td>{{ media.date }}</td>
+                <td class="sr-admin-title-cell">{{ media.caption }}</td>
+                <td><span class="sr-admin-badge is-soft">{{ media.type }}</span></td>
+                <td>
+                  <div class="sr-admin-actions">
+                    <button (click)="editMedia(media)" class="sr-admin-action">Edit</button>
+                    <button (click)="deleteMedia(media.id!)" class="sr-admin-action-danger">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="filteredGallery.length === 0" class="sr-admin-empty-row">
+                <td colspan="5">No images found in this category.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <!-- Modal -->
-      <div *ngIf="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <div class="bg-white dark:bg-charcoal rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
-          <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-            <h3 class="text-xl font-bold font-playfair text-charcoal dark:text-ivory">
-              {{ isEditing ? 'Edit Image' : 'Add Image' }}
-            </h3>
-            <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">&times;</button>
+      <div *ngIf="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
+        <div class="sr-modal-panel w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6 md:p-7">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <span class="sr-kicker">{{ isEditing ? 'Editing' : 'Creating' }}</span>
+              <h2 class="sr-card-title mt-2">{{ isEditing ? 'Edit Image' : 'Add Image' }}</h2>
+            </div>
+            <button type="button" (click)="closeModal()" class="sr-close-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          
-          <div class="p-6 space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-charcoal dark:text-ivory mb-1">Caption</label>
-              <input [(ngModel)]="currentMedia.caption" type="text" class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 bg-transparent text-charcoal dark:text-ivory focus:border-royal-gold outline-none">
-            </div>
 
+          <div class="mt-6 space-y-4">
             <div>
-              <label class="block text-sm font-medium text-charcoal dark:text-ivory mb-1">Date</label>
-              <input [(ngModel)]="currentMedia.date" type="text" placeholder="e.g. March 2024" class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 bg-transparent text-charcoal dark:text-ivory focus:border-royal-gold outline-none">
+              <label class="sr-field-label">Caption</label>
+              <input [(ngModel)]="currentMedia.caption" type="text" class="sr-input">
             </div>
-
             <div>
-              <label class="block text-sm font-medium text-charcoal dark:text-ivory mb-1">Gallery Image</label>
-              <div class="flex gap-2 mb-2">
-                <input [(ngModel)]="currentMedia.imageUrl" type="text" placeholder="Paste link or upload..." class="flex-1 p-2 rounded border border-gray-300 dark:border-gray-600 bg-transparent text-charcoal dark:text-ivory focus:border-royal-gold outline-none">
-                <button (click)="fileInput.click()" [disabled]="isUploading" class="px-3 py-2 bg-royal-gold/10 hover:bg-royal-gold/20 text-royal-gold rounded text-xs font-semibold transition-all flex items-center gap-2">
-                  <svg *ngIf="!isUploading" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                  </svg>
-                  <div *ngIf="isUploading" class="w-4 h-4 border-2 border-royal-gold border-t-transparent rounded-full animate-spin"></div>
-                  {{ isUploading ? 'Uploading...' : 'Upload Image' }}
-                </button>
+              <label class="sr-field-label">Date</label>
+              <input [(ngModel)]="currentMedia.date" type="text" placeholder="March 2024" class="sr-input">
+            </div>
+            <div>
+              <label class="sr-field-label">Gallery Image</label>
+              <div class="flex flex-col gap-3 md:flex-row">
+                <input [(ngModel)]="currentMedia.imageUrl" type="text" placeholder="Paste image URL" class="sr-input flex-1">
+                <button type="button" (click)="fileInput.click()" [disabled]="isUploading" class="sr-button-outline whitespace-nowrap px-5">{{ isUploading ? 'Uploading...' : 'Upload Image' }}</button>
                 <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
               </div>
-
-              <!-- Preview Area -->
-              <div *ngIf="currentMedia.imageUrl" class="mt-2 relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-video bg-gray-50 dark:bg-deep-black/20">
-                <img [src]="currentMedia.imageUrl" class="w-full h-full object-cover" alt="Preview">
+              <div *ngIf="currentMedia.imageUrl" class="mt-4 overflow-hidden rounded-[1.3rem] border border-[rgba(228,196,163,0.14)] bg-[rgba(243,232,220,0.04)] p-3">
+                <img [src]="currentMedia.imageUrl" class="sr-admin-thumb h-40 w-full max-w-md" alt="Preview">
               </div>
             </div>
-
             <div>
-              <label class="block text-sm font-medium text-charcoal dark:text-ivory mb-1">Category</label>
-              <select [(ngModel)]="currentMedia.type" class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 bg-transparent text-charcoal dark:text-ivory focus:border-royal-gold outline-none">
-                <option *ngFor="let cat of categories.slice(1)" [value]="cat.value" class="bg-white dark:bg-charcoal">{{ cat.label }}</option>
+              <label class="sr-field-label">Category</label>
+              <select [(ngModel)]="currentMedia.type" class="sr-select">
+                <option *ngFor="let cat of categories.slice(1)" [value]="cat.value">{{ cat.label }}</option>
               </select>
             </div>
           </div>
 
-          <div class="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
-            <button (click)="closeModal()" class="px-4 py-2 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
-            <button (click)="saveMedia()" class="px-4 py-2 bg-royal-gold text-deep-black rounded hover:bg-royal-gold/90 font-medium">Save</button>
+          <div class="mt-8 flex justify-end gap-3">
+            <button type="button" (click)="closeModal()" class="sr-button-ghost">Cancel</button>
+            <button type="button" (click)="saveMedia()" class="sr-button">Save</button>
           </div>
         </div>
       </div>
@@ -150,7 +144,6 @@ export class ManageGalleryComponent implements OnInit {
 
     this.isUploading = true;
 
-    // Cloudinary Upload Logic
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', 'ml_default');
@@ -179,7 +172,6 @@ export class ManageGalleryComponent implements OnInit {
 
   loadGallery(): void {
     this.apiService.getMediaGalleries().subscribe(data => {
-      // Exclude 'Home' type items as they are managed in Home Page admin
       this.galleryList = data.filter(item => item.type !== 'Home');
     });
   }

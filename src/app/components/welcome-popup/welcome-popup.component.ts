@@ -157,6 +157,8 @@ export class WelcomePopupComponent implements OnInit {
   closePopup() {
     this.isVisible = false;
     document.body.style.overflow = '';
+    // Persist so popup doesn't show again for this user
+    localStorage.setItem('srp_welcome_seen', 'true');
     this.close.emit();
   }
 }

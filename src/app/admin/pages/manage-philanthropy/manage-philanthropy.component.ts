@@ -8,142 +8,140 @@ import { ApiService, Philanthropy } from '../../../services/api.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-playfair font-bold text-ivory">Manage Philanthropy</h1>
-        <button (click)="openModal()" class="bg-royal-gold text-deep-black px-4 py-2 rounded-md font-bold hover:bg-white transition-colors">
-          Add New Item
-        </button>
+    <div class="sr-admin-page">
+      <div class="sr-admin-page-header">
+        <div>
+          <span class="sr-kicker">Impact</span>
+          <h1 class="sr-admin-title">Manage Philanthropy</h1>
+          <p class="sr-admin-subtitle">Maintain initiatives, statistics, and success stories with the same editorial tone as the public philanthropy page.</p>
+        </div>
+        <button (click)="openModal()" class="sr-button">Add Item</button>
       </div>
 
-      <!-- Philanthropy Table -->
-      <div class="bg-charcoal rounded-lg shadow-lg overflow-hidden">
-        <table class="w-full text-left">
-          <thead class="bg-deep-black text-royal-gold uppercase text-sm">
-            <tr>
-              <th class="p-4">Title</th>
-              <th class="p-4">Type</th>
-              <th class="p-4">Details</th>
-              <th class="p-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="text-ivory/90 divide-y divide-white/10">
-            <tr *ngFor="let item of philanthropies" class="hover:bg-white/5 transition-colors">
-              <td class="p-4 font-bold">{{item.title}}</td>
-              <td class="p-4">
-                <span [ngClass]="{
-                    'bg-blue-900': item.type === 'Initiative',
-                    'bg-green-900': item.type === 'Stat',
-                    'bg-purple-900': item.type === 'Story'
-                }" class="px-2 py-1 rounded text-xs">
-                  {{item.type}}
-                </span>
-              </td>
-              <td class="p-4">
-                <div *ngIf="item.type === 'Stat'">
-                    <span class="font-bold text-royal-gold">{{item.value | number}}</span>
-                    <span class="text-white/50 ml-2">Icon: {{item.icon}}</span>
-                </div>
-                <div *ngIf="item.type === 'Initiative'">
-                    <span class="block text-white/50 mb-1">Icon: {{item.icon}}</span>
-                    <span class="block truncate max-w-xs" title="{{item.description}}">{{item.description}}</span>
-                </div>
-                <div *ngIf="item.type === 'Story'">
-                    <div class="flex items-center gap-2">
-                        <img *ngIf="item.imageUrl" [src]="item.imageUrl" class="h-8 w-8 object-cover rounded" alt="thunb">
-                        <span class="truncate max-w-xs" title="{{item.description}}">{{item.description}}</span>
-                    </div>
-                </div>
-              </td>
-              <td class="p-4 flex gap-3">
-                <button (click)="openModal(item)" class="text-blue-400 hover:text-blue-300">Edit</button>
-                <button (click)="deleteItem(item.id!)" class="text-red-400 hover:text-red-300">Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="sr-surface sr-admin-table-wrap">
+        <div class="sr-admin-table-scroll">
+          <table class="sr-admin-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Details</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of philanthropies">
+                <td class="sr-admin-title-cell">{{ item.title }}</td>
+                <td>
+                  <span class="sr-admin-badge" [class.is-soft]="item.type === 'Initiative'" [class.is-success]="item.type === 'Stat'" [class.is-accent]="item.type === 'Story'">{{ item.type }}</span>
+                </td>
+                <td>
+                  <div *ngIf="item.type === 'Stat'" class="space-y-2">
+                    <p class="font-['Cormorant_Garamond'] text-3xl leading-none text-[var(--editorial-accent-strong)]">{{ item.value | number }}</p>
+                    <p class="sr-card-text">Icon: {{ item.icon || 'Not set' }}</p>
+                  </div>
+                  <div *ngIf="item.type === 'Initiative'" class="space-y-2 max-w-md">
+                    <p class="sr-card-text">{{ item.description }}</p>
+                    <p class="sr-card-text">Icon: {{ item.icon || 'Not set' }}</p>
+                  </div>
+                  <div *ngIf="item.type === 'Story'" class="sr-admin-media max-w-md">
+                    <img *ngIf="item.imageUrl" [src]="item.imageUrl" class="sr-admin-thumb" alt="Story image">
+                    <p class="sr-card-text">{{ item.description }}</p>
+                  </div>
+                </td>
+                <td>
+                  <div class="sr-admin-actions">
+                    <button (click)="openModal(item)" class="sr-admin-action">Edit</button>
+                    <button (click)="deleteItem(item.id!)" class="sr-admin-action-danger">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="philanthropies.length === 0" class="sr-admin-empty-row">
+                <td colspan="4">No philanthropy items found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <!-- Modal -->
-      <div *ngIf="isModalOpen" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div class="bg-charcoal p-6 rounded-lg w-full max-w-lg relative border border-royal-gold/30">
-          <button (click)="closeModal()" class="absolute top-4 right-4 text-white hover:text-royal-gold">✕</button>
-          <h2 class="text-2xl font-playfair font-bold text-royal-gold mb-4">{{ isEditing ? 'Edit Item' : 'Add New Item' }}</h2>
-          
-          <form (ngSubmit)="saveItem()" class="space-y-4">
+      <div *ngIf="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
+        <div class="sr-modal-panel w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6 md:p-7">
+          <div class="flex items-start justify-between gap-4">
             <div>
-                <label class="block text-sm text-ivory/70 mb-1">Type</label>
-                <select [(ngModel)]="currentItem.type" name="type" class="w-full bg-deep-black border border-white/20 rounded p-2 text-ivory focus:border-royal-gold outline-none">
-                    <option value="Initiative">Initiative</option>
-                    <option value="Stat">Stat</option>
-                    <option value="Story">Success Story</option>
-                </select>
+              <span class="sr-kicker">{{ isEditing ? 'Editing' : 'Creating' }}</span>
+              <h2 class="sr-card-title mt-2">{{ isEditing ? 'Edit Item' : 'Add Item' }}</h2>
             </div>
-
-            <div>
-              <label class="block text-sm text-ivory/70 mb-1">Title</label>
-              <input [(ngModel)]="currentItem.title" name="title" class="w-full bg-deep-black border border-white/20 rounded p-2 text-ivory focus:border-royal-gold outline-none" required>
-            </div>
-
-            <!-- Fields for Stat -->
-            <div *ngIf="currentItem.type === 'Stat'" class="space-y-4">
-                <div>
-                    <label class="block text-sm text-ivory/70 mb-1">Value (Count)</label>
-                    <input [(ngModel)]="currentItem.value" name="value" type="number" class="w-full bg-deep-black border border-white/20 rounded p-2 text-ivory focus:border-royal-gold outline-none">
-                </div>
-                <div>
-                     <label class="block text-sm text-ivory/70 mb-1">Icon (Emoji/Text)</label>
-                     <input [(ngModel)]="currentItem.icon" name="icon" class="w-full bg-deep-black border border-white/20 rounded p-2 text-ivory focus:border-royal-gold outline-none">
-                </div>
-            </div>
-
-            <!-- Fields for Initiative -->
-            <div *ngIf="currentItem.type === 'Initiative'" class="space-y-4">
-                <div>
-                  <label class="block text-sm text-ivory/70 mb-1">Description</label>
-                  <textarea [(ngModel)]="currentItem.description" name="description" rows="3" class="w-full bg-deep-black border border-white/20 rounded p-2 text-ivory focus:border-royal-gold outline-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm text-ivory/70 mb-1">Icon (Emoji/Text)</label>
-                    <input [(ngModel)]="currentItem.icon" name="icon" class="w-full bg-deep-black border border-white/20 rounded p-2 text-ivory focus:border-royal-gold outline-none">
-               </div>
-            </div>
-
-            <!-- Fields for Story -->
-            <div *ngIf="currentItem.type === 'Story'" class="space-y-4">
-                <div>
-                    <label class="block text-sm text-ivory/70 mb-1">Content/Description</label>
-                    <textarea [(ngModel)]="currentItem.description" name="description" rows="5" class="w-full bg-deep-black border border-white/20 rounded p-2 text-ivory focus:border-royal-gold outline-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm text-ivory/70 mb-1">Story Image</label>
-                    <div class="flex gap-2 mb-2">
-                        <input [(ngModel)]="currentItem.imageUrl" name="imageUrl" placeholder="Paste link or upload..." class="flex-1 bg-deep-black border border-white/20 rounded p-2 text-ivory focus:border-royal-gold outline-none">
-                        <button type="button" (click)="fileInput.click()" [disabled]="isUploading" class="px-3 py-2 bg-royal-gold/10 hover:bg-royal-gold/20 text-royal-gold rounded text-xs font-semibold transition-all flex items-center gap-2">
-                            <svg *ngIf="!isUploading" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                            <div *ngIf="isUploading" class="w-4 h-4 border-2 border-royal-gold border-t-transparent rounded-full animate-spin"></div>
-                            {{ isUploading ? 'Uploading...' : 'Upload Image' }}
-                        </button>
-                        <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
-                    </div>
-                    
-                    <!-- Preview Area -->
-                    <div *ngIf="currentItem.imageUrl" class="mt-2 relative rounded-lg overflow-hidden border border-white/10 aspect-video bg-deep-black/30">
-                        <img [src]="currentItem.imageUrl" class="w-full h-full object-cover" alt="Preview">
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit" class="w-full bg-royal-gold text-deep-black font-bold py-2 rounded hover:bg-white transition-colors mt-4">
-              {{ isEditing ? 'Update Item' : 'Create Item' }}
+            <button type="button" (click)="closeModal()" class="sr-close-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
+          </div>
+
+          <form (ngSubmit)="saveItem()" class="mt-6 space-y-4">
+            <div>
+              <label class="sr-field-label">Type</label>
+              <select [(ngModel)]="currentItem.type" name="type" class="sr-select">
+                <option value="Initiative">Initiative</option>
+                <option value="Stat">Stat</option>
+                <option value="Story">Success Story</option>
+              </select>
+            </div>
+            <div>
+              <label class="sr-field-label">Title</label>
+              <input [(ngModel)]="currentItem.title" name="title" class="sr-input" required>
+            </div>
+
+            <div *ngIf="currentItem.type === 'Stat'" class="grid gap-4 md:grid-cols-2">
+              <div>
+                <label class="sr-field-label">Value</label>
+                <input [(ngModel)]="currentItem.value" name="value" type="number" class="sr-input">
+              </div>
+              <div>
+                <label class="sr-field-label">Icon</label>
+                <input [(ngModel)]="currentItem.icon" name="statIcon" class="sr-input">
+              </div>
+            </div>
+
+            <div *ngIf="currentItem.type === 'Initiative'" class="space-y-4">
+              <div>
+                <label class="sr-field-label">Description</label>
+                <textarea [(ngModel)]="currentItem.description" name="initiativeDescription" rows="4" class="sr-textarea"></textarea>
+              </div>
+              <div>
+                <label class="sr-field-label">Icon</label>
+                <input [(ngModel)]="currentItem.icon" name="initiativeIcon" class="sr-input">
+              </div>
+            </div>
+
+            <div *ngIf="currentItem.type === 'Story'" class="space-y-4">
+              <div>
+                <label class="sr-field-label">Content</label>
+                <textarea [(ngModel)]="currentItem.description" name="storyDescription" rows="5" class="sr-textarea"></textarea>
+              </div>
+              <div>
+                <label class="sr-field-label">Story Image</label>
+                <div class="flex flex-col gap-3 md:flex-row">
+                  <input [(ngModel)]="currentItem.imageUrl" name="imageUrl" placeholder="Paste image URL" class="sr-input flex-1">
+                  <button type="button" (click)="fileInput.click()" [disabled]="isUploading" class="sr-button-outline whitespace-nowrap px-5">{{ isUploading ? 'Uploading...' : 'Upload Image' }}</button>
+                  <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+                </div>
+                <div *ngIf="currentItem.imageUrl" class="mt-4 overflow-hidden rounded-[1.3rem] border border-[rgba(228,196,163,0.14)] bg-[rgba(243,232,220,0.04)] p-3">
+                  <img [src]="currentItem.imageUrl" class="sr-admin-thumb h-40 w-full max-w-md" alt="Preview">
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+              <button type="button" (click)="closeModal()" class="sr-button-ghost">Cancel</button>
+              <button type="submit" class="sr-button">{{ isEditing ? 'Update Item' : 'Create Item' }}</button>
+            </div>
           </form>
         </div>
       </div>
     </div>
-  `
+  `,
+  styles: []
 })
 export class ManagePhilanthropyComponent implements OnInit {
   philanthropies: Philanthropy[] = [];
@@ -151,7 +149,6 @@ export class ManagePhilanthropyComponent implements OnInit {
   isEditing = false;
   isUploading = false;
 
-  // Default
   currentItem: Philanthropy = {
     title: '',
     type: 'Initiative',
@@ -173,7 +170,6 @@ export class ManagePhilanthropyComponent implements OnInit {
 
     this.isUploading = true;
 
-    // Cloudinary Upload Logic
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', 'ml_default');
