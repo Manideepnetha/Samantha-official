@@ -63,7 +63,7 @@ import { ThemeService } from '../../services/theme.service';
                   <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
                </button>
 
-               <a routerLink="/contact" class="sr-button">Get In Touch</a>
+               <a routerLink="/fan-zone" class="sr-button">Fan Zone</a>
             </div>
           </div>
         </nav>
@@ -149,7 +149,7 @@ export class NavbarComponent {
       { label: 'Blog', route: '/blog', exact: false },
       { label: 'Press', route: '/media', exact: false },
       { label: 'Gallery', route: '/gallery', exact: false },
-      { label: 'Fan Zone', route: '/contact', exact: false }
+      { label: 'Fan Zone', route: '/fan-zone', exact: false }
    ];
 
    constructor(private themeService: ThemeService) {

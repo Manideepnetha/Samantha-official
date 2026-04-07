@@ -1,0 +1,96 @@
+<div class="gallery-shell">
+  <section class="gallery-hero">
+    <div class="hero-frame">
+      <span class="hero-kicker">Gallery</span>
+      <h1>Visual Journey</h1>
+      <p>
+        The gallery now moves in curated story sets. Each set opens into its own screen with the related images grouped together,
+        giving the archive a more editorial rhythm instead of a flat image wall.
+      </p>
+    </div>
+  </section>
+
+  <section class="gallery-toolbar">
+    <div class="toolbar-copy">
+      <span>Story Sets</span>
+      <h2>Browse the archive by mood, moment, and visual language.</h2>
+    </div>
+
+    <div class="category-chips">
+      <button
+        *ngFor="let category of categories"
+        type="button"
+        class="category-chip"
+        [class.is-active]="selectedCategory === category.value"
+        (click)="selectedCategory = category.value"
+      >
+        {{ category.label }}
+      </button>
+    </div>
+  </section>
+
+  <section *ngIf="loading" class="gallery-empty-state">
+    Loading the visual journey...
+  </section>
+
+  <section *ngIf="!loading && featuredSet as set" class="journey-stage" [style.--stage-accent]="set.accentTone">
+    <div class="journey-stage-copy">
+      <span>{{ getGalleryCategoryLabel(set.category) }}</span>
+      <h2>{{ set.title }}</h2>
+      <p>{{ set.description }}</p>
+
+      <div class="set-meta">
+        <div>
+          <strong>{{ set.itemCount }}</strong>
+          <small>Images in this set</small>
+        </div>
+        <div>
+          <strong>{{ set.subtitle }}</strong>
+          <small>Editorial direction</small>
+        </div>
+      </div>
+
+      <a [routerLink]="['/gallery/set', set.key]" class="stage-link">Open Story Set</a>
+    </div>
+
+    <a [routerLink]="['/gallery/set', set.key]" class="journey-stage-preview">
+      <div class="preview-backdrop" [style.background-image]="'url(' + (set.coverImageUrl || set.leadImage?.imageUrl) + ')'"></div>
+      <div class="preview-rail">
+        <article *ngFor="let image of set.previewImages" class="preview-card">
+          <img [src]="image.imageUrl" [alt]="image.altText">
+          <div class="preview-caption">
+            <span>{{ image.date || 'Gallery Frame' }}</span>
+            <strong>{{ image.caption }}</strong>
+          </div>
+        </article>
+      </div>
+    </a>
+  </section>
+
+  <section *ngIf="!loading && supportingSets.length > 0" class="story-grid">
+    <a
+      *ngFor="let set of supportingSets; trackBy: trackBySet"
+      [routerLink]="['/gallery/set', set.key]"
+      class="story-card"
+      [style.--story-accent]="set.accentTone"
+    >
+      <div class="story-card-cover">
+        <img [src]="set.coverImageUrl || set.leadImage?.imageUrl" [alt]="set.title">
+      </div>
+
+      <div class="story-card-copy">
+        <span>{{ getGalleryCategoryLabel(set.category) }}</span>
+        <h3>{{ set.title }}</h3>
+        <p>{{ set.subtitle }}</p>
+      </div>
+
+      <div class="story-card-strip">
+        <img *ngFor="let image of set.previewImages" [src]="image.imageUrl" [alt]="image.altText">
+      </div>
+    </a>
+  </section>
+
+  <section *ngIf="!loading && filteredStorySets.length === 0" class="gallery-empty-state">
+    No story sets are available for this category yet.
+  </section>
+</div>

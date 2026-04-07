@@ -16,11 +16,14 @@ public class QuizController : ControllerBase
         _context = context;
     }
 
-    // POST /api/quiz/submit — save a quiz result
+    // POST /api/quiz/submit - save or improve a quiz result
     [HttpPost("submit")]
-    public async Task<ActionResult<QuizEntry>> Submit(QuizEntry entry)
+    public async Task<ActionResult<LeaderboardEntry>> Submit(QuizEntry entry)
     {
-        // Prevent duplicate submissions from same email on same day
+        entry.Email = NormalizeEmail(entry.Email);
+        entry.Name = entry.Name.Trim();
+        entry.City = NormalizeOptionalText(entry.City);
+
         var today = DateTime.UtcNow.Date;
         var existing = await _context.QuizEntries
             .Where(q => q.Email == entry.Email && q.SubmittedAt.Date == today)
@@ -28,25 +31,32 @@ public class QuizController : ControllerBase
 
         if (existing != null)
         {
-            // Update if they scored higher
-            if (entry.Score > existing.Score)
+            var shouldUpdate = entry.Score > existing.Score
+                || (entry.Score == existing.Score && entry.TimeTakenSeconds < existing.TimeTakenSeconds);
+
+            if (shouldUpdate)
             {
+                existing.Name = entry.Name;
+                existing.City = entry.City;
                 existing.Score = entry.Score;
+                existing.TotalQuestions = entry.TotalQuestions;
                 existing.TimeTakenSeconds = entry.TimeTakenSeconds;
                 existing.SubmittedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
-                return Ok(existing);
             }
-            return Ok(existing);
+
+            return Ok(await BuildLeaderboardEntry(existing));
         }
 
         entry.SubmittedAt = DateTime.UtcNow;
         _context.QuizEntries.Add(entry);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetLeaderboard), entry);
+
+        var leaderboardEntry = await BuildLeaderboardEntry(entry);
+        return CreatedAtAction(nameof(GetPlayerEntry), new { email = entry.Email }, leaderboardEntry);
     }
 
-    // GET /api/quiz/leaderboard — top 20 all-time
+    // GET /api/quiz/leaderboard - top 20 all-time
     [HttpGet("leaderboard")]
     public async Task<ActionResult<IEnumerable<LeaderboardEntry>>> GetLeaderboard()
     {
@@ -59,7 +69,7 @@ public class QuizController : ControllerBase
             {
                 Rank = 0,
                 Name = q.Name,
-                City = q.City ?? "—",
+                City = q.City ?? "N/A",
                 Score = q.Score,
                 TotalQuestions = q.TotalQuestions,
                 TimeTakenSeconds = q.TimeTakenSeconds,
@@ -67,22 +77,82 @@ public class QuizController : ControllerBase
             })
             .ToListAsync();
 
-        for (int i = 0; i < entries.Count; i++)
+        for (var i = 0; i < entries.Count; i++)
+        {
             entries[i].Rank = i + 1;
+        }
 
         return Ok(entries);
     }
 
-    // GET /api/quiz/check?email=x — check if already played today
+    // GET /api/quiz/entry?email=x - best result for a player, including global rank
+    [HttpGet("entry")]
+    public async Task<ActionResult<LeaderboardEntry>> GetPlayerEntry([FromQuery] string email)
+    {
+        var normalizedEmail = NormalizeEmail(email);
+        if (string.IsNullOrWhiteSpace(normalizedEmail))
+        {
+            return BadRequest(new { message = "Email is required." });
+        }
+
+        var entry = await _context.QuizEntries
+            .Where(q => q.Email == normalizedEmail)
+            .OrderByDescending(q => q.Score)
+            .ThenBy(q => q.TimeTakenSeconds)
+            .ThenByDescending(q => q.SubmittedAt)
+            .FirstOrDefaultAsync();
+
+        if (entry == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(await BuildLeaderboardEntry(entry));
+    }
+
+    // GET /api/quiz/check?email=x - check if already played today
     [HttpGet("check")]
     public async Task<ActionResult<object>> CheckPlayed([FromQuery] string email)
     {
+        var normalizedEmail = NormalizeEmail(email);
         var today = DateTime.UtcNow.Date;
+
         var existing = await _context.QuizEntries
-            .Where(q => q.Email == email && q.SubmittedAt.Date == today)
+            .Where(q => q.Email == normalizedEmail && q.SubmittedAt.Date == today)
             .FirstOrDefaultAsync();
 
         return Ok(new { played = existing != null, score = existing?.Score ?? 0 });
+    }
+
+    private async Task<LeaderboardEntry> BuildLeaderboardEntry(QuizEntry entry)
+    {
+        var higherRankCount = await _context.QuizEntries.CountAsync(q =>
+            q.Score > entry.Score
+            || (q.Score == entry.Score && q.TimeTakenSeconds < entry.TimeTakenSeconds)
+            || (q.Score == entry.Score && q.TimeTakenSeconds == entry.TimeTakenSeconds && q.SubmittedAt > entry.SubmittedAt));
+
+        return new LeaderboardEntry
+        {
+            Rank = higherRankCount + 1,
+            Name = entry.Name,
+            City = entry.City ?? "N/A",
+            Score = entry.Score,
+            TotalQuestions = entry.TotalQuestions,
+            TimeTakenSeconds = entry.TimeTakenSeconds,
+            SubmittedAt = entry.SubmittedAt
+        };
+    }
+
+    private static string NormalizeEmail(string? email)
+    {
+        return string.IsNullOrWhiteSpace(email)
+            ? string.Empty
+            : email.Trim().ToLowerInvariant();
+    }
+
+    private static string? NormalizeOptionalText(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 }
 
@@ -90,7 +160,7 @@ public class LeaderboardEntry
 {
     public int Rank { get; set; }
     public required string Name { get; set; }
-    public string City { get; set; } = "—";
+    public string City { get; set; } = "N/A";
     public int Score { get; set; }
     public int TotalQuestions { get; set; }
     public int TimeTakenSeconds { get; set; }

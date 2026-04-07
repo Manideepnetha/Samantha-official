@@ -30,6 +30,11 @@ export const routes: Routes = [
         title: 'About | Samantha Ruth Prabhu'
       },
       {
+        path: 'filmography/:id',
+        loadComponent: () => import('./pages/filmography/movie-detail.component').then(c => c.MovieDetailComponent),
+        title: 'Film Details | Samantha Ruth Prabhu'
+      },
+      {
         path: 'filmography',
         loadComponent: () => import('./pages/filmography/filmography.component').then(c => c.FilmographyComponent),
         title: 'Filmography | Samantha Ruth Prabhu'
@@ -50,6 +55,11 @@ export const routes: Routes = [
         title: 'Fashion & Style | Samantha Ruth Prabhu'
       },
       {
+        path: 'gallery/set/:collectionKey',
+        loadComponent: () => import('./pages/gallery-set/gallery-set.component').then(c => c.GallerySetComponent),
+        title: 'Gallery Story Set | Samantha Ruth Prabhu'
+      },
+      {
         path: 'gallery',
         loadComponent: () => import('./pages/gallery/gallery.component').then(c => c.GalleryComponent),
         title: 'Gallery | Samantha Ruth Prabhu'
@@ -60,9 +70,19 @@ export const routes: Routes = [
         title: 'Media & Press | Samantha Ruth Prabhu'
       },
       {
-        path: 'contact',
+        path: 'fan-zone/edits',
+        loadComponent: () => import('./pages/fan-edits/fan-edits.component').then(c => c.FanEditsComponent),
+        title: 'Fan Made Edits | Samantha Ruth Prabhu'
+      },
+      {
+        path: 'fan-zone',
         loadComponent: () => import('./pages/fan-zone/fan-zone.component').then(c => c.FanZoneComponent),
         title: 'Fan Zone | Samantha Ruth Prabhu'
+      },
+      {
+        path: 'contact',
+        redirectTo: 'fan-zone',
+        pathMatch: 'full'
       },
       {
         path: 'blog',

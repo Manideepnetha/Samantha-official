@@ -1,0 +1,110 @@
+<div class="gallery-set-shell">
+  <section *ngIf="loading" class="gallery-set-empty-state">
+    Loading story set...
+  </section>
+
+  <ng-container *ngIf="!loading && currentSet as set; else missingState">
+    <section class="gallery-set-hero" [style.--set-accent]="set.accentTone">
+      <div class="gallery-set-backdrop" [style.background-image]="'url(' + (selectedImage?.imageUrl || set.coverImageUrl) + ')'"></div>
+
+      <div class="gallery-set-content">
+        <div class="set-copy-card">
+          <a routerLink="/gallery" class="back-link">Back To Visual Journey</a>
+          <span>{{ getGalleryCategoryLabel(set.category) }}</span>
+          <h1>{{ set.title }}</h1>
+          <p>{{ set.description }}</p>
+
+          <div class="set-copy-meta">
+            <div>
+              <strong>{{ set.itemCount }}</strong>
+              <small>Images grouped here</small>
+            </div>
+            <div>
+              <strong>{{ set.subtitle }}</strong>
+              <small>Current creative note</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="set-floating-card" *ngIf="selectedImage as frame">
+          <img [src]="frame.imageUrl" [alt]="frame.altText">
+          <div class="floating-copy">
+            <span>{{ frame.date || 'Gallery Frame' }}</span>
+            <h2>{{ frame.caption }}</h2>
+            <p>Selected frame from this story set. Use the strip below to move across the related images.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="gallery-set-body">
+      <article class="feature-frame" *ngIf="selectedImage as frame">
+        <div class="feature-image-wrap">
+          <img [src]="frame.imageUrl" [alt]="frame.altText" class="feature-image">
+        </div>
+
+        <div class="feature-copy">
+          <span>{{ frame.date || 'Featured Frame' }}</span>
+          <h2>{{ frame.caption }}</h2>
+          <p>
+            This screen keeps related visuals together, so each gallery click now opens a set-based view instead of an isolated
+            single image.
+          </p>
+        </div>
+      </article>
+
+      <article class="thumbnail-layer">
+        <div class="section-head">
+          <span>Story Strip</span>
+          <h3>Related images in this set</h3>
+        </div>
+
+        <div class="thumbnail-grid">
+          <button
+            *ngFor="let image of set.images; let index = index; trackBy: trackByImage"
+            type="button"
+            class="thumbnail-card"
+            [class.is-active]="selectedImageIndex === index"
+            (click)="selectImage(index)"
+          >
+            <img [src]="image.imageUrl" [alt]="image.altText">
+            <div class="thumbnail-copy">
+              <span>{{ image.date || 'Gallery Frame' }}</span>
+              <strong>{{ image.caption }}</strong>
+            </div>
+          </button>
+        </div>
+      </article>
+
+      <article *ngIf="relatedSets.length > 0" class="related-layer">
+        <div class="section-head">
+          <span>More Sets</span>
+          <h3>Continue through the archive</h3>
+        </div>
+
+        <div class="related-grid">
+          <a
+            *ngFor="let related of relatedSets; trackBy: trackBySet"
+            [routerLink]="['/gallery/set', related.key]"
+            class="related-card"
+            [style.--related-accent]="related.accentTone"
+          >
+            <img [src]="related.coverImageUrl || related.leadImage?.imageUrl" [alt]="related.title">
+            <div class="related-copy">
+              <span>{{ getGalleryCategoryLabel(related.category) }}</span>
+              <strong>{{ related.title }}</strong>
+            </div>
+          </a>
+        </div>
+      </article>
+    </section>
+  </ng-container>
+
+  <ng-template #missingState>
+    <section class="gallery-set-empty-state">
+      <h1>That story set could not be found.</h1>
+      <p>The gallery collections are still available below, so you can jump back into the visual journey from there.</p>
+      <a routerLink="/gallery" class="back-link">Return To Gallery</a>
+    </section>
+  </ng-template>
+</div>

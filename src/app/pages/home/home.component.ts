@@ -235,7 +235,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     { label: 'FILMOGRAPHY', route: '/filmography' },
     { label: 'AWARDS', route: '/awards' },
     { label: 'GALLERY', route: '/gallery' },
-    { label: 'CONTACT ME', route: '/contact' }
+    { label: 'FAN ZONE', route: '/fan-zone' }
   ];
 
   readonly secondaryNavItems = [

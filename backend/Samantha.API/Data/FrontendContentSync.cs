@@ -28,6 +28,8 @@ public static class FrontendContentSync
         SeedHome.Initialize(context);
         SeedFashion.Initialize(context);
         SeedGallery.Initialize(context);
+        var galleryCollectionsSynced = UpsertGalleryCollectionDefaults(context, overwritePageContent);
+        var galleryImagesBackfilled = BackfillGalleryCollectionData(context);
 
         var pageContentKeys = new List<string>();
         var pageContentBlocksSynced = 0;
@@ -69,6 +71,7 @@ public static class FrontendContentSync
         );
 
         var philanthropyRecordsSynced = UpsertPhilanthropyDefaults(context, overwritePhilanthropyDefaults);
+        var fanCreationsSynced = UpsertFanCreationDefaults(context, overwritePageContent);
 
         context.SaveChanges();
 
@@ -77,6 +80,9 @@ public static class FrontendContentSync
             syncedAtUtc = DateTime.UtcNow,
             pageContentBlocksSynced,
             philanthropyRecordsSynced,
+            fanCreationsSynced,
+            galleryCollectionsSynced,
+            galleryImagesBackfilled,
             pageContentKeys
         };
     }
@@ -197,6 +203,260 @@ public static class FrontendContentSync
             existing.ImageUrl = item.ImageUrl;
             existing.Icon = item.Icon;
             changes++;
+        }
+
+        return changes;
+    }
+
+    private static int UpsertFanCreationDefaults(AppDbContext context, bool overwrite)
+    {
+        var defaults = new List<FanCreation>
+        {
+            new()
+            {
+                Title = "Celestial Bloom Poster",
+                CreatorName = "Community Spotlight",
+                Type = "Poster",
+                Description = "A layered tribute poster built with warm metallic tones and a dramatic studio finish.",
+                ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045346/Samantha29_clxsnm.jpg",
+                MediaUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045346/Samantha29_clxsnm.jpg",
+                DateLabel = "Featured Submission",
+                Platform = "Poster Art",
+                IsFeatured = true
+            },
+            new()
+            {
+                Title = "Stage Light Tribute",
+                CreatorName = "Community Spotlight",
+                Type = "Poster",
+                Description = "A fan-made print concept imagined as a premium theatrical campaign key visual.",
+                ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008414/8F9A7087_koclpw.jpg",
+                MediaUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008414/8F9A7087_koclpw.jpg",
+                DateLabel = "Poster Drop",
+                Platform = "Poster Art",
+                IsFeatured = false
+            },
+            new()
+            {
+                Title = "Honey Bunny Motion Tribute",
+                CreatorName = "Community Spotlight",
+                Type = "Video",
+                Description = "A sharp-cut fan edit concept celebrating Samantha's streaming-era action presence.",
+                ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748011805/8F9A6978_1_jd2efv.jpg",
+                MediaUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                DateLabel = "Video Edit",
+                Platform = "YouTube",
+                IsFeatured = true
+            },
+            new()
+            {
+                Title = "Retro Reel Remix",
+                CreatorName = "Community Spotlight",
+                Type = "Video",
+                Description = "A mood-driven tribute reel designed for social-first fan communities.",
+                ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748010072/8F9A7985_m86vsc.jpg",
+                MediaUrl = "https://www.instagram.com/",
+                DateLabel = "Social Edit",
+                Platform = "Instagram",
+                IsFeatured = false
+            },
+            new()
+            {
+                Title = "Ink & Gold Illustration",
+                CreatorName = "Community Spotlight",
+                Type = "Illustration",
+                Description = "A stylized portrait concept that treats Samantha like a magazine-cover icon in mixed media.",
+                ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008413/PAND7159_k4qlvo.jpg",
+                MediaUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008413/PAND7159_k4qlvo.jpg",
+                DateLabel = "Illustration Art",
+                Platform = "Digital Illustration",
+                IsFeatured = true
+            },
+            new()
+            {
+                Title = "Midnight Frame Sketch",
+                CreatorName = "Community Spotlight",
+                Type = "Illustration",
+                Description = "A monochrome fan illustration composed as a dramatic editorial portrait.",
+                ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008412/DSC_9143-1_ayf7fl.jpg",
+                MediaUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008412/DSC_9143-1_ayf7fl.jpg",
+                DateLabel = "Illustration Art",
+                Platform = "Digital Illustration",
+                IsFeatured = false
+            }
+        };
+
+        var changes = 0;
+
+        foreach (var item in defaults)
+        {
+            var existing = context.FanCreations.FirstOrDefault(fanCreation =>
+                fanCreation.Title == item.Title && fanCreation.Type == item.Type);
+
+            if (existing == null)
+            {
+                context.FanCreations.Add(new FanCreation
+                {
+                    Title = item.Title,
+                    CreatorName = item.CreatorName,
+                    Type = item.Type,
+                    Description = item.Description,
+                    ImageUrl = item.ImageUrl,
+                    MediaUrl = item.MediaUrl,
+                    DateLabel = item.DateLabel,
+                    Platform = item.Platform,
+                    IsFeatured = item.IsFeatured
+                });
+                changes++;
+                continue;
+            }
+
+            if (!overwrite)
+            {
+                continue;
+            }
+
+            existing.CreatorName = item.CreatorName;
+            existing.Description = item.Description;
+            existing.ImageUrl = item.ImageUrl;
+            existing.MediaUrl = item.MediaUrl;
+            existing.DateLabel = item.DateLabel;
+            existing.Platform = item.Platform;
+            existing.IsFeatured = item.IsFeatured;
+            changes++;
+        }
+
+        return changes;
+    }
+
+    private static int UpsertGalleryCollectionDefaults(AppDbContext context, bool overwrite)
+    {
+        var defaults = new List<GalleryCollection>
+        {
+            new()
+            {
+                Key = "fashion-editorials",
+                Title = "Fashion Editorials",
+                Subtitle = "Minimal silhouettes and statement styling",
+                Description = "A polished runway of Samantha's editorial looks, designed to feel deliberate, spacious, and cinematic.",
+                Category = "fashion",
+                CoverImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748298223/d5wj1d4ydqe61_fr3adf.jpg",
+                AccentTone = "#d0a05a",
+                SortOrder = 1
+            },
+            new()
+            {
+                Key = "event-highlights",
+                Title = "Event Highlights",
+                Subtitle = "Appearances, arrivals, and public moments",
+                Description = "A brighter set of red-carpet and event photography arranged as a clean social reel.",
+                Category = "events",
+                CoverImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295435/5_6185746542628962569_bgalhv.jpg",
+                AccentTone = "#b87050",
+                SortOrder = 2
+            },
+            new()
+            {
+                Key = "cover-shoots",
+                Title = "Cover Shoots",
+                Subtitle = "Magazine-ready frames",
+                Description = "A showcase of polished portrait and cover-shoot images where layout and pacing matter as much as the still itself.",
+                Category = "photoshoots",
+                CoverImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295799/5_6185746542628962570_c68nyo.jpg",
+                AccentTone = "#d3b598",
+                SortOrder = 3
+            },
+            new()
+            {
+                Key = "film-frames",
+                Title = "Film Frames",
+                Subtitle = "Projects, production stills, and screen presence",
+                Description = "A contained look at project imagery with a stronger editorial emphasis on composition and cinematic texture.",
+                Category = "films",
+                CoverImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296812/SRP_q8wmpl.jpg",
+                AccentTone = "#69808f",
+                SortOrder = 4
+            },
+            new()
+            {
+                Key = "behind-the-scenes",
+                Title = "Behind The Scenes",
+                Subtitle = "Candid process and atmosphere",
+                Description = "Production energy, in-between moments, and process-driven stills collected as one softer, documentary-like layer.",
+                Category = "bts",
+                CoverImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296881/53885681037_6a705301cf_o_ztjyeg.jpg",
+                AccentTone = "#7a7f68",
+                SortOrder = 5
+            }
+        };
+
+        var changes = 0;
+
+        foreach (var item in defaults)
+        {
+            var existing = context.GalleryCollections.FirstOrDefault(collection => collection.Key == item.Key);
+            if (existing == null)
+            {
+                context.GalleryCollections.Add(new GalleryCollection
+                {
+                    Key = item.Key,
+                    Title = item.Title,
+                    Subtitle = item.Subtitle,
+                    Description = item.Description,
+                    Category = item.Category,
+                    CoverImageUrl = item.CoverImageUrl,
+                    AccentTone = item.AccentTone,
+                    SortOrder = item.SortOrder
+                });
+                changes++;
+                continue;
+            }
+
+            if (!overwrite)
+            {
+                continue;
+            }
+
+            existing.Title = item.Title;
+            existing.Subtitle = item.Subtitle;
+            existing.Description = item.Description;
+            existing.Category = item.Category;
+            existing.CoverImageUrl = item.CoverImageUrl;
+            existing.AccentTone = item.AccentTone;
+            existing.SortOrder = item.SortOrder;
+            changes++;
+        }
+
+        return changes;
+    }
+
+    private static int BackfillGalleryCollectionData(AppDbContext context)
+    {
+        var changes = 0;
+
+        foreach (var item in context.MediaGalleries)
+        {
+            var (collectionKey, displayOrder) = item.Type switch
+            {
+                "fashion" => ("fashion-editorials", item.DisplayOrder == 0 ? 1 : item.DisplayOrder),
+                "events" => ("event-highlights", item.DisplayOrder == 0 ? 1 : item.DisplayOrder),
+                "photoshoots" => ("cover-shoots", item.DisplayOrder == 0 ? 1 : item.DisplayOrder),
+                "films" => ("film-frames", item.DisplayOrder == 0 ? 1 : item.DisplayOrder),
+                "bts" => ("behind-the-scenes", item.DisplayOrder == 0 ? 1 : item.DisplayOrder),
+                _ => (string.Empty, item.DisplayOrder)
+            };
+
+            if (string.IsNullOrWhiteSpace(item.CollectionKey) && !string.IsNullOrWhiteSpace(collectionKey))
+            {
+                item.CollectionKey = collectionKey;
+                changes++;
+            }
+
+            if (item.DisplayOrder != displayOrder)
+            {
+                item.DisplayOrder = displayOrder;
+                changes++;
+            }
         }
 
         return changes;

@@ -20,7 +20,13 @@ public class MediaGalleryController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MediaGallery>>> GetMediaGalleries()
     {
-        return await _context.MediaGalleries.ToListAsync();
+        return await _context.MediaGalleries
+            .AsNoTracking()
+            .OrderBy(item => item.Type)
+            .ThenBy(item => item.CollectionKey)
+            .ThenBy(item => item.DisplayOrder)
+            .ThenBy(item => item.Id)
+            .ToListAsync();
     }
 
     [HttpPost]

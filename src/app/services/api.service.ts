@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, concat } from 'rxjs';
-import { tap, shareReplay } from 'rxjs/operators';
+import { tap, shareReplay, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { clearStoredAuth, getStoredToken, hasValidSession, isTokenExpired } from './auth-session.utils';
 
 export interface Movie {
   id: number;
@@ -58,6 +59,20 @@ export interface MediaGallery {
   altText?: string;
   type: string;
   date?: string;
+  collectionKey?: string;
+  displayOrder?: number;
+}
+
+export interface GalleryCollection {
+  id?: number;
+  key: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  category: string;
+  coverImageUrl?: string;
+  accentTone?: string;
+  sortOrder: number;
 }
 
 export interface FashionItem {
@@ -87,6 +102,72 @@ export interface SiteSetting {
   value: string;
 }
 
+export interface QuizSubmission {
+  name: string;
+  email: string;
+  city?: string | null;
+  score: number;
+  totalQuestions: number;
+  timeTakenSeconds: number;
+}
+
+export interface QuizCheckResponse {
+  played: boolean;
+  score: number;
+}
+
+export interface QuizLeaderboardEntry {
+  rank: number;
+  name: string;
+  city: string;
+  score: number;
+  totalQuestions: number;
+  timeTakenSeconds: number;
+  submittedAt: string;
+}
+
+export interface FanCreation {
+  id?: number;
+  title: string;
+  creatorName: string;
+  type: 'Poster' | 'Video' | 'Illustration';
+  description?: string;
+  imageUrl: string;
+  mediaUrl?: string;
+  dateLabel?: string;
+  platform?: string;
+  isFeatured?: boolean;
+}
+
+export interface UploadedMediaAsset {
+  url: string;
+  publicId: string;
+  fileName: string;
+  format: string;
+  width: number;
+  height: number;
+}
+
+export interface VisitorEntrySubmission {
+  clientVisitorId: string;
+  name: string;
+  socialMediaId?: string;
+  source?: string;
+}
+
+export interface VisitorEntry {
+  id: number;
+  clientVisitorId: string;
+  name: string;
+  socialMediaId?: string;
+  source?: string;
+  userAgent?: string;
+  ipAddress?: string;
+  firstCompletedAt: string;
+  lastCompletedAt: string;
+  isFirstVisit?: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -99,8 +180,10 @@ export class ApiService {
   private philanthropyCache$: Observable<Philanthropy[]> | null = null;
   private newsCache$: Observable<NewsArticle[]> | null = null;
   private mediaCache$: Observable<MediaGallery[]> | null = null;
+  private galleryCollectionsCache$: Observable<GalleryCollection[]> | null = null;
   private fashionCache$: Observable<FashionItem[]> | null = null;
   private settingsCache$: Observable<SiteSetting[]> | null = null;
+  private fanCreationsCache$: Observable<FanCreation[]> | null = null;
   private pageContentCache = new Map<string, Observable<unknown>>();
 
   constructor(private http: HttpClient, private router: Router) { }
@@ -175,7 +258,7 @@ export class ApiService {
   }
 
   // Helper to clear cache (call on create/update/delete)
-  private clearCache(key: 'movies' | 'awards' | 'philanthropy' | 'news' | 'media' | 'fashion' | 'settings') {
+  private clearCache(key: 'movies' | 'awards' | 'philanthropy' | 'news' | 'media' | 'galleryCollections' | 'fashion' | 'settings' | 'fanCreations') {
     // We clear both memory cache and storage cache to ensure fresh fetch
     this.removeFromStorage(key);
     switch (key) {
@@ -184,8 +267,10 @@ export class ApiService {
       case 'philanthropy': this.philanthropyCache$ = null; break;
       case 'news': this.newsCache$ = null; break;
       case 'media': this.mediaCache$ = null; break;
+      case 'galleryCollections': this.galleryCollectionsCache$ = null; break;
       case 'fashion': this.fashionCache$ = null; break;
       case 'settings': this.settingsCache$ = null; break;
+      case 'fanCreations': this.fanCreationsCache$ = null; break;
     }
   }
 
@@ -195,8 +280,10 @@ export class ApiService {
     this.philanthropyCache$ = null;
     this.newsCache$ = null;
     this.mediaCache$ = null;
+    this.galleryCollectionsCache$ = null;
     this.fashionCache$ = null;
     this.settingsCache$ = null;
+    this.fanCreationsCache$ = null;
     this.clearPageContentCache();
 
     Object.keys(localStorage)
@@ -359,6 +446,42 @@ export class ApiService {
     return this.http.delete<void>(`${this.apiUrl}/mediagallery/${id}`, this.getOptions());
   }
 
+  // --- GALLERY COLLECTIONS ---
+  getGalleryCollections(): Observable<GalleryCollection[]> {
+    const cached = this.loadFromStorage<GalleryCollection[]>('galleryCollections');
+
+    if (!this.galleryCollectionsCache$) {
+      this.galleryCollectionsCache$ = this.http.get<GalleryCollection[]>(`${this.apiUrl}/gallerycollections`, this.getPublicOptions())
+        .pipe(
+          tap(data => this.saveToStorage('galleryCollections', data)),
+          shareReplay(1)
+        );
+    }
+
+    if (cached) {
+      return concat(of(cached), this.galleryCollectionsCache$);
+    }
+
+    return this.galleryCollectionsCache$;
+  }
+
+  createGalleryCollection(collection: GalleryCollection): Observable<GalleryCollection> {
+    this.clearCache('galleryCollections');
+    return this.http.post<GalleryCollection>(`${this.apiUrl}/gallerycollections`, collection, this.getOptions());
+  }
+
+  updateGalleryCollection(id: number, collection: GalleryCollection): Observable<void> {
+    this.clearCache('galleryCollections');
+    this.clearCache('media');
+    return this.http.put<void>(`${this.apiUrl}/gallerycollections/${id}`, collection, this.getOptions());
+  }
+
+  deleteGalleryCollection(id: number): Observable<void> {
+    this.clearCache('galleryCollections');
+    this.clearCache('media');
+    return this.http.delete<void>(`${this.apiUrl}/gallerycollections/${id}`, this.getOptions());
+  }
+
   // --- FASHION ---
   getFashion(): Observable<FashionItem[]> {
     if (!this.fashionCache$) {
@@ -381,6 +504,40 @@ export class ApiService {
   deleteFashion(id: number): Observable<void> {
     this.clearCache('fashion');
     return this.http.delete<void>(`${this.apiUrl}/fashion/${id}`, this.getOptions());
+  }
+
+  // --- FAN CREATIONS ---
+  getFanCreations(): Observable<FanCreation[]> {
+    const cached = this.loadFromStorage<FanCreation[]>('fanCreations');
+
+    if (!this.fanCreationsCache$) {
+      this.fanCreationsCache$ = this.http.get<FanCreation[]>(`${this.apiUrl}/fancreations`, this.getPublicOptions())
+        .pipe(
+          tap(data => this.saveToStorage('fanCreations', data)),
+          shareReplay(1)
+        );
+    }
+
+    if (cached) {
+      return concat(of(cached), this.fanCreationsCache$);
+    }
+
+    return this.fanCreationsCache$;
+  }
+
+  createFanCreation(item: FanCreation): Observable<FanCreation> {
+    this.clearCache('fanCreations');
+    return this.http.post<FanCreation>(`${this.apiUrl}/fancreations`, item, this.getOptions());
+  }
+
+  updateFanCreation(id: number, item: FanCreation): Observable<void> {
+    this.clearCache('fanCreations');
+    return this.http.put<void>(`${this.apiUrl}/fancreations/${id}`, item, this.getOptions());
+  }
+
+  deleteFanCreation(id: number): Observable<void> {
+    this.clearCache('fanCreations');
+    return this.http.delete<void>(`${this.apiUrl}/fancreations/${id}`, this.getOptions());
   }
 
   // --- CONTACTS ---
@@ -457,6 +614,50 @@ export class ApiService {
       .pipe(tap(() => this.clearAllCachedContent()));
   }
 
+  uploadImage(file: File, folder?: string): Observable<UploadedMediaAsset> {
+    return this.uploadImages([file], folder).pipe(
+      map(results => results[0])
+    );
+  }
+
+  uploadImages(files: File[], folder?: string): Observable<UploadedMediaAsset[]> {
+    const formData = new FormData();
+
+    files.forEach(file => formData.append('files', file, file.name));
+
+    if (folder?.trim()) {
+      formData.append('folder', folder.trim());
+    }
+
+    return this.http.post<UploadedMediaAsset[]>(`${this.apiUrl}/uploads/images`, formData, this.getOptions());
+  }
+
+  // --- VISITOR ENTRY TRACKING ---
+  recordVisitorEntry(payload: VisitorEntrySubmission): Observable<VisitorEntry> {
+    return this.http.post<VisitorEntry>(`${this.apiUrl}/visitorentries`, payload, this.getPublicOptions());
+  }
+
+  getVisitorEntries(): Observable<VisitorEntry[]> {
+    return this.http.get<VisitorEntry[]>(`${this.apiUrl}/visitorentries`, this.getOptions());
+  }
+
+  // --- QUIZ ---
+  checkQuizStatus(email: string): Observable<QuizCheckResponse> {
+    return this.http.get<QuizCheckResponse>(`${this.apiUrl}/quiz/check?email=${encodeURIComponent(email.trim())}`, this.getPublicOptions());
+  }
+
+  submitQuizEntry(entry: QuizSubmission): Observable<QuizLeaderboardEntry> {
+    return this.http.post<QuizLeaderboardEntry>(`${this.apiUrl}/quiz/submit`, entry, this.getPublicOptions());
+  }
+
+  getQuizLeaderboard(): Observable<QuizLeaderboardEntry[]> {
+    return this.http.get<QuizLeaderboardEntry[]>(`${this.apiUrl}/quiz/leaderboard`, this.getPublicOptions());
+  }
+
+  getQuizPlayerEntry(email: string): Observable<QuizLeaderboardEntry> {
+    return this.http.get<QuizLeaderboardEntry>(`${this.apiUrl}/quiz/entry?email=${encodeURIComponent(email.trim())}`, this.getPublicOptions());
+  }
+
   // --- AUTH ---
   login(credentials: { email: string, password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/login`, credentials)
@@ -473,17 +674,23 @@ export class ApiService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    clearStoredAuth();
     this.clearAllCachedContent();
     this.router.navigate(['/login']);
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('token');
+    return hasValidSession();
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    const token = getStoredToken();
+
+    if (isTokenExpired(token)) {
+      clearStoredAuth();
+      return null;
+    }
+
+    return token;
   }
 }

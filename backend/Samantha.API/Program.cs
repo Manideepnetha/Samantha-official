@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Samantha.API.Data;
@@ -7,9 +8,13 @@ using Samantha.API.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+var webRootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+Directory.CreateDirectory(webRootPath);
+builder.Environment.WebRootPath = webRootPath;
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
 
 // Database
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -71,6 +76,9 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+var applicationUrls = builder.Configuration["ASPNETCORE_URLS"] ?? string.Empty;
+var shouldUseHttpsRedirection = !app.Environment.IsDevelopment()
+    || applicationUrls.Contains("https://", StringComparison.OrdinalIgnoreCase);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -81,7 +89,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowAll");
 
-app.UseHttpsRedirection();
+if (shouldUseHttpsRedirection)
+{
+    app.UseHttpsRedirection();
+}
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(webRootPath)
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -93,6 +108,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
+    DatabaseSchemaBootstrap.EnsureCompatibleSchema(db, app.Logger);
 
     if (!db.Users.Any())
     {
@@ -105,70 +121,14 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 
-    // Auto-create SiteSettings table if missing (Production Safety)
-    try 
-    {
-        db.Database.ExecuteSqlRaw(@"
-            CREATE TABLE IF NOT EXISTS ""SiteSettings"" (
-                ""Id"" serial NOT NULL,
-                ""Key"" text NOT NULL,
-                ""Value"" text NOT NULL,
-                CONSTRAINT ""PK_SiteSettings"" PRIMARY KEY (""Id"")
-            );
-        ");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine("Error checking/creating SiteSettings table: " + ex.Message);
-    }
-
     try
     {
-        db.Database.ExecuteSqlRaw(@"
-            CREATE TABLE IF NOT EXISTS ""PageContents"" (
-                ""Id"" serial NOT NULL,
-                ""Key"" text NOT NULL,
-                ""ContentJson"" text NOT NULL,
-                ""Description"" text NULL,
-                ""UpdatedAt"" timestamp with time zone NOT NULL DEFAULT NOW(),
-                CONSTRAINT ""PK_PageContents"" PRIMARY KEY (""Id"")
-            );
-
-            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_PageContents_Key"" ON ""PageContents"" (""Key"");
-
-            ALTER TABLE IF EXISTS ""ContactMessages"" ADD COLUMN IF NOT EXISTS ""Category"" text;
-            ALTER TABLE IF EXISTS ""ContactMessages"" ADD COLUMN IF NOT EXISTS ""MetadataJson"" text;
-        ");
+        FrontendContentSync.EnsureSeeded(db);
     }
     catch (Exception ex)
     {
-        Console.WriteLine("Error checking/creating content sync tables: " + ex.Message);
+        app.Logger.LogError(ex, "Frontend content sync failed during startup. The API will keep running so admin sync can be retried after startup.");
     }
-
-    // Create QuizEntries table
-    try
-    {
-        db.Database.ExecuteSqlRaw(@"
-            CREATE TABLE IF NOT EXISTS ""QuizEntries"" (
-                ""Id"" serial NOT NULL,
-                ""Name"" text NOT NULL,
-                ""Email"" text NOT NULL,
-                ""City"" text NULL,
-                ""Score"" integer NOT NULL DEFAULT 0,
-                ""TotalQuestions"" integer NOT NULL DEFAULT 0,
-                ""TimeTakenSeconds"" integer NOT NULL DEFAULT 0,
-                ""SubmittedAt"" timestamp with time zone NOT NULL DEFAULT NOW(),
-                CONSTRAINT ""PK_QuizEntries"" PRIMARY KEY (""Id"")
-            );
-            CREATE INDEX IF NOT EXISTS ""IX_QuizEntries_Email"" ON ""QuizEntries"" (""Email"");
-        ");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine("Error creating QuizEntries table: " + ex.Message);
-    }
-
-    FrontendContentSync.EnsureSeeded(db);
 }
 
 app.Run();

@@ -165,6 +165,11 @@ export class AdminLayoutComponent {
       icon: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>'
     },
     {
+      label: 'Fan Zone',
+      link: '/admin/fan-zone',
+      icon: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.868v4.264a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"></path></svg>'
+    },
+    {
       label: 'Philanthropy',
       link: '/admin/philanthropy',
       icon: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>'
@@ -195,20 +200,58 @@ export class AdminLayoutComponent {
     this.syncMessage = 'Refreshing database content...';
 
     this.apiService.syncSiteContent().subscribe({
-      next: () => {
+      next: (result: {
+        pageContentBlocksSynced?: number;
+        philanthropyRecordsSynced?: number;
+        fanCreationsSynced?: number;
+        galleryCollectionsSynced?: number;
+        galleryImagesBackfilled?: number;
+      }) => {
         this.isSyncing = false;
-        this.syncMessage = 'Content synced. Reloading view...';
-        setTimeout(() => window.location.reload(), 700);
+        const summary = [
+          result.pageContentBlocksSynced ? `${result.pageContentBlocksSynced} page blocks` : '',
+          result.galleryCollectionsSynced ? `${result.galleryCollectionsSynced} gallery sets` : '',
+          result.galleryImagesBackfilled ? `${result.galleryImagesBackfilled} gallery image updates` : '',
+          result.fanCreationsSynced ? `${result.fanCreationsSynced} fan entries` : '',
+          result.philanthropyRecordsSynced ? `${result.philanthropyRecordsSynced} philanthropy records` : ''
+        ].filter(Boolean).join(', ');
+
+        this.syncMessage = summary ? `Sync complete: ${summary}. Reloading...` : 'Content synced. Reloading view...';
+        setTimeout(() => window.location.reload(), 1100);
       },
-      error: () => {
+      error: (error: unknown) => {
         this.isSyncing = false;
         this.syncMessage = '';
-        this.syncError = 'Sync failed. Please try again.';
+        this.syncError = this.getErrorMessage(error, 'Sync failed. Please sign in again or try once more.');
       }
     });
   }
 
   logout() {
     this.apiService.logout();
+  }
+
+  private getErrorMessage(error: unknown, fallback: string): string {
+    if (typeof error === 'object' && error !== null) {
+      const errorRecord = error as {
+        error?: { message?: string };
+        message?: string;
+        status?: number;
+      };
+
+      if (errorRecord.status === 401 || errorRecord.status === 403) {
+        return 'Your admin session has expired. Please sign in again.';
+      }
+
+      if (errorRecord.error?.message) {
+        return errorRecord.error.message;
+      }
+
+      if (errorRecord.message) {
+        return errorRecord.message;
+      }
+    }
+
+    return fallback;
   }
 }

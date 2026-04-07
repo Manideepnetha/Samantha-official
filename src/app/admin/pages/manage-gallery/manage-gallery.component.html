@@ -1,0 +1,310 @@
+<div class="sr-admin-page">
+  <div class="sr-admin-page-header">
+    <div>
+      <span class="sr-kicker">Gallery</span>
+      <h1 class="sr-admin-title">Manage Visual Journey</h1>
+      <p class="sr-admin-subtitle">
+        Organize the public gallery as curated story sets, then assign images into those sets so the new gallery flow stays
+        synced across admin, frontend, and API.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" (click)="openCollectionModal()" class="sr-button-ghost">New Story Set</button>
+      <button type="button" (click)="openImageModal()" class="sr-button">Add Image</button>
+    </div>
+  </div>
+
+  <div *ngIf="feedbackMessage" class="status-banner is-success">{{ feedbackMessage }}</div>
+  <div *ngIf="errorMessage" class="status-banner is-error">{{ errorMessage }}</div>
+
+  <div class="stats-grid">
+    <article class="stat-card">
+      <span>Story Sets</span>
+      <strong>{{ collectionCount }}</strong>
+      <p>Curated collection screens in the public gallery.</p>
+    </article>
+    <article class="stat-card">
+      <span>Gallery Images</span>
+      <strong>{{ imageCount }}</strong>
+      <p>Total visual assets available in the gallery archive.</p>
+    </article>
+    <article class="stat-card">
+      <span>Assigned Images</span>
+      <strong>{{ assignedImageCount }}</strong>
+      <p>Images already connected to a specific story set.</p>
+    </article>
+  </div>
+
+  <div class="gallery-admin-tabs">
+    <button
+      type="button"
+      class="gallery-admin-tab"
+      [class.is-active]="activeTab === 'collections'"
+      (click)="activeTab = 'collections'"
+    >
+      Story Sets
+    </button>
+    <button
+      type="button"
+      class="gallery-admin-tab"
+      [class.is-active]="activeTab === 'images'"
+      (click)="activeTab = 'images'"
+    >
+      Images
+    </button>
+  </div>
+
+  <section *ngIf="activeTab === 'collections'" class="gallery-admin-section">
+    <div *ngIf="loading" class="sr-empty-state">Loading story sets...</div>
+
+    <div *ngIf="!loading && sortedCollections.length > 0" class="collection-grid">
+      <article *ngFor="let collection of sortedCollections" class="collection-card">
+        <div class="collection-card-cover">
+          <img [src]="collection.coverImageUrl || 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295799/5_6185746542628962570_c68nyo.jpg'" [alt]="collection.title">
+        </div>
+
+        <div class="collection-card-copy">
+          <div class="collection-card-head">
+            <span class="sr-admin-badge is-soft">{{ getGalleryCategoryLabel(collection.category) }}</span>
+            <span class="collection-tone" [style.background]="collection.accentTone || '#d0a05a'"></span>
+          </div>
+
+          <h2>{{ collection.title }}</h2>
+          <p>{{ getCollectionSubtitle(collection) }}</p>
+
+          <div class="collection-card-meta">
+            <div>
+              <strong>{{ getLinkedImageCount(collection.key) }}</strong>
+              <small>Linked images</small>
+            </div>
+            <div>
+              <strong>#{{ collection.sortOrder }}</strong>
+              <small>Display order</small>
+            </div>
+          </div>
+
+          <div class="sr-admin-actions">
+            <button type="button" (click)="openCollectionModal(collection)" class="sr-admin-action">Edit</button>
+            <button type="button" (click)="deleteCollection(collection)" class="sr-admin-action-danger">Delete</button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div *ngIf="!loading && sortedCollections.length === 0" class="sr-empty-state">
+      No story sets are configured yet.
+    </div>
+  </section>
+
+  <section *ngIf="activeTab === 'images'" class="gallery-admin-section">
+    <div class="filters-panel">
+      <div class="flex flex-wrap gap-3">
+        <button
+          *ngFor="let category of categories"
+          type="button"
+          class="sr-chip"
+          [class.is-active]="filterCategory === category.value"
+          (click)="filterCategory = category.value"
+        >
+          {{ category.label }}
+        </button>
+      </div>
+
+      <div class="filter-select-wrap">
+        <label class="sr-field-label">Filter By Story Set</label>
+        <select [(ngModel)]="filterCollection" class="sr-select">
+          <option value="all">All Story Sets</option>
+          <option value="">Unassigned</option>
+          <option *ngFor="let collection of sortedCollections" [value]="collection.key">{{ collection.title }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sr-surface sr-admin-table-wrap">
+      <div class="sr-admin-table-scroll">
+        <table class="sr-admin-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Caption</th>
+              <th>Story Set</th>
+              <th>Category</th>
+              <th>Order</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let media of filteredGallery">
+              <td><img [src]="media.imageUrl" class="sr-admin-thumb" alt="Gallery item"></td>
+              <td class="sr-admin-title-cell">{{ media.caption }}</td>
+              <td>{{ getCollectionTitle(media.collectionKey) }}</td>
+              <td><span class="sr-admin-badge is-soft">{{ getGalleryCategoryLabel(media.type) }}</span></td>
+              <td>{{ media.displayOrder || 1 }}</td>
+              <td>
+                <div class="sr-admin-actions">
+                  <button type="button" (click)="openImageModal(media)" class="sr-admin-action">Edit</button>
+                  <button type="button" (click)="media.id && deleteMedia(media.id)" class="sr-admin-action-danger">Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredGallery.length === 0" class="sr-admin-empty-row">
+              <td colspan="6">No gallery images found for the selected filters.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div *ngIf="isCollectionModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
+    <div class="sr-modal-panel w-full max-w-3xl max-h-[92vh] overflow-y-auto p-6 md:p-7">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <span class="sr-kicker">{{ isEditingCollection ? 'Editing' : 'Creating' }}</span>
+          <h2 class="sr-card-title mt-2">{{ isEditingCollection ? 'Edit Story Set' : 'New Story Set' }}</h2>
+        </div>
+        <button type="button" (click)="closeCollectionModal()" class="sr-close-button">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-grid">
+        <div>
+          <label class="sr-field-label">Title</label>
+          <input [(ngModel)]="currentCollection.title" type="text" class="sr-input" placeholder="Fashion Editorials">
+        </div>
+
+        <div>
+          <label class="sr-field-label">Key</label>
+          <input [(ngModel)]="currentCollection.key" type="text" class="sr-input" placeholder="fashion-editorials">
+          <p class="field-note">Leave blank to auto-generate from the title.</p>
+        </div>
+
+        <div>
+          <label class="sr-field-label">Subtitle</label>
+          <input [(ngModel)]="currentCollection.subtitle" type="text" class="sr-input" placeholder="Minimal silhouettes and statement styling">
+        </div>
+
+        <div>
+          <label class="sr-field-label">Category</label>
+          <select [(ngModel)]="currentCollection.category" class="sr-select">
+            <option *ngFor="let category of categories.slice(1)" [value]="category.value">{{ category.label }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="sr-field-label">Sort Order</label>
+          <input [(ngModel)]="currentCollection.sortOrder" type="number" min="1" class="sr-input">
+        </div>
+
+        <div>
+          <label class="sr-field-label">Accent Tone</label>
+          <div class="accent-tone-field">
+            <input [(ngModel)]="currentCollection.accentTone" type="text" class="sr-input" placeholder="#d0a05a">
+            <input [(ngModel)]="currentCollection.accentTone" type="color" class="accent-tone-picker">
+          </div>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="sr-field-label">Description</label>
+          <textarea [(ngModel)]="currentCollection.description" rows="4" class="sr-textarea" placeholder="Describe the visual direction for this set."></textarea>
+        </div>
+
+        <div class="md:col-span-2">
+          <app-admin-image-upload-field
+            label="Cover Image"
+            [value]="currentCollection.coverImageUrl || ''"
+            (valueChange)="currentCollection.coverImageUrl = $event"
+            placeholder="Paste cover image URL"
+            uploadButtonLabel="Upload Cover"
+            uploadFolder="gallery/collections"
+            previewAlt="Story set cover preview">
+          </app-admin-image-upload-field>
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-end gap-3">
+        <button type="button" (click)="closeCollectionModal()" class="sr-button-ghost">Cancel</button>
+        <button type="button" (click)="saveCollection()" class="sr-button">Save Story Set</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isImageModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
+    <div class="sr-modal-panel w-full max-w-3xl max-h-[92vh] overflow-y-auto p-6 md:p-7">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <span class="sr-kicker">{{ isEditingImage ? 'Editing' : 'Creating' }}</span>
+          <h2 class="sr-card-title mt-2">{{ isEditingImage ? 'Edit Gallery Image' : 'Add Gallery Image' }}</h2>
+        </div>
+        <button type="button" (click)="closeImageModal()" class="sr-close-button">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-grid">
+        <div>
+          <label class="sr-field-label">Caption</label>
+          <input [(ngModel)]="currentMedia.caption" type="text" class="sr-input" placeholder="Magazine Feature Portrait">
+        </div>
+
+        <div>
+          <label class="sr-field-label">Alt Text</label>
+          <input [(ngModel)]="currentMedia.altText" type="text" class="sr-input" placeholder="Accessible image description">
+        </div>
+
+        <div>
+          <label class="sr-field-label">Date</label>
+          <input [(ngModel)]="currentMedia.date" type="text" class="sr-input" placeholder="March 2024">
+        </div>
+
+        <div>
+          <label class="sr-field-label">Story Set</label>
+          <select [(ngModel)]="currentMedia.collectionKey" (ngModelChange)="onCollectionSelectionChange($event)" class="sr-select">
+            <option value="">Unassigned</option>
+            <option *ngFor="let collection of sortedCollections" [value]="collection.key">{{ collection.title }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="sr-field-label">Category</label>
+          <select [(ngModel)]="currentMedia.type" class="sr-select" [disabled]="hasSelectedCollection">
+            <option *ngFor="let category of categories.slice(1)" [value]="category.value">{{ category.label }}</option>
+          </select>
+          <p *ngIf="hasSelectedCollection" class="field-note">Category syncs automatically from the selected story set.</p>
+        </div>
+
+        <div>
+          <label class="sr-field-label">Display Order</label>
+          <input [(ngModel)]="currentMedia.displayOrder" type="number" min="1" class="sr-input">
+        </div>
+
+        <div class="md:col-span-2">
+          <app-admin-image-upload-field
+            label="Gallery Image"
+            [value]="currentMedia.imageUrl || ''"
+            (valueChange)="currentMedia.imageUrl = $event"
+            placeholder="Paste image URL"
+            uploadButtonLabel="Upload Image"
+            bulkButtonLabel="Bulk Upload"
+            helperText="Bulk upload creates one gallery entry per file using the current story set and filename-based captions."
+            uploadFolder="gallery/sets"
+            [allowBulk]="true"
+            previewAlt="Gallery preview"
+            (bulkUploaded)="handleBulkUpload($event)">
+          </app-admin-image-upload-field>
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-end gap-3">
+        <button type="button" (click)="closeImageModal()" class="sr-button-ghost">Cancel</button>
+        <button type="button" (click)="saveImage()" class="sr-button">Save Image</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,6 +6,10 @@ import { WelcomePopupComponent } from './components/welcome-popup/welcome-popup.
 import { PreloaderComponent } from './components/preloader/preloader.component';
 import { ApiService } from './services/api.service';
 import { ViewportScroller } from '@angular/common';
+import {
+  ENTRY_EXPERIENCE_COMPLETED_STORAGE_KEY,
+  PENDING_VISITOR_ENTRY_STORAGE_KEY
+} from './components/welcome-popup/entry-experience.storage';
 
 @Component({
   selector: 'app-root',
@@ -33,8 +37,14 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     // 1. Wake up the backend
     this.apiService.getNews().subscribe({
-      next: () => { this.finishLoading(); },
-      error: () => { this.finishLoading(); }
+      next: () => {
+        this.retryPendingVisitorEntry();
+        this.finishLoading();
+      },
+      error: () => {
+        this.retryPendingVisitorEntry();
+        this.finishLoading();
+      }
     });
 
     // 2. Scroll to top on every navigation
@@ -62,7 +72,7 @@ export class AppComponent implements OnInit {
     const isRestricted = currentUrl.includes('/admin') || currentUrl.includes('/login');
 
     // Persist popup state in localStorage so it only shows once per user (not every session)
-    const hasSeenPopup = localStorage.getItem('srp_welcome_seen') === 'true';
+    const hasSeenPopup = localStorage.getItem(ENTRY_EXPERIENCE_COMPLETED_STORAGE_KEY) === 'true';
 
     if (!isRestricted && !this.hasShownPopup && !this.isLoading && !hasSeenPopup) {
       setTimeout(() => {
@@ -74,5 +84,22 @@ export class AppComponent implements OnInit {
 
   onWelcomePopupClose() {
     this.showWelcomePopup = false;
+  }
+
+  private retryPendingVisitorEntry() {
+    const pendingPayload = localStorage.getItem(PENDING_VISITOR_ENTRY_STORAGE_KEY);
+    if (!pendingPayload) {
+      return;
+    }
+
+    try {
+      const parsedPayload = JSON.parse(pendingPayload);
+      this.apiService.recordVisitorEntry(parsedPayload).subscribe({
+        next: () => localStorage.removeItem(PENDING_VISITOR_ENTRY_STORAGE_KEY),
+        error: () => {}
+      });
+    } catch {
+      localStorage.removeItem(PENDING_VISITOR_ENTRY_STORAGE_KEY);
+    }
   }
 }

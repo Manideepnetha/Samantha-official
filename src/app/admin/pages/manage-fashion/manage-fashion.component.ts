@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, FashionItem } from '../../../services/api.service';
+import { AdminImageUploadFieldComponent } from '../../components/admin-image-upload-field/admin-image-upload-field.component';
 
 @Component({
   selector: 'app-manage-fashion',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AdminImageUploadFieldComponent],
   template: `
     <div class="sr-admin-page">
       <div class="sr-admin-page-header">
@@ -76,17 +77,15 @@ import { ApiService, FashionItem } from '../../../services/api.service';
               <label class="sr-field-label">Description</label>
               <textarea [(ngModel)]="currentItem.description" rows="4" class="sr-textarea"></textarea>
             </div>
-            <div>
-              <label class="sr-field-label">Image</label>
-              <div class="flex flex-col gap-3 md:flex-row">
-                <input [(ngModel)]="currentItem.imageUrl" type="text" placeholder="Paste image URL" class="sr-input flex-1">
-                <button type="button" (click)="fileInput.click()" [disabled]="isUploading" class="sr-button-outline whitespace-nowrap px-5">{{ isUploading ? 'Uploading...' : 'Upload Image' }}</button>
-                <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
-              </div>
-              <div *ngIf="currentItem.imageUrl" class="mt-4 overflow-hidden rounded-[1.3rem] border border-[rgba(228,196,163,0.14)] bg-[rgba(243,232,220,0.04)] p-3">
-                <img [src]="currentItem.imageUrl" class="sr-admin-thumb h-40 w-full max-w-md" alt="Preview">
-              </div>
-            </div>
+            <app-admin-image-upload-field
+              label="Image"
+              [value]="currentItem.imageUrl"
+              (valueChange)="currentItem.imageUrl = $event"
+              placeholder="Paste image URL"
+              uploadButtonLabel="Upload Image"
+              uploadFolder="fashion"
+              previewAlt="Fashion image preview">
+            </app-admin-image-upload-field>
             <div>
               <label class="sr-field-label">Link URL</label>
               <input [(ngModel)]="currentItem.link" type="text" class="sr-input">
@@ -107,45 +106,12 @@ export class ManageFashionComponent implements OnInit {
   fashionItems: FashionItem[] = [];
   isModalOpen = false;
   isEditing = false;
-  isUploading = false;
   currentItem: FashionItem = { title: '', date: '', description: '', imageUrl: '', link: '' };
 
   constructor(private apiService: ApiService) { }
 
   ngOnInit(): void {
     this.loadItems();
-  }
-
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    this.isUploading = true;
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'ml_default');
-    formData.append('cloud_name', 'dpnd6ve1e');
-
-    fetch(`https://api.cloudinary.com/v1_1/dpnd6ve1e/image/upload`, {
-      method: 'POST',
-      body: formData
-    })
-      .then(res => res.json())
-      .then(res => {
-        if (res.secure_url) {
-          this.currentItem.imageUrl = res.secure_url;
-        } else {
-          alert('Upload failed. Please ensure your Cloudinary "Unsigned Upload Preset" is named "ml_default".');
-        }
-      })
-      .catch(err => {
-        console.error('Upload error:', err);
-        alert('Error connecting to Cloudinary.');
-      })
-      .finally(() => {
-        this.isUploading = false;
-      });
   }
 
   loadItems(): void {

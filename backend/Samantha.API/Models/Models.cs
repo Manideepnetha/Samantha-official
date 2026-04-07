@@ -114,6 +114,19 @@ public class NewsArticle
     public string? Date { get; set; } // "May 15, 2025"
 }
 
+public class GalleryCollection
+{
+    public int Id { get; set; }
+    public required string Key { get; set; }
+    public required string Title { get; set; }
+    public string? Subtitle { get; set; }
+    public string? Description { get; set; }
+    public required string Category { get; set; }
+    public string? CoverImageUrl { get; set; }
+    public string? AccentTone { get; set; }
+    public int SortOrder { get; set; }
+}
+
 public class MediaGallery
 {
     public int Id { get; set; }
@@ -122,6 +135,8 @@ public class MediaGallery
     public string? AltText { get; set; }
     public string Type { get; set; } = "Home"; // "Home", "General", "Film", "Event", "Fashion", "BTS", "Photoshoot"
     public string? Date { get; set; } // "March 2024"
+    public string? CollectionKey { get; set; }
+    public int DisplayOrder { get; set; }
 }
 
 public class FashionItem
@@ -151,6 +166,41 @@ public class QuizEntry
     public int TotalQuestions { get; set; }
     public int TimeTakenSeconds { get; set; }
     public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class FanCreation
+{
+    public int Id { get; set; }
+    public required string Title { get; set; }
+    public required string CreatorName { get; set; }
+    public required string Type { get; set; } // "Poster", "Video", "Illustration"
+    public string? Description { get; set; }
+    public required string ImageUrl { get; set; }
+    public string? MediaUrl { get; set; }
+    public string? DateLabel { get; set; }
+    public string? Platform { get; set; }
+    public bool IsFeatured { get; set; }
+}
+
+public class VisitorEntry
+{
+    public int Id { get; set; }
+    public required string ClientVisitorId { get; set; }
+    public required string Name { get; set; }
+    public string? SocialMediaId { get; set; }
+    public string? Source { get; set; }
+    public string? UserAgent { get; set; }
+    public string? IpAddress { get; set; }
+    public DateTime FirstCompletedAt { get; set; } = DateTime.UtcNow;
+    public DateTime LastCompletedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class RecordVisitorEntryRequest
+{
+    public required string ClientVisitorId { get; set; }
+    public required string Name { get; set; }
+    public string? SocialMediaId { get; set; }
+    public string? Source { get; set; }
 }
 
 public class PageContent

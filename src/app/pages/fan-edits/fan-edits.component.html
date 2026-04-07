@@ -1,0 +1,216 @@
+<div class="fan-edits-shell">
+  <section class="fan-edits-hero">
+    <div class="hero-stage">
+      <div class="hero-copy">
+        <span class="hero-kicker">Fan Made Edits</span>
+        <h1>A richer showcase for posters, video tributes, and illustration art.</h1>
+        <p>
+          The fan-made gallery now opens like a curated editorial room instead of a plain grid. Every layer gives the
+          artwork more space, cleaner framing, and a stronger sense of atmosphere.
+        </p>
+        <div class="hero-metrics" *ngIf="!loading">
+          <div>
+            <strong>{{ fanCreations.length }}</strong>
+            <span>Creative drops</span>
+          </div>
+          <div>
+            <strong>{{ creatorCount }}</strong>
+            <span>Fan artists</span>
+          </div>
+          <div>
+            <strong>{{ spotlightCount }}</strong>
+            <span>Spotlight picks</span>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <a href="#poster-vault" class="primary-button">Explore The Gallery</a>
+          <a routerLink="/fan-zone" class="secondary-button">Back To Fan Zone</a>
+        </div>
+      </div>
+
+      <div class="hero-visual" [class.single-visual]="heroSupportCards.length === 0" *ngIf="heroCover as cover; else coverPlaceholder">
+        <article class="cover-spotlight">
+          <span class="visual-tag">Featured Cover</span>
+          <div class="cover-frame">
+            <img [src]="cover.imageUrl" [alt]="cover.title">
+          </div>
+          <div class="cover-copy">
+            <span>{{ getCollectionLabel(cover) }}</span>
+            <h2>{{ cover.title }}</h2>
+            <p>{{ cover.description || 'A highlighted fan-made tribute selected from the community collection.' }}</p>
+          </div>
+        </article>
+
+        <div class="supporting-visuals" *ngIf="heroSupportCards.length > 0">
+          <article *ngFor="let item of heroSupportCards" class="mini-card">
+            <img [src]="item.imageUrl" [alt]="item.title">
+            <div class="mini-card-copy">
+              <span>{{ getCollectionLabel(item) }}</span>
+              <h3>{{ item.title }}</h3>
+              <small>By {{ item.creatorName || 'Fan Creator' }}</small>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <ng-template #coverPlaceholder>
+    <div class="hero-fallback">
+      <span class="visual-tag">Fan Gallery</span>
+      <h2>Curated fan creativity is loading into view.</h2>
+      <p>The posters, edits, and artwork will settle into this stage as soon as the collection loads.</p>
+    </div>
+  </ng-template>
+
+  <section *ngIf="loading" class="empty-state">Loading fan creations...</section>
+
+  <section *ngIf="!loading && fanCreations.length > 0" class="category-rail">
+    <a href="#poster-vault" class="rail-card">
+      <span>Poster Vault</span>
+      <strong>{{ posters.length }}</strong>
+      <p>Tribute key art, campaign concepts, and cinematic poster treatments.</p>
+    </a>
+    <a href="#motion-layer" class="rail-card">
+      <span>Motion Layer</span>
+      <strong>{{ videos.length }}</strong>
+      <p>Fast-cut edits, tribute reels, and fan-made motion storytelling.</p>
+    </a>
+    <a href="#illustration-room" class="rail-card">
+      <span>Illustration Room</span>
+      <strong>{{ illustrations.length }}</strong>
+      <p>Painted portraits, stylized studies, and digital illustration tributes.</p>
+    </a>
+  </section>
+
+  <section *ngIf="!loading" class="fan-edits-content">
+    <article id="poster-vault" class="section-card poster-layer">
+      <div class="section-head">
+        <div>
+          <span>Poster Vault</span>
+          <h2>Fan-made poster drops</h2>
+          <p>Large-format tribute posters, campaign concepts, and stylized key-art explorations from the community.</p>
+        </div>
+        <div class="section-chip">{{ posters.length }} works</div>
+      </div>
+      <div *ngIf="posters.length === 0" class="empty-state">No fan posters yet.</div>
+      <div *ngIf="posters.length > 0" class="section-showcase" [class.single-column]="posterGallery.length === 0">
+        <article *ngIf="featuredPoster as item" class="feature-card">
+          <div class="feature-media portrait-media">
+            <img [src]="item.imageUrl" [alt]="item.title">
+          </div>
+          <div class="feature-copy">
+            <span>{{ getDetailTag(item) }}</span>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description || 'A fan-crafted poster concept shaped with cinematic styling and tribute energy.' }}</p>
+            <div class="art-meta">
+              <small>By {{ item.creatorName || 'Fan Creator' }}</small>
+              <a *ngIf="item.mediaUrl" [href]="item.mediaUrl" target="_blank" rel="noopener noreferrer">{{ getMediaCta(item) }}</a>
+            </div>
+          </div>
+        </article>
+
+        <div *ngIf="posterGallery.length > 0" class="art-grid compact-grid">
+          <article *ngFor="let item of (featuredPoster ? posterGallery : posters)" class="art-card">
+            <img [src]="item.imageUrl" [alt]="item.title">
+            <div class="art-copy">
+              <span>{{ getDetailTag(item) }}</span>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.description }}</p>
+              <div class="art-meta">
+                <small>By {{ item.creatorName || 'Fan Creator' }}</small>
+                <a *ngIf="item.mediaUrl" [href]="item.mediaUrl" target="_blank" rel="noopener noreferrer">{{ getMediaCta(item) }}</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </article>
+
+    <article id="motion-layer" class="section-card video-layer">
+      <div class="section-head">
+        <div>
+          <span>Motion Layer</span>
+          <h2>Fan-made video edits</h2>
+          <p>Fast-cut tribute reels, cinematic recaps, and mood edits collected into a single watch list.</p>
+        </div>
+        <div class="section-chip">{{ videos.length }} edits</div>
+      </div>
+      <div *ngIf="videos.length === 0" class="empty-state">No video edits yet.</div>
+      <div *ngIf="videos.length > 0" class="video-showcase" [class.single-column]="videoGallery.length === 0">
+        <article *ngIf="featuredVideo as item" class="feature-card cinematic-card">
+          <div class="feature-media cinematic-media">
+            <img [src]="item.imageUrl" [alt]="item.title">
+          </div>
+          <div class="feature-copy">
+            <span>{{ getDetailTag(item) }}</span>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description || 'A standout motion tribute cut with fan-made pacing, mood, and cinematic energy.' }}</p>
+            <div class="art-meta">
+              <small>By {{ item.creatorName || 'Fan Editor' }}</small>
+              <a *ngIf="item.mediaUrl" [href]="item.mediaUrl" target="_blank" rel="noopener noreferrer">{{ getMediaCta(item) }}</a>
+            </div>
+          </div>
+        </article>
+
+        <div *ngIf="videoGallery.length > 0" class="video-list">
+          <article *ngFor="let item of (featuredVideo ? videoGallery : videos)" class="video-card">
+            <img [src]="item.imageUrl" [alt]="item.title">
+            <div class="video-copy">
+              <span>{{ getDetailTag(item) }}</span>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.description }}</p>
+              <div class="art-meta">
+                <small>By {{ item.creatorName || 'Fan Editor' }}</small>
+                <a *ngIf="item.mediaUrl" [href]="item.mediaUrl" target="_blank" rel="noopener noreferrer">{{ getMediaCta(item) }}</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </article>
+
+    <article id="illustration-room" class="section-card illustration-layer">
+      <div class="section-head">
+        <div>
+          <span>Illustration Room</span>
+          <h2>Illustration arts</h2>
+          <p>Painted portraits, stylized studies, and digitally composed tribute pieces from the fan art community.</p>
+        </div>
+        <div class="section-chip">{{ illustrations.length }} pieces</div>
+      </div>
+      <div *ngIf="illustrations.length === 0" class="empty-state">No illustration pieces yet.</div>
+      <div *ngIf="illustrations.length > 0" class="section-showcase reverse-showcase" [class.single-column]="illustrationGallery.length === 0">
+        <div *ngIf="illustrationGallery.length > 0" class="art-grid compact-grid">
+          <article *ngFor="let item of (featuredIllustration ? illustrationGallery : illustrations)" class="art-card illustration-card">
+            <img [src]="item.imageUrl" [alt]="item.title">
+            <div class="art-copy">
+              <span>{{ getDetailTag(item) }}</span>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.description }}</p>
+              <div class="art-meta">
+                <small>By {{ item.creatorName || 'Fan Illustrator' }}</small>
+                <a *ngIf="item.mediaUrl" [href]="item.mediaUrl" target="_blank" rel="noopener noreferrer">{{ getMediaCta(item) }}</a>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <article *ngIf="featuredIllustration as item" class="feature-card illustration-feature">
+          <div class="feature-media portrait-media">
+            <img [src]="item.imageUrl" [alt]="item.title">
+          </div>
+          <div class="feature-copy">
+            <span>{{ getDetailTag(item) }}</span>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description || 'A highlighted illustration piece with a more expressive, gallery-style frame.' }}</p>
+            <div class="art-meta">
+              <small>By {{ item.creatorName || 'Fan Illustrator' }}</small>
+              <a *ngIf="item.mediaUrl" [href]="item.mediaUrl" target="_blank" rel="noopener noreferrer">{{ getMediaCta(item) }}</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </article>
+  </section>
+</div>

@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, NewsArticle } from '../../../services/api.service';
+import { AdminImageUploadFieldComponent } from '../../components/admin-image-upload-field/admin-image-upload-field.component';
 
 @Component({
   selector: 'app-manage-news',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AdminImageUploadFieldComponent],
   template: `
     <div class="sr-admin-page">
       <div class="sr-admin-page-header">
@@ -76,10 +77,15 @@ import { ApiService, NewsArticle } from '../../../services/api.service';
               <label class="sr-field-label">Excerpt</label>
               <textarea [(ngModel)]="currentNews.excerpt" rows="4" class="sr-textarea"></textarea>
             </div>
-            <div>
-              <label class="sr-field-label">Image URL</label>
-              <input [(ngModel)]="currentNews.imageUrl" type="text" class="sr-input">
-            </div>
+            <app-admin-image-upload-field
+              label="Image URL"
+              [value]="currentNews.imageUrl || ''"
+              (valueChange)="currentNews.imageUrl = $event"
+              placeholder="Paste image URL"
+              uploadButtonLabel="Upload Highlight Image"
+              uploadFolder="news"
+              previewAlt="Highlight preview">
+            </app-admin-image-upload-field>
             <div>
               <label class="sr-field-label">Link URL</label>
               <input [(ngModel)]="currentNews.link" type="text" class="sr-input">

@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, Movie } from '../../../services/api.service';
+import { AdminImageUploadFieldComponent } from '../../components/admin-image-upload-field/admin-image-upload-field.component';
 
 @Component({
   selector: 'app-manage-movies',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AdminImageUploadFieldComponent],
   template: `
     <div class="sr-admin-page">
       <div class="sr-admin-page-header">
@@ -100,18 +101,16 @@ import { ApiService, Movie } from '../../../services/api.service';
               <input [(ngModel)]="currentMovie.role" type="text" class="sr-input">
             </div>
             <div class="md:col-span-2">
-              <label class="sr-field-label">Poster Image</label>
-              <div class="flex flex-col gap-3 md:flex-row">
-                <input [(ngModel)]="currentMovie.poster" type="text" placeholder="Paste poster URL" class="sr-input flex-1">
-                <button type="button" (click)="fileInput.click()" [disabled]="isUploading" class="sr-button-outline whitespace-nowrap px-5">
-                  <span *ngIf="!isUploading">Upload Poster</span>
-                  <span *ngIf="isUploading">Uploading...</span>
-                </button>
-                <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
-              </div>
-              <div *ngIf="currentMovie.poster" class="mt-4 overflow-hidden rounded-[1.3rem] border border-[rgba(228,196,163,0.14)] bg-[rgba(243,232,220,0.04)] p-3">
-                <img [src]="currentMovie.poster" class="sr-admin-thumb is-poster h-48 w-32" alt="Preview">
-              </div>
+              <app-admin-image-upload-field
+                label="Poster Image"
+                [value]="currentMovie.poster"
+                (valueChange)="currentMovie.poster = $event"
+                placeholder="Paste poster URL"
+                uploadButtonLabel="Upload Poster"
+                uploadFolder="movies"
+                previewAlt="Poster preview"
+                previewClass="sr-admin-thumb is-poster h-48 w-32">
+              </app-admin-image-upload-field>
             </div>
             <div class="md:col-span-2">
               <label class="sr-field-label">Description</label>
@@ -141,7 +140,6 @@ export class ManageMoviesComponent implements OnInit {
   movies: Movie[] = [];
   isModalOpen = false;
   isEditing = false;
-  isUploading = false;
 
   currentMovie: Movie = this.getEmptyMovie();
 
@@ -149,38 +147,6 @@ export class ManageMoviesComponent implements OnInit {
 
   ngOnInit(): void {
     this.refreshMovies();
-  }
-
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    this.isUploading = true;
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'ml_default');
-    formData.append('cloud_name', 'dpnd6ve1e');
-
-    fetch(`https://api.cloudinary.com/v1_1/dpnd6ve1e/image/upload`, {
-      method: 'POST',
-      body: formData
-    })
-      .then(res => res.json())
-      .then(res => {
-        if (res.secure_url) {
-          this.currentMovie.poster = res.secure_url;
-        } else {
-          alert('Upload failed. Please ensure your Cloudinary "Unsigned Upload Preset" is named "ml_default".');
-        }
-      })
-      .catch(err => {
-        console.error('Upload error:', err);
-        alert('Error connecting to Cloudinary.');
-      })
-      .finally(() => {
-        this.isUploading = false;
-      });
   }
 
   refreshMovies() {

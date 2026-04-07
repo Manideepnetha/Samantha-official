@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, Award } from '../../../services/api.service';
+import { AdminImageUploadFieldComponent } from '../../components/admin-image-upload-field/admin-image-upload-field.component';
 
 @Component({
   selector: 'app-manage-awards',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AdminImageUploadFieldComponent],
   template: `
     <div class="sr-admin-page">
       <div class="sr-admin-page-header">
@@ -110,16 +111,19 @@ import { ApiService, Award } from '../../../services/api.service';
             </div>
 
             <div *ngIf="currentAward.type === 'Gallery'" class="space-y-4">
-              <div>
-                <label class="sr-field-label">Image URL</label>
-                <input [(ngModel)]="currentAward.imageUrl" name="imageUrl" class="sr-input">
-              </div>
+              <app-admin-image-upload-field
+                label="Image URL"
+                [value]="currentAward.imageUrl || ''"
+                (valueChange)="currentAward.imageUrl = $event"
+                placeholder="Paste image URL"
+                uploadButtonLabel="Upload Award Image"
+                uploadFolder="awards"
+                previewAlt="Award image preview"
+                previewClass="sr-admin-thumb h-48 w-full max-w-sm">
+              </app-admin-image-upload-field>
               <div>
                 <label class="sr-field-label">Description</label>
                 <input [(ngModel)]="currentAward.description" name="galleryDescription" class="sr-input">
-              </div>
-              <div *ngIf="currentAward.imageUrl" class="overflow-hidden rounded-[1.3rem] border border-[rgba(228,196,163,0.14)] bg-[rgba(243,232,220,0.04)] p-3">
-                <img [src]="currentAward.imageUrl" alt="Preview" class="sr-admin-thumb h-48 w-full max-w-sm">
               </div>
             </div>
 

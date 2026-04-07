@@ -1080,6 +1080,14 @@
   object-fit: cover;
 }
 
+.news-media img {
+  object-position: center 18%;
+}
+
+.project-poster img {
+  object-position: center center;
+}
+
 .news-copy,
 .project-copy {
   display: flex;

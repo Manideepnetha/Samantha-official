@@ -1,26 +1,20 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../services/api.service';
-
-interface Movie {
-  id: number;
-  title: string;
-  year: number;
-  releaseDate?: string;
-  language: string;
-  genre: string[];
-  role: string;
-  director: string;
-  poster: string;
-  description: string;
-  trailer?: string;
-}
+import { RouterLink } from '@angular/router';
+import { ApiService, Movie } from '../../services/api.service';
+import {
+  getMovieGenres,
+  isCameoMovie,
+  isWebSeriesMovie,
+  matchesMovieSearch,
+  normalizeMovie
+} from './movie.utils';
 
 @Component({
   selector: 'app-filmography',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <div class="sr-page">
       <section class="sr-hero-shell">
@@ -122,7 +116,7 @@ interface Movie {
               <span class="sr-meta">{{movie.year}}<span *ngIf="movie.releaseDate"> / {{movie.releaseDate}}</span></span>
               <h3 class="sr-card-title mt-3 mb-2">{{movie.title}}</h3>
               <p class="sr-card-text mb-4">{{movie.role}}</p>
-              <button class="sr-button w-full" (click)="openMovieDetails(movie)">View Details</button>
+              <a class="sr-button w-full text-center" [routerLink]="['/filmography', movie.id]">View Details</a>
             </div>
           </div>
         </div>
@@ -150,7 +144,7 @@ interface Movie {
               <span class="sr-meta">{{series.year}} / {{series.language}}</span>
               <h3 class="sr-card-title mt-3 mb-2">{{series.title}}</h3>
               <p class="sr-card-text mb-4">{{series.role}}</p>
-              <button class="sr-button w-full" (click)="openMovieDetails(series)">View Details</button>
+              <a class="sr-button w-full text-center" [routerLink]="['/filmography', series.id]">View Details</a>
             </div>
           </div>
         </div>
@@ -174,60 +168,11 @@ interface Movie {
               <span class="sr-meta">{{movie.year}} / {{movie.language}}</span>
               <h3 class="sr-card-title mt-3 mb-2">{{movie.title}}</h3>
               <p class="sr-card-text mb-4">{{movie.role}}</p>
-              <button class="sr-button w-full" (click)="openMovieDetails(movie)">View Details</button>
+              <a class="sr-button w-full text-center" [routerLink]="['/filmography', movie.id]">View Details</a>
             </div>
           </div>
         </div>
       </section>
-
-      <div *ngIf="selectedMovie" class="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(8,4,4,0.84)] p-4 backdrop-blur-sm">
-        <div class="sr-modal-panel relative max-h-[90vh] w-full max-w-4xl overflow-y-auto">
-          <button (click)="closeMovieDetails()" class="sr-close-button absolute right-4 top-4 z-10" aria-label="Close details">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          <div class="grid grid-cols-1 md:grid-cols-[0.78fr_1.22fr]">
-            <div class="overflow-hidden md:rounded-l-[1.75rem]">
-              <img [src]="selectedMovie.poster" [alt]="selectedMovie.title" class="h-full w-full object-cover" />
-            </div>
-
-            <div class="p-6 md:p-8">
-              <span class="sr-meta">{{selectedMovie.year}} / {{selectedMovie.language}}</span>
-              <h2 class="sr-card-title mt-3 mb-5">{{selectedMovie.title}}</h2>
-
-              <div class="grid gap-4">
-                <div>
-                  <span class="sr-field-label">Role</span>
-                  <span class="block text-lg text-[#f6ecdf]">{{selectedMovie.role}}</span>
-                </div>
-                <div>
-                  <span class="sr-field-label">Director</span>
-                  <span class="block text-lg text-[#f6ecdf]">{{selectedMovie.director}}</span>
-                </div>
-                <div>
-                  <span class="sr-field-label">Genre</span>
-                  <div class="mt-2 flex flex-wrap gap-2">
-                    <span *ngFor="let genre of selectedMovie.genre" class="sr-chip">{{genre}}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-6">
-                <h3 class="sr-card-title mb-3 text-[2rem]">About the Film</h3>
-                <p class="sr-card-text">{{selectedMovie.description}}</p>
-              </div>
-
-              <div *ngIf="selectedMovie.trailer" class="mt-8">
-                <a [href]="selectedMovie.trailer" target="_blank" class="sr-button">
-                  Watch Trailer
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   `,
   styles: []
@@ -237,7 +182,6 @@ export class FilmographyComponent implements OnInit {
   webSeries: Movie[] = [];
   filteredMovies: Movie[] = [];
   cameoMovies: Movie[] = [];
-  selectedMovie: Movie | null = null;
 
   searchTerm: string = '';
   selectedLanguage: string = '';
@@ -257,11 +201,12 @@ export class FilmographyComponent implements OnInit {
   fetchMovies() {
     this.apiService.getMovies().subscribe({
       next: (data) => {
-        this.webSeries = data.filter(m => m.description.toLowerCase().includes('web series'));
-        this.movies = data.filter(m => !m.description.toLowerCase().includes('web series'));
+        const normalizedMovies = data.map(movie => this.normalizeMovie(movie));
+        this.webSeries = normalizedMovies.filter(movie => isWebSeriesMovie(movie));
+        this.movies = normalizedMovies.filter(movie => !isWebSeriesMovie(movie));
 
-        this.cameoMovies = this.movies.filter(m => m.role.toLowerCase().includes('cameo') || m.description.toLowerCase().includes('cameo'));
-        this.movies = this.movies.filter(m => !m.role.toLowerCase().includes('cameo') && !m.description.toLowerCase().includes('cameo'));
+        this.cameoMovies = this.movies.filter(movie => isCameoMovie(movie));
+        this.movies = this.movies.filter(movie => !isCameoMovie(movie));
 
         this.extractFilterOptions();
         this.applyFilters();
@@ -279,7 +224,7 @@ export class FilmographyComponent implements OnInit {
 
     const genres = new Set<string>();
     this.movies.forEach(movie => {
-      movie.genre.forEach(genre => genres.add(genre));
+      this.getGenres(movie).forEach(genre => genres.add(genre));
     });
     this.availableGenres = Array.from(genres).sort();
   }
@@ -290,9 +235,9 @@ export class FilmographyComponent implements OnInit {
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
       result = result.filter(movie =>
-        movie.title.toLowerCase().includes(term) ||
-        movie.role.toLowerCase().includes(term) ||
-        movie.director.toLowerCase().includes(term)
+        matchesMovieSearch(movie.title, term) ||
+        matchesMovieSearch(movie.role, term) ||
+        matchesMovieSearch(movie.director, term)
       );
     }
 
@@ -306,7 +251,7 @@ export class FilmographyComponent implements OnInit {
 
     if (this.selectedGenre) {
       result = result.filter(movie =>
-        movie.genre.some(genre => genre === this.selectedGenre)
+        this.getGenres(movie).some(genre => genre === this.selectedGenre)
       );
     }
 
@@ -331,13 +276,11 @@ export class FilmographyComponent implements OnInit {
     }
   }
 
-  openMovieDetails(movie: Movie): void {
-    this.selectedMovie = movie;
-    document.body.style.overflow = 'hidden';
+  getGenres(movie: Movie | null): string[] {
+    return getMovieGenres(movie);
   }
 
-  closeMovieDetails(): void {
-    this.selectedMovie = null;
-    document.body.style.overflow = '';
+  private normalizeMovie(movie: Partial<Movie>): Movie {
+    return normalizeMovie(movie);
   }
 }

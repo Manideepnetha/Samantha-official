@@ -2,6 +2,8 @@
   "name": "samantha-ruth-prabhu-official",
   "private": true,
   "scripts": {
+    "backend": "powershell -ExecutionPolicy Bypass -File ./backend/run-api.ps1",
+    "backend:nobuild": "powershell -ExecutionPolicy Bypass -File ./backend/run-api.ps1 -NoBuild",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",

@@ -15,7 +15,7 @@ import { ApiService, NewsArticle } from '../../services/api.service';
               <img
                 src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748293717/FFoxLHbX3EA-HD_p81ikk.jpg"
                 alt="Media & Press"
-                class="object-[center_24%]"
+                class="object-[center_14%] md:object-[center_20%]"
               />
             </div>
 
@@ -60,7 +60,7 @@ import { ApiService, NewsArticle } from '../../services/api.service';
               <img
                 [src]="article.imageUrl || 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748293717/FFoxLHbX3EA-HD_p81ikk.jpg'"
                 [alt]="article.title"
-                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                class="h-full w-full object-cover object-[center_18%] md:object-[center_24%] transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-[rgba(8,4,4,0.72)] via-transparent to-transparent"></div>

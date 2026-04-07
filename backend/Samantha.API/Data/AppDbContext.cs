@@ -16,9 +16,12 @@ public class AppDbContext : DbContext
     public DbSet<Award> Awards { get; set; }
     public DbSet<Philanthropy> Philanthropies { get; set; }
     public DbSet<NewsArticle> NewsArticles { get; set; }
+    public DbSet<GalleryCollection> GalleryCollections { get; set; }
     public DbSet<MediaGallery> MediaGalleries { get; set; }
     public DbSet<FashionItem> FashionItems { get; set; }
     public DbSet<SiteSetting> SiteSettings { get; set; }
     public DbSet<PageContent> PageContents { get; set; }
     public DbSet<QuizEntry> QuizEntries { get; set; }
+    public DbSet<FanCreation> FanCreations { get; set; }
+    public DbSet<VisitorEntry> VisitorEntries { get; set; }
 }

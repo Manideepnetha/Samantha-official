@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService, MediaGallery } from '../../../services/api.service';
+import { forkJoin } from 'rxjs';
+import { ApiService, MediaGallery, UploadedMediaAsset } from '../../../services/api.service';
+import { AdminImageUploadFieldComponent } from '../../components/admin-image-upload-field/admin-image-upload-field.component';
 
 @Component({
     selector: 'app-manage-media-gallery',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, AdminImageUploadFieldComponent],
     template: `
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
@@ -62,10 +64,19 @@ import { ApiService, MediaGallery } from '../../../services/api.service';
               <input [(ngModel)]="currentMedia.caption" type="text" class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 bg-transparent text-charcoal dark:text-ivory focus:border-royal-gold outline-none">
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-charcoal dark:text-ivory mb-1">Image URL</label>
-              <input [(ngModel)]="currentMedia.imageUrl" type="text" class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 bg-transparent text-charcoal dark:text-ivory focus:border-royal-gold outline-none">
-            </div>
+            <app-admin-image-upload-field
+              label="Image URL"
+              [value]="currentMedia.imageUrl"
+              (valueChange)="currentMedia.imageUrl = $event"
+              placeholder="Paste image URL"
+              uploadButtonLabel="Upload Image"
+              bulkButtonLabel="Bulk Upload"
+              helperText="Bulk upload creates one featured gallery item per file using the filename as the caption."
+              uploadFolder="home/featured-gallery"
+              [allowBulk]="true"
+              previewAlt="Featured gallery preview"
+              (bulkUploaded)="handleBulkUpload($event)">
+            </app-admin-image-upload-field>
 
             <div>
               <label class="block text-sm font-medium text-charcoal dark:text-ivory mb-1">Alt Text</label>
@@ -123,6 +134,35 @@ export class ManageMediaGalleryComponent implements OnInit {
         this.isModalOpen = true;
     }
 
+    handleBulkUpload(assets: UploadedMediaAsset[]): void {
+        if (assets.length === 0) {
+            return;
+        }
+
+        const type = this.currentMedia.type || 'Home';
+        const requests = assets.map(asset => {
+            const caption = this.formatUploadLabel(asset.fileName);
+            return this.apiService.createMediaGallery({
+                caption,
+                imageUrl: asset.url,
+                type,
+                altText: caption
+            });
+        });
+
+        forkJoin(requests).subscribe({
+            next: () => {
+                this.loadGallery();
+                this.closeModal();
+                alert(`${assets.length} featured image${assets.length === 1 ? '' : 's'} uploaded successfully.`);
+            },
+            error: (error) => {
+                console.error('Failed to save featured gallery bulk upload', error);
+                alert('Some uploaded images could not be saved.');
+            }
+        });
+    }
+
     saveMedia(): void {
         if (this.isEditing && this.currentMedia.id) {
             this.apiService.updateMediaGallery(this.currentMedia.id, this.currentMedia).subscribe(() => {
@@ -141,5 +181,19 @@ export class ManageMediaGalleryComponent implements OnInit {
         if (confirm('Are you sure you want to delete this image from the gallery?')) {
             this.apiService.deleteMediaGallery(id).subscribe(() => this.loadGallery());
         }
+    }
+
+    private formatUploadLabel(fileName: string): string {
+        const cleaned = fileName
+            .replace(/\.[^.]+$/, '')
+            .replace(/[_-]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        if (!cleaned) {
+            return 'Featured Image';
+        }
+
+        return cleaned.replace(/\b\w/g, char => char.toUpperCase());
     }
 }
