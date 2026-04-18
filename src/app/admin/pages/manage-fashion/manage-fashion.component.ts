@@ -81,6 +81,7 @@ import { AdminImageUploadFieldComponent } from '../../components/admin-image-upl
               label="Image"
               [value]="currentItem.imageUrl"
               (valueChange)="currentItem.imageUrl = $event"
+              (uploadCompleted)="persistEditedFashionImage()"
               placeholder="Paste image URL"
               uploadButtonLabel="Upload Image"
               uploadFolder="fashion"
@@ -146,6 +147,20 @@ export class ManageFashionComponent implements OnInit {
         this.closeModal();
       });
     }
+  }
+
+  persistEditedFashionImage(): void {
+    if (!this.isEditing || !this.currentItem.id || !this.currentItem.title?.trim()) {
+      return;
+    }
+
+    this.apiService.updateFashion(this.currentItem.id, this.currentItem).subscribe({
+      next: () => this.loadItems(),
+      error: (error) => {
+        console.error('Failed to auto-save uploaded fashion image', error);
+        alert('The image uploaded, but the fashion story was not saved automatically. Please click Save.');
+      }
+    });
   }
 
   deleteItem(id: number): void {

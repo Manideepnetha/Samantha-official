@@ -3,6 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { gsap } from 'gsap';
 import { ApiService } from '../../services/api.service';
+import { ThemeService } from '../../services/theme.service';
+import { NotificationBellComponent } from '../../components/notification-bell/notification-bell.component';
+import { BirthdayCountdownComponent } from '../../components/birthday-countdown/birthday-countdown.component';
+import { QuoteOfTheDayComponent } from '../../components/quote-of-the-day/quote-of-the-day.component';
+import { ThisDayHistoryComponent } from '../../components/this-day-history/this-day-history.component';
+import { InstagramFeedEmbedComponent } from '../../components/instagram-feed-embed/instagram-feed-embed.component';
+import { Subscription } from 'rxjs';
 
 interface HeroSlide {
   image: string;
@@ -213,7 +220,15 @@ const DEFAULT_HOME_CONTENT: HomePageContent = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [
+    CommonModule,
+    RouterLink,
+    NotificationBellComponent,
+    BirthdayCountdownComponent,
+    QuoteOfTheDayComponent,
+    ThisDayHistoryComponent,
+    InstagramFeedEmbedComponent
+  ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -221,10 +236,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   currentSlide = 0;
   currentRole = 0;
   isMobileMenuOpen = false;
+  isDarkMode = false;
   awardCount = 12;
+  private readonly visibilityChangeHandler = () => this.handleVisibilityChange();
 
   private roleInterval?: ReturnType<typeof setInterval>;
   private slideInterval?: ReturnType<typeof setInterval>;
+  private themeSubscription?: Subscription;
+
+  private readonly CACHE_VERSION = 'v2';
 
   readonly debutYear = 2010;
   performanceRange = DEFAULT_HOME_CONTENT.performanceRange;
@@ -241,7 +261,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly secondaryNavItems = [
     { label: 'Fashion', route: '/fashion' },
     { label: 'Philanthropy', route: '/philanthropy' },
-    { label: 'Blog', route: '/blog' },
+    { label: 'Timeline', route: '/timeline' },
+    { label: 'Wallpapers', route: '/wallpapers' },
+    { label: 'Fan Wall', route: '/fan-wall' },
     { label: 'Press', route: '/media' }
   ];
 
@@ -281,17 +303,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   heroSlides: HeroSlide[] = [
     {
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008414/8F9A7087_koclpw.jpg',
+      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008414/8F9A7087_koclpw.jpg?cache=v2',
       role: 'Actress',
       alt: 'Samantha Ruth Prabhu portrait'
     },
     {
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008413/PAND7159_k4qlvo.jpg',
+      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008413/PAND7159_k4qlvo.jpg?cache=v2',
       role: 'Icon',
       alt: 'Samantha Ruth Prabhu editorial portrait'
     },
     {
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008412/DSC_9143-1_ayf7fl.jpg',
+      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008412/DSC_9143-1_ayf7fl.jpg?cache=v2',
       role: 'Philanthropist',
       alt: 'Samantha Ruth Prabhu feature portrait'
     }
@@ -305,8 +327,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   featuredGallery: HomeGalleryImage[] = [];
   tickerText = '';
   tickerLink = '';
+  fallbackImage = 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045346/Samantha29_clxsnm.jpg?cache=v2';
 
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService, private themeService: ThemeService) {
+    this.themeSubscription = this.themeService.isDarkMode$.subscribe(isDarkMode => {
+      this.isDarkMode = isDarkMode;
+    });
+  }
 
   get currentHeroSlide(): HeroSlide {
     return this.heroSlides[this.currentSlide] ?? this.heroSlides[0];
@@ -335,6 +362,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.startCarousels();
     this.loadHomepageContent();
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.visibilityChangeHandler);
+    }
   }
 
   ngAfterViewInit(): void {
@@ -342,14 +372,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.roleInterval) {
-      clearInterval(this.roleInterval);
+    this.stopCarousels();
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
     }
 
-    if (this.slideInterval) {
-      clearInterval(this.slideInterval);
-    }
-
+    this.themeSubscription?.unsubscribe();
     document.body.style.overflow = '';
   }
 
@@ -361,6 +389,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   closeMobileMenu(): void {
     this.isMobileMenuOpen = false;
     document.body.style.overflow = '';
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleDarkMode();
   }
 
   onTickerClick(): void {
@@ -382,21 +414,25 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private startCarousels(): void {
-    this.roleInterval = setInterval(() => {
-      if (this.roles.length === 0) {
-        return;
-      }
+    if (!this.roleInterval) {
+      this.roleInterval = setInterval(() => {
+        if (this.roles.length === 0) {
+          return;
+        }
 
-      this.currentRole = (this.currentRole + 1) % this.roles.length;
-    }, 3200);
+        this.currentRole = (this.currentRole + 1) % this.roles.length;
+      }, 3200);
+    }
 
-    this.slideInterval = setInterval(() => {
-      if (this.heroSlides.length === 0) {
-        return;
-      }
+    if (!this.slideInterval) {
+      this.slideInterval = setInterval(() => {
+        if (this.heroSlides.length === 0) {
+          return;
+        }
 
-      this.currentSlide = (this.currentSlide + 1) % this.heroSlides.length;
-    }, 5200);
+        this.currentSlide = (this.currentSlide + 1) % this.heroSlides.length;
+      }, 5200);
+    }
   }
 
   private loadHomepageContent(): void {
@@ -417,7 +453,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         title: item.title,
         date: item.date,
         excerpt: item.excerpt,
-        image: item.imageUrl || 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181752/1KBvNGVxuMg-HD_gvqzhe.jpg',
+        image: this.getCacheBustedUrl(item.imageUrl || 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181752/1KBvNGVxuMg-HD_gvqzhe.jpg'),
         link: item.link
       }));
     });
@@ -431,20 +467,23 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           releaseDate: movie.releaseDate,
           description: movie.description,
           director: movie.director,
-          image: movie.title.toLowerCase().includes('bangaram')
-            ? 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg'
-            : (movie.poster || 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748010072/8F9A7985_m86vsc.jpg')
+          image: this.getCacheBustedUrl(
+            movie.title.toLowerCase().includes('bangaram')
+              ? 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg'
+              : (movie.poster || 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748010072/8F9A7985_m86vsc.jpg')
+          )
         }));
     });
 
-    this.apiService.getMediaGalleries().subscribe(data => {
-      const nonHeroGallery = data.filter(item => !item.type || item.type === 'Home');
-      const featuredGallery = nonHeroGallery.length > 0
-        ? nonHeroGallery
-        : data.filter(item => item.type !== 'Hero');
+    this.apiService.getMediaGalleries(true).subscribe(data => {
+      const standaloneMediaItems = data.filter(item => !item.collectionKey?.trim());
+      const homeGalleryItems = standaloneMediaItems.filter(item => !item.type || item.type === 'Home');
+      const featuredGallery = homeGalleryItems.length > 0
+        ? homeGalleryItems
+        : standaloneMediaItems.filter(item => item.type !== 'Hero');
 
       this.featuredGallery = featuredGallery.map(item => ({
-        url: item.imageUrl,
+        url: this.getCacheBustedUrl(item.imageUrl),
         alt: item.altText || item.caption || 'Samantha Ruth Prabhu gallery image',
         caption: item.caption
       }));
@@ -452,7 +491,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       const dynamicHeroSlides = data.filter(item => item.type === 'Hero');
       if (dynamicHeroSlides.length > 0) {
         this.heroSlides = dynamicHeroSlides.map(item => ({
-          image: item.imageUrl,
+          image: this.getCacheBustedUrl(item.imageUrl),
           role: item.caption || 'Icon',
           alt: item.altText || 'Samantha Ruth Prabhu hero portrait'
         }));
@@ -490,9 +529,22 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         ...DEFAULT_HOME_CONTENT.featureShowcaseImage,
         ...(content.featureShowcaseImage ?? {})
       },
-      performanceLayers: content.performanceLayers ?? DEFAULT_HOME_CONTENT.performanceLayers,
+      performanceLayers: this.applyCacheBusting(content.performanceLayers ?? DEFAULT_HOME_CONTENT.performanceLayers),
       keyFeatureCards: content.keyFeatureCards ?? DEFAULT_HOME_CONTENT.keyFeatureCards
     };
+  }
+
+  private getCacheBustedUrl(url: string): string {
+    if (!url || url.includes('cache=')) return url;
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}cache=${this.CACHE_VERSION}`;
+  }
+
+  private applyCacheBusting(layers: HomePerformanceLayer[]): HomePerformanceLayer[] {
+    return layers.map(layer => ({
+      ...layer,
+      image: this.getCacheBustedUrl(layer.image)
+    }));
   }
 
   private initAnimations(): void {
@@ -528,5 +580,26 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       delay: 0.6,
       ease: 'power3.out'
     });
+  }
+
+  private stopCarousels(): void {
+    if (this.roleInterval) {
+      clearInterval(this.roleInterval);
+      this.roleInterval = undefined;
+    }
+
+    if (this.slideInterval) {
+      clearInterval(this.slideInterval);
+      this.slideInterval = undefined;
+    }
+  }
+
+  private handleVisibilityChange(): void {
+    if (document.hidden) {
+      this.stopCarousels();
+      return;
+    }
+
+    this.startCarousels();
   }
 }

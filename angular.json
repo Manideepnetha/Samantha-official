@@ -20,7 +20,13 @@
               "aot": true,
               "extractLicenses": true,
               "namedChunks": false,
-              "optimization": true,
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": {
+                  "inline": false
+                }
+              },
               "outputHashing": "all",
               "sourceMap": false
             }

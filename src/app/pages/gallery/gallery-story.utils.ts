@@ -89,7 +89,80 @@ const GALLERY_COLLECTION_PRESETS: GalleryCollection[] = [
   }
 ];
 
+const GALLERY_MEDIA_PRESETS: MediaGallery[] = [
+  {
+    caption: 'Samantha x Burberry Collaboration',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296933/Samantha_x_burberry_ml1yed.jpg',
+    altText: 'Samantha x Burberry',
+    type: 'fashion',
+    date: 'March 2024',
+    collectionKey: 'fashion-editorials',
+    displayOrder: 1
+  },
+  {
+    caption: 'Latest Fashion Editorial',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748298223/d5wj1d4ydqe61_fr3adf.jpg',
+    altText: 'Fashion Editorial',
+    type: 'fashion',
+    date: 'March 2024',
+    collectionKey: 'fashion-editorials',
+    displayOrder: 2
+  },
+  {
+    caption: 'Latest Fashion Editorial - Blue Saree',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748297784/behance_download_1705218613069_toqclh.jpg',
+    altText: 'Fashion Editorial - Blue Saree',
+    type: 'fashion',
+    date: 'March 2024',
+    collectionKey: 'fashion-editorials',
+    displayOrder: 3
+  },
+  {
+    caption: 'Latest Film Project',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296812/SRP_q8wmpl.jpg',
+    altText: 'Film Still',
+    type: 'films',
+    date: '2024',
+    collectionKey: 'film-frames',
+    displayOrder: 1
+  },
+  {
+    caption: 'Behind the Scenes',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748296881/53885681037_6a705301cf_o_ztjyeg.jpg',
+    altText: 'Behind the Scenes',
+    type: 'bts',
+    date: 'March 2024',
+    collectionKey: 'behind-the-scenes',
+    displayOrder: 1
+  },
+  {
+    caption: 'Fashion Event Appearance',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295435/5_6185746542628962569_bgalhv.jpg',
+    altText: 'Fashion Event',
+    type: 'events',
+    date: 'March 2024',
+    collectionKey: 'event-highlights',
+    displayOrder: 1
+  },
+  {
+    caption: 'Magazine Cover Shoot',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748295799/5_6185746542628962570_c68nyo.jpg',
+    altText: 'Magazine Cover',
+    type: 'photoshoots',
+    date: 'March 2024',
+    collectionKey: 'cover-shoots',
+    displayOrder: 1
+  }
+];
+
 const PRESET_LOOKUP = new Map(GALLERY_COLLECTION_PRESETS.map(item => [item.key, item]));
+
+export function getFallbackGalleryStorySets(): GalleryStorySet[] {
+  return buildGalleryStorySets(
+    GALLERY_COLLECTION_PRESETS.map(collection => ({ ...collection })),
+    GALLERY_MEDIA_PRESETS.map(item => ({ ...item }))
+  );
+}
 
 export function buildGalleryStorySets(
   collections: GalleryCollection[],
@@ -111,7 +184,7 @@ export function buildGalleryStorySets(
   }
 
   mediaItems
-    .filter(item => item.type !== 'Home')
+    .filter(item => shouldIncludeInGallery(item))
     .forEach((item, index) => {
       const resolvedKey = item.collectionKey?.trim() || getFallbackCollectionKey(item.type);
       const mappedImage: GalleryStoryImage = {
@@ -178,6 +251,21 @@ export function buildGalleryStorySets(
 
       return left.title.localeCompare(right.title);
     });
+}
+
+function shouldIncludeInGallery(item: MediaGallery): boolean {
+  const normalizedType = (item.type || '').trim().toLowerCase();
+  const hasCollectionKey = !!item.collectionKey?.trim();
+
+  if (normalizedType === 'hero') {
+    return false;
+  }
+
+  if (hasCollectionKey) {
+    return true;
+  }
+
+  return normalizedType !== 'home';
 }
 
 export function getGalleryCategoryLabel(category: string): string {

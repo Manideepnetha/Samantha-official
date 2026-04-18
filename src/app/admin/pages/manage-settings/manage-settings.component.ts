@@ -57,6 +57,24 @@ import { ApiService, SiteSetting } from '../../../services/api.service';
 
           <div class="space-y-5">
             <div>
+              <span class="sr-kicker">Music Widget</span>
+              <h3 class="sr-card-title mt-2">Floating Player Track</h3>
+              <p class="sr-card-text mt-3">The current player is configured for a single featured track. Paste either a direct audio file URL or a normal YouTube link if you want to replace it later.</p>
+            </div>
+
+            <div class="grid gap-3">
+              <label class="sr-field-label">Featured Track URL</label>
+              <div class="flex flex-col gap-3 md:flex-row">
+                <input [(ngModel)]="musicTrackOne" type="text" placeholder="https://www.youtube.com/watch?v=... or https://example.com/audio/track.mp3" class="sr-input flex-1">
+                <button (click)="saveSetting('music_track_1_url', musicTrackOne)" class="sr-button whitespace-nowrap">Save Track</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sr-divider"></div>
+
+          <div class="space-y-5">
+            <div>
               <span class="sr-kicker">Ticker</span>
               <h3 class="sr-card-title mt-2">Latest Updates Strip</h3>
               <p class="sr-card-text mt-3">Control the scrolling homepage message and its destination link. Leave the text empty if you want the ticker hidden.</p>
@@ -86,7 +104,7 @@ import { ApiService, SiteSetting } from '../../../services/api.service';
           </div>
 
           <div class="sr-admin-note">
-            Tip: Host audio files on a public cloud URL such as Cloudinary, Dropbox, or S3, then paste the direct link here so the popup can stream them reliably.
+            Tip: For the floating player, you can now use either direct public audio files or regular YouTube links. For popup sounds, direct audio files are still the safest choice.
           </div>
         </div>
       </div>
@@ -97,6 +115,7 @@ export class ManageSettingsComponent implements OnInit {
   yesAudio = '';
   noAudio = '';
   enterAudio = '';
+  musicTrackOne = '';
   tickerText = '';
   tickerLink = '';
 
@@ -112,12 +131,14 @@ export class ManageSettingsComponent implements OnInit {
         const yes = settings.find(s => s.key === 'yes_audio');
         const no = settings.find(s => s.key === 'no_audio');
         const enter = settings.find(s => s.key === 'enter_site_audio');
+        const musicOne = settings.find(s => s.key === 'music_track_1_url');
         const ticker = settings.find(s => s.key === 'latest_updates_text');
         const link = settings.find(s => s.key === 'latest_updates_link');
 
         if (yes) this.yesAudio = yes.value;
         if (no) this.noAudio = no.value;
         if (enter) this.enterAudio = enter.value;
+        if (musicOne) this.musicTrackOne = musicOne.value;
         if (ticker) this.tickerText = ticker.value;
         if (link) this.tickerLink = link.value;
       },
@@ -136,6 +157,7 @@ export class ManageSettingsComponent implements OnInit {
           'yes_audio': 'Yes Audio',
           'no_audio': 'No Audio',
           'enter_site_audio': 'Enter Site Audio',
+          'music_track_1_url': 'Featured Track URL',
           'latest_updates_text': 'Ticker Text',
           'latest_updates_link': 'Ticker Link'
         };

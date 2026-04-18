@@ -4,178 +4,182 @@
     <div class="hero-overlay"></div>
 
     <div class="landing-content">
-      <section class="hero-panel">
-        <div class="hero-copy">
-          <span class="hero-kicker">Fan Zone</span>
-          <h1>Where the contest energy and community creativity live together.</h1>
-          <p>
-            Contest Zone stays right here on the main page, while Fan Made Edits opens into its own curated gallery of posters,
-            video edits, and illustration art from the community.
-          </p>
-          <div class="hero-actions">
-            <button type="button" class="primary-button" (click)="openRegister()">Enter Contest Zone</button>
-            <a routerLink="/fan-zone/edits" class="secondary-button">Explore Fan Made Edits</a>
+      <div class="hero-top">
+        <span class="kicker">Fan Zone</span>
+        <h1>How well do you<br><em>know Samantha?</em></h1>
+        <p class="hero-sub">15 questions · 90 seconds · public leaderboard. Prove you're her biggest fan.</p>
+        <div class="hero-actions">
+          <button type="button" class="btn-primary" (click)="openRegister()">Start Quiz</button>
+          <button type="button" class="btn-ghost" (click)="openLeaderboard()">Leaderboard</button>
+        </div>
+      </div>
+
+      <div class="stats-strip">
+        <div class="stat-item">
+          <span class="stat-num">15</span>
+          <span class="stat-label">Questions</span>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <span class="stat-num">90s</span>
+          <span class="stat-label">Time Limit</span>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <span class="stat-num">300</span>
+          <span class="stat-label">Max Points</span>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <span class="stat-num">{{ leaderboard.length || '—' }}</span>
+          <span class="stat-label">Players</span>
+        </div>
+      </div>
+
+      <div class="mid-grid">
+        <div class="diff-col">
+          <span class="kicker">Difficulty Levels</span>
+          <div class="diff-cards">
+            <div class="diff-card easy">
+              <span class="diff-dot"></span>
+              <div>
+                <strong>Easy</strong>
+                <p>5 questions · 10 pts each</p>
+              </div>
+              <span class="diff-pts">50 pts</span>
+            </div>
+            <div class="diff-card medium">
+              <span class="diff-dot"></span>
+              <div>
+                <strong>Medium</strong>
+                <p>5 questions · 20 pts each</p>
+              </div>
+              <span class="diff-pts">100 pts</span>
+            </div>
+            <div class="diff-card hard">
+              <span class="diff-dot"></span>
+              <div>
+                <strong>Hard</strong>
+                <p>5 questions · 30 pts each</p>
+              </div>
+              <span class="diff-pts">150 pts</span>
+            </div>
           </div>
         </div>
 
-        <div class="portal-grid">
-          <article class="portal-card contest-layer">
-            <span class="portal-label">Contest Zone</span>
-            <h2>Fast-paced quiz. Public ranking. One clean arena.</h2>
-            <p>15 questions, 90 seconds, and a leaderboard that updates with your best daily performance.</p>
-            <div class="portal-stats">
-              <div>
-                <strong>15</strong>
-                <span>Questions</span>
-              </div>
-              <div>
-                <strong>90s</strong>
-                <span>Timer</span>
-              </div>
-              <div>
-                <strong>300</strong>
-                <span>Max Score</span>
-              </div>
+        <div class="lb-preview-col">
+          <div class="lb-preview-head">
+            <span class="kicker">Top Fans</span>
+            <button type="button" class="lb-view-all" (click)="openLeaderboard()">View All →</button>
+          </div>
+          <div *ngIf="topLeaderboard.length === 0" class="lb-empty">No entries yet — be the first!</div>
+          <div *ngFor="let entry of topLeaderboard; let i = index" class="lb-row">
+            <span class="lb-rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">
+              {{ i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1 }}
+            </span>
+            <div class="lb-info">
+              <span class="lb-name">{{ entry.name }}</span>
+              <span class="lb-city">{{ entry.city || '—' }}</span>
             </div>
-            <button type="button" class="portal-button" (click)="openRegister()">Start Quiz</button>
-          </article>
+            <span class="lb-score">{{ entry.score }}<small>/300</small></span>
+          </div>
+        </div>
+      </div>
 
-          <article class="portal-card edits-layer">
-            <span class="portal-label">Fan Made Edits</span>
-            <h2>A separate screen for posters, reels, and illustration drops.</h2>
-            <p>See the best community-made visuals collected into one layered showcase.</p>
-            <div class="portal-stats">
-              <div>
-                <strong>{{ posterCount }}</strong>
-                <span>Posters</span>
-              </div>
-              <div>
-                <strong>{{ videoCount }}</strong>
-                <span>Video Edits</span>
-              </div>
-              <div>
-                <strong>{{ illustrationCount }}</strong>
-                <span>Illustrations</span>
-              </div>
+      <div class="landing-cta">
+        <button type="button" class="btn-primary btn-lg" (click)="openRegister()">Take the Quiz Now →</button>
+      </div>
+
+      <div class="portal-grid">
+        <article class="portal-card contest-card">
+          <span class="portal-badge">Contest Zone</span>
+          <h3>Fast-paced quiz.<br>Public ranking.</h3>
+          <p>15 questions, 90 seconds, and a leaderboard that updates with your best daily performance.</p>
+          <div class="portal-stats">
+            <div><strong>15</strong><span>Questions</span></div>
+            <div><strong>90s</strong><span>Timer</span></div>
+            <div><strong>300</strong><span>Max Score</span></div>
+          </div>
+          <button type="button" class="btn-primary" (click)="openRegister()">Start Quiz →</button>
+        </article>
+
+        <article class="portal-card edits-card">
+          <span class="portal-badge teal">Fan Made Edits</span>
+          <h3>Posters, reels &amp;<br>illustration drops.</h3>
+          <p>Community-made visuals collected into one layered showcase — posters, video edits, and art.</p>
+          <div class="portal-stats">
+            <div><strong>{{ posterCount || '—' }}</strong><span>Posters</span></div>
+            <div><strong>{{ videoCount || '—' }}</strong><span>Videos</span></div>
+            <div><strong>{{ illustrationCount || '—' }}</strong><span>Art</span></div>
+          </div>
+          <a routerLink="/fan-zone/edits" class="btn-ghost">Explore Edits →</a>
+        </article>
+      </div>
+
+      <div class="fan-zone-secondary-grid">
+        <app-fan-poll></app-fan-poll>
+
+        <article class="fan-zone-sidecard">
+          <span class="kicker">More Fan Corners</span>
+          <h3>Keep the energy moving beyond the quiz.</h3>
+          <p>Drop a message on the fan wall, browse downloadable wallpapers, or revisit the larger career timeline whenever you want another layer of the site.</p>
+          <div class="fan-zone-side-actions">
+            <a routerLink="/fan-wall" class="btn-ghost">Open Fan Wall</a>
+            <a routerLink="/wallpapers" class="btn-ghost">Wallpapers</a>
+            <a routerLink="/timeline" class="btn-primary">Timeline</a>
+          </div>
+        </article>
+      </div>
+
+      <div *ngIf="featuredFanCreations.length > 0" class="edits-preview-section">
+        <div class="edits-preview-head">
+          <span class="kicker">Fan Made Edits · Featured</span>
+          <a routerLink="/fan-zone/edits" class="lb-view-all">View All →</a>
+        </div>
+        <div class="edits-preview-grid">
+          <article *ngFor="let item of featuredFanCreations" class="edit-card">
+            <div class="edit-img-wrap">
+              <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" />
+              <span class="edit-type-badge">{{ item.type }}</span>
             </div>
-            <a routerLink="/fan-zone/edits" class="portal-button secondary">Open Fan Edits</a>
+            <div class="edit-copy">
+              <h4>{{ item.title }}</h4>
+              <p>{{ item.description }}</p>
+              <small>By {{ item.creatorName || 'Fan Creator' }}</small>
+            </div>
           </article>
         </div>
-      </section>
-
-      <section class="layer-grid">
-        <article class="layer-card contest-surface">
-          <div class="layer-heading">
-            <span class="section-kicker">Contest Zone</span>
-            <h2>Play from this page and challenge the current top fans.</h2>
-            <p>
-              The contest flow stays inside Fan Zone, so visitors can move from the overview into registration, the live quiz,
-              results, and the leaderboard without leaving the page.
-            </p>
-          </div>
-
-          <div class="contest-grid">
-            <div class="contest-steps">
-              <div class="step-card">
-                <span>01</span>
-                <h3>Register</h3>
-                <p>Add your name and email so the leaderboard can keep daily entries clean.</p>
-              </div>
-              <div class="step-card">
-                <span>02</span>
-                <h3>Race the clock</h3>
-                <p>Answer across easy, medium, and hard rounds while the timer keeps the pressure on.</p>
-              </div>
-              <div class="step-card">
-                <span>03</span>
-                <h3>Claim rank</h3>
-                <p>Your score is ranked by points first and speed second for a sharper finish table.</p>
-              </div>
-            </div>
-
-            <div class="leaderboard-preview">
-              <div class="preview-head">
-                <h3>Current top fans</h3>
-                <button type="button" (click)="openLeaderboard()">View full leaderboard</button>
-              </div>
-              <div *ngIf="topLeaderboard.length === 0" class="empty-state">No entries yet. The first score still has room to become legendary.</div>
-              <div *ngFor="let entry of topLeaderboard; let i = index" class="preview-row">
-                <div class="preview-rank">{{ i + 1 }}</div>
-                <div>
-                  <p>{{ entry.name }}</p>
-                  <span>{{ entry.city || 'City not shared' }}</span>
-                </div>
-                <strong>{{ entry.score }}</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="section-actions">
-            <button type="button" class="primary-button" (click)="openRegister()">Begin Quiz</button>
-            <button type="button" class="secondary-button" (click)="openLeaderboard()">Open Leaderboard</button>
-          </div>
-        </article>
-
-        <article class="layer-card edits-surface">
-          <div class="layer-heading">
-            <span class="section-kicker">Fan Made Edits</span>
-            <h2>Community work gets its own screen instead of being buried under the contest flow.</h2>
-            <p>
-              Posters, video edits, and illustration art now live in a dedicated gallery screen with stronger visual hierarchy and
-              category separation.
-            </p>
-          </div>
-
-          <div *ngIf="loadingFanCreations" class="empty-state">Loading community highlights...</div>
-          <div *ngIf="!loadingFanCreations" class="creation-preview-grid">
-            <article *ngFor="let item of featuredFanCreations" class="creation-preview-card">
-              <img [src]="item.imageUrl" [alt]="item.title" />
-              <div class="creation-preview-copy">
-                <span>{{ item.type }}</span>
-                <h3>{{ item.title }}</h3>
-                <p>{{ item.description }}</p>
-                <small>By {{ item.creatorName || 'Fan Creator' }}</small>
-              </div>
-            </article>
-          </div>
-
-          <div class="section-actions">
-            <a routerLink="/fan-zone/edits" class="primary-button">Go To Fan Made Edits</a>
-          </div>
-        </article>
-      </section>
+      </div>
     </div>
   </section>
 
   <section *ngIf="screen === 'register'" class="state-shell">
-    <div class="state-card compact-card">
-      <div class="state-header">
-        <span class="section-kicker">Contest Zone</span>
-        <h2>Enter your details</h2>
-        <p>Your name will appear publicly on the leaderboard. Your email is only used to control repeat entries.</p>
-      </div>
+    <div class="state-card">
+      <span class="kicker">Step 1 of 2</span>
+      <h2>Enter your details</h2>
+      <p class="state-sub">Your name appears on the leaderboard. Email is only used to prevent duplicate entries.</p>
 
       <div class="form-stack">
-        <label>
-          <span>Full Name</span>
-          <input [(ngModel)]="player.name" type="text" placeholder="e.g. Priya Sharma">
+        <label class="field">
+          <span>Full Name *</span>
+          <input [(ngModel)]="player.name" type="text" placeholder="e.g. Priya Sharma" />
         </label>
-        <label>
-          <span>Email Address</span>
-          <input [(ngModel)]="player.email" type="email" placeholder="you@example.com">
+        <label class="field">
+          <span>Email Address *</span>
+          <input [(ngModel)]="player.email" type="email" placeholder="you@example.com" />
         </label>
-        <label>
-          <span>City</span>
-          <input [(ngModel)]="player.city" type="text" placeholder="e.g. Hyderabad">
+        <label class="field">
+          <span>City <em>(optional)</em></span>
+          <input [(ngModel)]="player.city" type="text" placeholder="e.g. Hyderabad" />
         </label>
 
         <div *ngIf="registerError" class="error-box">{{ registerError }}</div>
 
-        <div class="state-actions">
-          <button type="button" class="primary-button" (click)="startQuiz()" [disabled]="checkingEmail">
-            {{ checkingEmail ? 'Checking...' : 'Begin Quiz' }}
+        <div class="form-actions">
+          <button type="button" class="btn-primary" (click)="startQuiz()" [disabled]="checkingEmail">
+            {{ checkingEmail ? 'Checking...' : 'Begin Quiz →' }}
           </button>
-          <button type="button" class="secondary-button" (click)="screen = 'landing'">Back To Fan Zone</button>
+          <button type="button" class="btn-ghost" (click)="screen = 'landing'">← Back</button>
         </div>
       </div>
     </div>
@@ -184,42 +188,42 @@
   <section *ngIf="screen === 'quiz'" class="quiz-shell">
     <div class="quiz-wrap">
       <header class="quiz-topbar">
-        <div class="progress-block">
-          <span>{{ currentQ + 1 }} / {{ questions.length }}</span>
+        <div class="q-progress">
+          <span class="q-count">{{ currentQ + 1 }}<em>/{{ questions.length }}</em></span>
           <div class="progress-track">
             <div class="progress-bar" [style.width.%]="((currentQ + 1) / questions.length) * 100"></div>
           </div>
         </div>
-
-        <div class="quiz-meta">
-          <span class="timer">{{ formatTime(timeLeft) }}</span>
-          <span class="score">{{ score }} pts</span>
+        <div class="q-meta">
+          <span class="timer" [class.urgent]="timeLeft <= 15">⏱ {{ formatTime(timeLeft) }}</span>
+          <span class="q-score">{{ score }} pts</span>
         </div>
       </header>
 
-      <article class="quiz-card">
-        <div class="difficulty-tag" [attr.data-level]="questions[currentQ].difficulty">
+      <div class="quiz-card">
+        <span class="diff-tag" [attr.data-level]="questions[currentQ].difficulty">
           {{ questions[currentQ].difficulty }} · {{ questions[currentQ].points }} pts
-        </div>
+        </span>
         <h2>{{ questions[currentQ].text }}</h2>
 
         <div class="option-list">
           <button
-            *ngFor="let option of questions[currentQ].options; let i = index"
+            *ngFor="let opt of questions[currentQ].options; let i = index"
             type="button"
-            class="option-button"
+            class="option-btn"
             [ngClass]="getOptionClass(i)"
             [disabled]="answered"
-            (click)="selectAnswer(i)">
-            <span class="option-index">{{ ['A', 'B', 'C', 'D'][i] }}</span>
-            <span>{{ option }}</span>
+            (click)="selectAnswer(i)"
+          >
+            <span class="opt-letter">{{ ['A','B','C','D'][i] }}</span>
+            <span>{{ opt }}</span>
           </button>
         </div>
-      </article>
+      </div>
 
-      <div *ngIf="answered" class="quiz-footer">
-        <button type="button" class="primary-button" (click)="nextQuestion()">
-          {{ currentQ < questions.length - 1 ? 'Next Question' : 'See Results' }}
+      <div *ngIf="answered" class="quiz-next">
+        <button type="button" class="btn-primary" (click)="nextQuestion()">
+          {{ currentQ < questions.length - 1 ? 'Next →' : 'See Results →' }}
         </button>
       </div>
     </div>
@@ -231,93 +235,98 @@
         <svg viewBox="0 0 120 120">
           <circle cx="60" cy="60" r="52"></circle>
           <circle
-            class="score-progress"
+            class="score-arc"
             cx="60"
             cy="60"
             r="52"
             [attr.stroke-dasharray]="326.7"
-            [attr.stroke-dashoffset]="326.7 - (326.7 * score / 300)">
-          </circle>
+            [attr.stroke-dashoffset]="326.7 - (326.7 * score / 300)"
+          ></circle>
         </svg>
-        <div class="score-ring-copy">
+        <div class="ring-label">
           <strong>{{ score }}</strong>
           <span>/ 300</span>
         </div>
       </div>
 
-      <span class="section-kicker">Result</span>
+      <span class="kicker">Your Result</span>
       <h2>{{ getResultTitle() }}</h2>
-      <p>{{ correctAnswers }} correct answers · {{ formatTime(timeTaken) }} total time</p>
+      <p class="state-sub">{{ correctAnswers }} correct · {{ formatTime(timeTaken) }} taken</p>
 
-      <div class="result-grid">
-        <div>
-          <strong>{{ easyCorrect }}</strong>
-          <span>Easy</span>
-        </div>
-        <div>
-          <strong>{{ mediumCorrect }}</strong>
-          <span>Medium</span>
-        </div>
-        <div>
-          <strong>{{ hardCorrect }}</strong>
-          <span>Hard</span>
-        </div>
+      <div class="result-breakdown">
+        <div class="rb-item easy"><strong>{{ easyCorrect }}</strong><span>Easy</span></div>
+        <div class="rb-item medium"><strong>{{ mediumCorrect }}</strong><span>Medium</span></div>
+        <div class="rb-item hard"><strong>{{ hardCorrect }}</strong><span>Hard</span></div>
       </div>
 
-      <p *ngIf="submitting" class="result-status">Saving your score...</p>
-      <p *ngIf="submitDone" class="result-status success">Score saved to the leaderboard.</p>
+      <p *ngIf="submitting" class="status-msg">Saving score...</p>
+      <p *ngIf="submitDone" class="status-msg ok">✓ Score saved to leaderboard</p>
 
-      <div class="state-actions">
-        <button type="button" class="primary-button" (click)="openLeaderboard()">View Leaderboard</button>
-        <button type="button" class="secondary-button" (click)="resetQuiz()">Play Again</button>
+      <div class="form-actions">
+        <button type="button" class="btn-primary" (click)="openLeaderboard()">View Leaderboard</button>
+        <button type="button" class="btn-ghost" (click)="resetQuiz()">Play Again</button>
+      </div>
+
+      <div class="result-share">
+        <button type="button" class="btn-ghost" (click)="shareScore('whatsapp')">Share on WhatsApp</button>
+        <button type="button" class="btn-ghost" (click)="shareScore('twitter')">Share on X</button>
       </div>
     </div>
   </section>
 
-  <section *ngIf="screen === 'leaderboard'" class="state-shell leaderboard-shell">
-    <div class="state-card leaderboard-card">
-      <div class="state-header">
-        <span class="section-kicker">Hall of Fame</span>
-        <h2>Contest leaderboard</h2>
-        <p>Top fans are ranked by score first and fastest time second.</p>
+  <section *ngIf="screen === 'leaderboard'" class="state-shell lb-shell">
+    <div class="state-card lb-card">
+      <div class="lb-header">
+        <button type="button" class="btn-back" (click)="screen = 'landing'">← Back to Fan Zone</button>
+        <span class="kicker">Hall of Fame</span>
+        <h2>Leaderboard</h2>
+        <p class="state-sub">Ranked by score · ties broken by fastest time</p>
       </div>
 
-      <div *ngIf="loadingLeaderboard" class="empty-state">Loading leaderboard...</div>
+      <div *ngIf="loadingLeaderboard" class="lb-empty">Loading...</div>
 
-      <div *ngIf="!loadingLeaderboard && currentPlayerEntry" class="player-highlight">
-        <div>
-          <span>Your latest result</span>
-          <h3>{{ currentPlayerEntry.name }}</h3>
-          <p>Rank #{{ currentPlayerEntry.rank }} · {{ currentPlayerEntry.city || 'City not shared' }} · {{ formatTime(currentPlayerEntry.timeTakenSeconds) }}</p>
+      <div *ngIf="!loadingLeaderboard && leaderboard.length >= 3" class="podium">
+        <div class="podium-item second">
+          <div class="podium-avatar">{{ leaderboard[1].name[0] }}</div>
+          <span class="podium-name">{{ leaderboard[1].name }}</span>
+          <span class="podium-score">{{ leaderboard[1].score }}</span>
+          <div class="podium-bar h2">🥈</div>
         </div>
-        <strong>{{ currentPlayerEntry.score }}</strong>
+        <div class="podium-item first">
+          <div class="podium-avatar gold">{{ leaderboard[0].name[0] }}</div>
+          <span class="podium-name">{{ leaderboard[0].name }}</span>
+          <span class="podium-score gold">{{ leaderboard[0].score }}</span>
+          <div class="podium-bar h1">👑</div>
+        </div>
+        <div class="podium-item third">
+          <div class="podium-avatar">{{ leaderboard[2].name[0] }}</div>
+          <span class="podium-name">{{ leaderboard[2].name }}</span>
+          <span class="podium-score">{{ leaderboard[2].score }}</span>
+          <div class="podium-bar h3">🥉</div>
+        </div>
       </div>
 
-      <div *ngIf="!loadingLeaderboard" class="leaderboard-table">
-        <div class="leaderboard-row header">
-          <span>Rank</span>
-          <span>Fan</span>
-          <span>City</span>
-          <span>Score</span>
-          <span>Time</span>
+      <div *ngIf="!loadingLeaderboard" class="lb-table">
+        <div class="lb-thead">
+          <span>#</span><span>Fan</span><span>City</span><span>Score</span><span>Time</span>
         </div>
-        <div *ngFor="let entry of leaderboard" class="leaderboard-row">
-          <span>{{ entry.rank }}</span>
-          <span>{{ entry.name }}</span>
-          <span>{{ entry.city || 'N/A' }}</span>
-          <span>{{ entry.score }}</span>
-          <span>{{ formatTime(entry.timeTakenSeconds) }}</span>
+        <div
+          *ngFor="let entry of leaderboard"
+          class="lb-trow"
+          [class.highlight]="currentPlayerEntry && entry.name === currentPlayerEntry.name && entry.score === currentPlayerEntry.score"
+        >
+          <span class="lb-rank-num">{{ entry.rank }}</span>
+          <span class="lb-fan-name">{{ entry.name }}</span>
+          <span class="lb-fan-city">{{ entry.city || '—' }}</span>
+          <span class="lb-fan-score">{{ entry.score }}<small>/300</small></span>
+          <span class="lb-fan-time">{{ formatTime(entry.timeTakenSeconds) }}</span>
         </div>
-        <div *ngIf="leaderboard.length === 0" class="empty-state">No entries yet. The board is still open.</div>
+        <div *ngIf="leaderboard.length === 0" class="lb-empty">No entries yet. Be the first!</div>
       </div>
 
-      <p *ngIf="currentPlayerEntry && !isCurrentPlayerOnLeaderboard()" class="leaderboard-note">
-        Your score is saved. The public table shows the current top 20 fans.
-      </p>
-
-      <div class="state-actions">
-        <button type="button" class="primary-button" (click)="openRegister()">Take The Quiz</button>
-        <button type="button" class="secondary-button" (click)="screen = 'landing'">Back To Fan Zone</button>
+      <div class="form-actions">
+        <button type="button" class="btn-primary" (click)="openRegister()">Take the Quiz</button>
+        <button type="button" class="btn-ghost" (click)="screen = 'landing'">← Back</button>
       </div>
     </div>
   </section>

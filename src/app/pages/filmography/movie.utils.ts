@@ -1,6 +1,6 @@
 import { Movie } from '../../services/api.service';
 
-const FALLBACK_POSTER_URL =
+export const FALLBACK_POSTER_URL =
   'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/Attarintiki_Daredi_Release_Date_Posters_21_cdba22.jpg';
 
 export function normalizeMovie(movie: Partial<Movie>): Movie {
@@ -27,8 +27,47 @@ export function getMovieGenres(movie: Movie | null): string[] {
   return movie.genre.filter((genre): genre is string => typeof genre === 'string' && genre.trim().length > 0);
 }
 
+export function getMovieLanguages(movie: Movie | null): string[] {
+  if (!movie || typeof movie.language !== 'string') {
+    return [];
+  }
+
+  return movie.language
+    .split(',')
+    .map((language) => language.trim())
+    .filter(Boolean);
+}
+
+export function isMultilingualMovie(movie: Movie | null): boolean {
+  return getMovieLanguages(movie).length > 1;
+}
+
+export function matchesMovieLanguage(movie: Movie | null, selectedLanguage: string): boolean {
+  if (!selectedLanguage) {
+    return true;
+  }
+
+  if (selectedLanguage === 'Multilingual') {
+    return isMultilingualMovie(movie);
+  }
+
+  return getMovieLanguages(movie).includes(selectedLanguage);
+}
+
 export function getMovieReleaseLabel(movie: Movie): string {
   return movie.releaseDate?.trim() || `Released in ${movie.year}`;
+}
+
+export function getMovieSortValue(movie: Movie): number {
+  const releaseDate = movie.releaseDate?.trim();
+  if (releaseDate && /^\d{4}-\d{2}-\d{2}$/.test(releaseDate)) {
+    const parsed = Date.parse(releaseDate);
+    if (!Number.isNaN(parsed)) {
+      return parsed;
+    }
+  }
+
+  return Date.UTC(movie.year, 0, 1);
 }
 
 export function getMovieFallbackDescription(movie: Movie): string {
@@ -36,7 +75,7 @@ export function getMovieFallbackDescription(movie: Movie): string {
 }
 
 export function matchesMovieSearch(value: string | undefined, term: string): boolean {
-  return (value || '').toLowerCase().includes(term);
+  return normalizeSearchValue(value).includes(normalizeSearchValue(term));
 }
 
 export function isWebSeriesMovie(movie: Movie): boolean {
@@ -44,7 +83,21 @@ export function isWebSeriesMovie(movie: Movie): boolean {
 }
 
 export function isCameoMovie(movie: Movie): boolean {
-  return matchesMovieSearch(movie.role, 'cameo') || matchesMovieSearch(movie.description, 'cameo');
+  return APPEARANCE_KEYWORDS.some((keyword) =>
+    matchesMovieSearch(movie.role, keyword) || matchesMovieSearch(movie.description, keyword)
+  );
+}
+
+export function getMovieAppearanceLabel(movie: Movie): string {
+  if (matchesMovieSearch(movie.role, 'special appearance') || matchesMovieSearch(movie.description, 'special appearance')) {
+    return 'Special Appearance';
+  }
+
+  if (matchesMovieSearch(movie.role, 'guest appearance') || matchesMovieSearch(movie.description, 'guest appearance')) {
+    return 'Guest Appearance';
+  }
+
+  return 'Cameo';
 }
 
 function normalizeGenres(genres: Movie['genre'] | string | null | undefined): string[] {
@@ -79,3 +132,12 @@ function normalizeOptionalText(value: unknown): string | undefined {
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
 }
+
+function normalizeSearchValue(value: string | undefined): string {
+  return (value || '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const APPEARANCE_KEYWORDS = ['cameo', 'special appearance', 'guest appearance'];

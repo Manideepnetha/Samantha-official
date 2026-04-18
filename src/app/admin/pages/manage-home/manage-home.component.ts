@@ -144,6 +144,7 @@ const DEFAULT_EDITORIAL_CONTENT: HomeEditorialContent = {
             label="Hero Image"
             [value]="heroItem.imageUrl"
             (valueChange)="heroItem.imageUrl = $event"
+            (uploadCompleted)="persistEditedHeroImage()"
             placeholder="Hero image URL"
             uploadButtonLabel="Upload Hero Image"
             bulkButtonLabel="Bulk Upload Slides"
@@ -184,6 +185,7 @@ const DEFAULT_EDITORIAL_CONTENT: HomeEditorialContent = {
             label="Highlight Image"
             [value]="newsItem.imageUrl || ''"
             (valueChange)="newsItem.imageUrl = $event"
+            (uploadCompleted)="persistEditedHomeHighlightImage()"
             placeholder="Image URL"
             uploadButtonLabel="Upload Highlight Image"
             uploadFolder="home/highlights"
@@ -226,6 +228,7 @@ const DEFAULT_EDITORIAL_CONTENT: HomeEditorialContent = {
             label="Poster Image"
             [value]="movieItem.poster"
             (valueChange)="movieItem.poster = $event"
+            (uploadCompleted)="persistEditedHomeProjectPoster()"
             placeholder="Poster URL"
             uploadButtonLabel="Upload Poster"
             uploadFolder="home/projects"
@@ -262,6 +265,7 @@ const DEFAULT_EDITORIAL_CONTENT: HomeEditorialContent = {
             label="Featured Image"
             [value]="galleryItem.imageUrl"
             (valueChange)="galleryItem.imageUrl = $event"
+            (uploadCompleted)="persistEditedFeaturedGalleryImage()"
             placeholder="Image URL"
             uploadButtonLabel="Upload Image"
             bulkButtonLabel="Bulk Upload Images"
@@ -279,8 +283,15 @@ const DEFAULT_EDITORIAL_CONTENT: HomeEditorialContent = {
       <section *ngIf="activeTab === 'Main Roles'" class="sr-surface p-6 md:p-7">
         <div class="sr-admin-toolbar">
           <div><span class="sr-kicker">Main Roles</span><h2 class="sr-card-title mt-2">Performance Layers</h2></div>
-          <button (click)="saveEditorialContent('Main roles updated.')" class="sr-button">Save Section</button>
+          <button (click)="saveMainRolesSection()" class="sr-button">
+            {{ editingPerformanceIndex === null ? 'Save Section' : 'Apply Edit & Save Section' }}
+          </button>
         </div>
+        <p class="sr-card-text mt-4">
+          {{ editingPerformanceIndex === null
+            ? 'Use the form below to add a new role. To replace an existing role image, click Edit on that row first.'
+            : 'You are editing an existing role. Upload the new image and click Update Role or Apply Edit & Save Section.' }}
+        </p>
         <input [(ngModel)]="editorialContent.performanceRange" class="sr-input mt-6" placeholder="Career range">
         <div class="sr-admin-table-scroll mt-6">
           <table class="sr-admin-table">
@@ -308,6 +319,7 @@ const DEFAULT_EDITORIAL_CONTENT: HomeEditorialContent = {
             label="Role Image"
             [value]="performanceLayerForm.image"
             (valueChange)="performanceLayerForm.image = $event"
+            (uploadCompleted)="persistEditedPerformanceLayerImage()"
             placeholder="Image URL"
             uploadButtonLabel="Upload Role Image"
             uploadFolder="home/main-roles"
@@ -322,7 +334,9 @@ const DEFAULT_EDITORIAL_CONTENT: HomeEditorialContent = {
       <section *ngIf="activeTab === 'Key Aspects'" class="sr-surface p-6 md:p-7">
         <div class="sr-admin-toolbar">
           <div><span class="sr-kicker">Key Aspects</span><h2 class="sr-card-title mt-2">Highlighting Key Aspects</h2></div>
-          <button (click)="saveEditorialContent('Key aspects updated.')" class="sr-button">Save Section</button>
+          <button (click)="saveKeyAspectsSection()" class="sr-button">
+            {{ editingFeatureCardIndex === null ? 'Save Section' : 'Apply Edit & Save Section' }}
+          </button>
         </div>
         <div class="mt-6 grid gap-6 lg:grid-cols-2">
           <div class="space-y-4">
@@ -334,6 +348,7 @@ const DEFAULT_EDITORIAL_CONTENT: HomeEditorialContent = {
               label="Spotlight Image"
               [value]="editorialContent.instagramSpotlight.image"
               (valueChange)="editorialContent.instagramSpotlight.image = $event"
+              (uploadCompleted)="persistInstagramSpotlightImage()"
               placeholder="Spotlight image URL"
               uploadButtonLabel="Upload Spotlight Image"
               uploadFolder="home/key-aspects"
@@ -345,6 +360,7 @@ const DEFAULT_EDITORIAL_CONTENT: HomeEditorialContent = {
               label="Showcase Image"
               [value]="editorialContent.featureShowcaseImage.url"
               (valueChange)="editorialContent.featureShowcaseImage.url = $event"
+              (uploadCompleted)="persistFeatureShowcaseImage()"
               placeholder="Showcase image URL"
               uploadButtonLabel="Upload Showcase Image"
               uploadFolder="home/key-aspects"
@@ -462,6 +478,30 @@ export class ManageHomeComponent implements OnInit {
     });
   }
 
+  saveMainRolesSection(): void {
+    if (this.editingPerformanceIndex !== null) {
+      this.applyPerformanceLayerEdit();
+    }
+
+    this.saveEditorialContent('Main roles updated.');
+  }
+
+  saveKeyAspectsSection(): void {
+    if (this.editingFeatureCardIndex !== null) {
+      this.applyFeatureCardEdit();
+    }
+
+    this.saveEditorialContent('Key aspects updated.');
+  }
+
+  persistInstagramSpotlightImage(): void {
+    this.saveEditorialContent('Key aspects updated.');
+  }
+
+  persistFeatureShowcaseImage(): void {
+    this.saveEditorialContent('Key aspects updated.');
+  }
+
   resetHeroForm(): void {
     this.heroItem = this.getEmptyGallery('Hero');
   }
@@ -513,6 +553,20 @@ export class ManageHomeComponent implements OnInit {
     });
   }
 
+  persistEditedHeroImage(): void {
+    if (!this.heroItem.id || !this.heroItem.caption.trim()) {
+      return;
+    }
+
+    this.apiService.updateMediaGallery(this.heroItem.id, this.heroItem).subscribe({
+      next: () => this.loadAll(),
+      error: (error) => {
+        console.error('Failed to auto-save uploaded hero image', error);
+        alert('The hero image uploaded, but the slide was not saved automatically. Please click Update Slide.');
+      }
+    });
+  }
+
   resetNewsForm(): void {
     this.newsItem = this.getEmptyNews();
   }
@@ -533,6 +587,20 @@ export class ManageHomeComponent implements OnInit {
     this.apiService.createNews(this.newsItem).subscribe(() => {
       this.loadAll();
       this.resetNewsForm();
+    });
+  }
+
+  persistEditedHomeHighlightImage(): void {
+    if (!this.newsItem.id || !this.newsItem.title.trim()) {
+      return;
+    }
+
+    this.apiService.updateNews(this.newsItem.id, this.newsItem).subscribe({
+      next: () => this.loadAll(),
+      error: (error) => {
+        console.error('Failed to auto-save uploaded homepage highlight image', error);
+        alert('The image uploaded, but the highlight was not saved automatically. Please click Update Highlight.');
+      }
     });
   }
 
@@ -562,6 +630,20 @@ export class ManageHomeComponent implements OnInit {
     this.apiService.createMovie(this.movieItem).subscribe(() => {
       this.loadAll();
       this.resetMovieForm();
+    });
+  }
+
+  persistEditedHomeProjectPoster(): void {
+    if (!this.movieItem.id || !this.movieItem.title.trim()) {
+      return;
+    }
+
+    this.apiService.updateMovie(this.movieItem.id, this.movieItem).subscribe({
+      next: () => this.loadAll(),
+      error: (error) => {
+        console.error('Failed to auto-save uploaded homepage project poster', error);
+        alert('The poster uploaded, but the project was not saved automatically. Please click Update Project.');
+      }
     });
   }
 
@@ -623,6 +705,20 @@ export class ManageHomeComponent implements OnInit {
     });
   }
 
+  persistEditedFeaturedGalleryImage(): void {
+    if (!this.galleryItem.id || !this.galleryItem.caption.trim()) {
+      return;
+    }
+
+    this.apiService.updateMediaGallery(this.galleryItem.id, this.galleryItem).subscribe({
+      next: () => this.loadAll(),
+      error: (error) => {
+        console.error('Failed to auto-save uploaded featured gallery image', error);
+        alert('The image uploaded, but the gallery entry was not saved automatically. Please click Update Image.');
+      }
+    });
+  }
+
   deleteGallery(id: number): void {
     if (confirm('Delete this image?')) {
       this.apiService.deleteMediaGallery(id).subscribe(() => this.loadAll());
@@ -636,19 +732,20 @@ export class ManageHomeComponent implements OnInit {
     this.editingPerformanceIndex = index;
   }
 
+  persistEditedPerformanceLayerImage(): void {
+    if (this.editingPerformanceIndex === null) {
+      return;
+    }
+
+    const layer = this.buildPerformanceLayerFromForm();
+    this.editorialContent.performanceLayers = this.editorialContent.performanceLayers.map((item, index) =>
+      index === this.editingPerformanceIndex ? layer : item
+    );
+    this.saveEditorialContent('Main roles updated.');
+  }
+
   savePerformanceLayer(): void {
-    const layer: HomePerformanceLayer = {
-      ...this.performanceLayerForm,
-      year: this.performanceLayerForm.year.trim(),
-      title: this.performanceLayerForm.title.trim(),
-      meta: this.performanceLayerForm.meta.trim(),
-      role: this.performanceLayerForm.role.trim(),
-      description: this.performanceLayerForm.description.trim(),
-      image: this.performanceLayerForm.image.trim(),
-      imageAlt: this.performanceLayerForm.imageAlt.trim(),
-      imagePosition: (this.performanceLayerForm.imagePosition || '').trim(),
-      highlights: this.performanceHighlightsText.split('\n').map(item => item.trim()).filter(Boolean)
-    };
+    const layer = this.buildPerformanceLayerFromForm();
 
     if (this.editingPerformanceIndex === null) {
       this.editorialContent.performanceLayers = [...this.editorialContent.performanceLayers, layer];
@@ -677,12 +774,7 @@ export class ManageHomeComponent implements OnInit {
   }
 
   saveFeatureCard(): void {
-    const card: HomeFeatureCard = {
-      title: this.featureCardForm.title.trim(),
-      eyebrow: this.featureCardForm.eyebrow.trim(),
-      description: this.featureCardForm.description.trim(),
-      icon: this.featureCardForm.icon
-    };
+    const card = this.buildFeatureCardFromForm();
 
     if (this.editingFeatureCardIndex === null) {
       this.editorialContent.keyFeatureCards = [...this.editorialContent.keyFeatureCards, card];
@@ -714,6 +806,53 @@ export class ManageHomeComponent implements OnInit {
 
   private getEmptyGallery(type: string): MediaGallery {
     return { caption: '', imageUrl: '', type };
+  }
+
+  private buildPerformanceLayerFromForm(): HomePerformanceLayer {
+    return {
+      ...this.performanceLayerForm,
+      year: this.performanceLayerForm.year.trim(),
+      title: this.performanceLayerForm.title.trim(),
+      meta: this.performanceLayerForm.meta.trim(),
+      role: this.performanceLayerForm.role.trim(),
+      description: this.performanceLayerForm.description.trim(),
+      image: this.performanceLayerForm.image.trim(),
+      imageAlt: this.performanceLayerForm.imageAlt.trim(),
+      imagePosition: (this.performanceLayerForm.imagePosition || '').trim(),
+      highlights: this.performanceHighlightsText.split('\n').map(item => item.trim()).filter(Boolean)
+    };
+  }
+
+  private applyPerformanceLayerEdit(): void {
+    if (this.editingPerformanceIndex === null) {
+      return;
+    }
+
+    const layer = this.buildPerformanceLayerFromForm();
+    this.editorialContent.performanceLayers = this.editorialContent.performanceLayers.map((item, index) => index === this.editingPerformanceIndex ? layer : item);
+    this.performanceLayerForm = this.getEmptyPerformanceLayer();
+    this.performanceHighlightsText = '';
+    this.editingPerformanceIndex = null;
+  }
+
+  private buildFeatureCardFromForm(): HomeFeatureCard {
+    return {
+      title: this.featureCardForm.title.trim(),
+      eyebrow: this.featureCardForm.eyebrow.trim(),
+      description: this.featureCardForm.description.trim(),
+      icon: this.featureCardForm.icon
+    };
+  }
+
+  private applyFeatureCardEdit(): void {
+    if (this.editingFeatureCardIndex === null) {
+      return;
+    }
+
+    const card = this.buildFeatureCardFromForm();
+    this.editorialContent.keyFeatureCards = this.editorialContent.keyFeatureCards.map((item, index) => index === this.editingFeatureCardIndex ? card : item);
+    this.featureCardForm = this.getEmptyFeatureCard();
+    this.editingFeatureCardIndex = null;
   }
 
   private getEmptyPerformanceLayer(): HomePerformanceLayer {

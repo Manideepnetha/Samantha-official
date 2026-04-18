@@ -115,6 +115,7 @@ import { AdminImageUploadFieldComponent } from '../../components/admin-image-upl
                 label="Image URL"
                 [value]="currentAward.imageUrl || ''"
                 (valueChange)="currentAward.imageUrl = $event"
+                (uploadCompleted)="persistEditedAwardImage()"
                 placeholder="Paste image URL"
                 uploadButtonLabel="Upload Award Image"
                 uploadFolder="awards"
@@ -203,6 +204,20 @@ export class ManageAwardsComponent implements OnInit {
         this.closeModal();
       });
     }
+  }
+
+  persistEditedAwardImage(): void {
+    if (!this.isEditing || !this.currentAward.id || !this.currentAward.title?.trim() || this.currentAward.type !== 'Gallery') {
+      return;
+    }
+
+    this.apiService.updateAward(this.currentAward.id, this.currentAward).subscribe({
+      next: () => this.loadAwards(),
+      error: (error) => {
+        console.error('Failed to auto-save uploaded award image', error);
+        alert('The image uploaded, but the award was not saved automatically. Please click Update Award.');
+      }
+    });
   }
 
   deleteAward(id: number) {

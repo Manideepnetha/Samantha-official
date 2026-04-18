@@ -68,6 +68,7 @@ import { AdminImageUploadFieldComponent } from '../../components/admin-image-upl
               label="Image URL"
               [value]="currentMedia.imageUrl"
               (valueChange)="currentMedia.imageUrl = $event"
+              (uploadCompleted)="persistEditedMediaImage()"
               placeholder="Paste image URL"
               uploadButtonLabel="Upload Image"
               bulkButtonLabel="Bulk Upload"
@@ -115,7 +116,7 @@ export class ManageMediaGalleryComponent implements OnInit {
     }
 
     loadGallery(): void {
-        this.apiService.getMediaGalleries().subscribe(data => this.galleryList = data);
+        this.apiService.getMediaGalleries(true).subscribe(data => this.galleryList = data);
     }
 
     openModal(): void {
@@ -175,6 +176,20 @@ export class ManageMediaGalleryComponent implements OnInit {
                 this.closeModal();
             });
         }
+    }
+
+    persistEditedMediaImage(): void {
+        if (!this.isEditing || !this.currentMedia.id || !this.currentMedia.caption?.trim()) {
+            return;
+        }
+
+        this.apiService.updateMediaGallery(this.currentMedia.id, this.currentMedia).subscribe({
+            next: () => this.loadGallery(),
+            error: (error) => {
+                console.error('Failed to auto-save uploaded featured gallery image', error);
+                alert('The image uploaded, but the gallery entry was not saved automatically. Please click Save.');
+            }
+        });
     }
 
     deleteMedia(id: number): void {

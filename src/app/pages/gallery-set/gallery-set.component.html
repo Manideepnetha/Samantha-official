@@ -1,62 +1,59 @@
 <div class="gallery-set-shell">
   <section *ngIf="loading" class="gallery-set-empty-state">
-    Loading story set...
+    <span>Loading</span>
+    <h1>Preparing this gallery chapter...</h1>
+    <p>The collection is being arranged now.</p>
   </section>
 
   <ng-container *ngIf="!loading && currentSet as set; else missingState">
-    <section class="gallery-set-hero" [style.--set-accent]="set.accentTone">
-      <div class="gallery-set-backdrop" [style.background-image]="'url(' + (selectedImage?.imageUrl || set.coverImageUrl) + ')'"></div>
+    <section class="gallery-set-header" [style.--set-accent]="set.accentTone">
+      <a routerLink="/gallery" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" class="back-link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back To Gallery
+      </a>
 
-      <div class="gallery-set-content">
-        <div class="set-copy-card">
-          <a routerLink="/gallery" class="back-link">Back To Visual Journey</a>
-          <span>{{ getGalleryCategoryLabel(set.category) }}</span>
-          <h1>{{ set.title }}</h1>
-          <p>{{ set.description }}</p>
+      <span class="gallery-set-kicker">{{ getGalleryCategoryLabel(set.category) }}</span>
+      <h1>{{ set.title }}</h1>
+      <p>{{ set.description }}</p>
 
-          <div class="set-copy-meta">
-            <div>
-              <strong>{{ set.itemCount }}</strong>
-              <small>Images grouped here</small>
-            </div>
-            <div>
-              <strong>{{ set.subtitle }}</strong>
-              <small>Current creative note</small>
-            </div>
-          </div>
+      <div class="set-copy-meta">
+        <div>
+          <strong>{{ set.itemCount }}</strong>
+          <small>Images in this collection</small>
         </div>
-
-        <div class="set-floating-card" *ngIf="selectedImage as frame">
-          <img [src]="frame.imageUrl" [alt]="frame.altText">
-          <div class="floating-copy">
-            <span>{{ frame.date || 'Gallery Frame' }}</span>
-            <h2>{{ frame.caption }}</h2>
-            <p>Selected frame from this story set. Use the strip below to move across the related images.</p>
-          </div>
+        <div>
+          <strong>{{ set.subtitle }}</strong>
+          <small>Current story note</small>
         </div>
+        <div>
+          <strong>{{ selectedImageDisplayIndex }} / {{ selectedImageCountLabel }}</strong>
+          <small>Last opened frame</small>
+        </div>
+      </div>
+
+      <div class="set-progress-meta">
+        <div class="set-progress-head">
+          <span>Collection Progress</span>
+          <strong>{{ selectedImageDisplayIndex }} / {{ selectedImageCountLabel }}</strong>
+        </div>
+        <div class="set-progress-bar">
+          <span [style.width.%]="selectedImageProgress"></span>
+        </div>
+        <small>Select any frame below to open it in a full-view overlay.</small>
       </div>
     </section>
 
     <section class="gallery-set-body">
-      <article class="feature-frame" *ngIf="selectedImage as frame">
-        <div class="feature-image-wrap">
-          <img [src]="frame.imageUrl" [alt]="frame.altText" class="feature-image">
-        </div>
-
-        <div class="feature-copy">
-          <span>{{ frame.date || 'Featured Frame' }}</span>
-          <h2>{{ frame.caption }}</h2>
-          <p>
-            This screen keeps related visuals together, so each gallery click now opens a set-based view instead of an isolated
-            single image.
-          </p>
-        </div>
-      </article>
-
       <article class="thumbnail-layer">
         <div class="section-head">
-          <span>Story Strip</span>
-          <h3>Related images in this set</h3>
+          <span>Gallery Frames</span>
+          <h3>Open any image without the extra feature frame</h3>
+          <p>
+            Every image opens directly in a clean viewer. The collection stays simple, and the back path to the main
+            gallery is always visible.
+          </p>
         </div>
 
         <div class="thumbnail-grid">
@@ -65,9 +62,14 @@
             type="button"
             class="thumbnail-card"
             [class.is-active]="selectedImageIndex === index"
-            (click)="selectImage(index)"
+            (click)="openImage(index)"
+            [attr.aria-label]="'Open frame ' + getDisplayIndex(index)"
           >
-            <img [src]="image.imageUrl" [alt]="image.altText">
+            <div class="thumbnail-media">
+              <img [src]="image.imageUrl" [alt]="image.altText" loading="lazy" decoding="async">
+              <span class="thumbnail-index">{{ getDisplayIndex(index) }}</span>
+              <span class="thumbnail-open">Open</span>
+            </div>
             <div class="thumbnail-copy">
               <span>{{ image.date || 'Gallery Frame' }}</span>
               <strong>{{ image.caption }}</strong>
@@ -80,6 +82,7 @@
         <div class="section-head">
           <span>More Sets</span>
           <h3>Continue through the archive</h3>
+          <p>Explore other official collections without losing the gallery flow.</p>
         </div>
 
         <div class="related-grid">
@@ -89,21 +92,72 @@
             class="related-card"
             [style.--related-accent]="related.accentTone"
           >
-            <img [src]="related.coverImageUrl || related.leadImage?.imageUrl" [alt]="related.title">
+            <img [src]="related.coverImageUrl || related.leadImage?.imageUrl" [alt]="related.title" loading="lazy" decoding="async">
             <div class="related-copy">
               <span>{{ getGalleryCategoryLabel(related.category) }}</span>
               <strong>{{ related.title }}</strong>
+              <small>{{ related.itemCount }} Frames</small>
             </div>
           </a>
         </div>
       </article>
     </section>
+
+    <div *ngIf="isLightboxOpen && selectedImage as image" class="gallery-lightbox" (click)="closeImage()">
+      <div class="gallery-lightbox-panel" (click)="$event.stopPropagation()">
+        <div class="gallery-lightbox-toolbar">
+          <button type="button" class="back-link gallery-lightbox-back" (click)="closeImage()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="back-link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+
+          <span class="gallery-lightbox-count">Frame {{ selectedImageDisplayIndex }} / {{ selectedImageCountLabel }}</span>
+
+          <a routerLink="/gallery" class="back-link gallery-lightbox-link" (click)="closeImage()">
+            Back To Gallery
+          </a>
+        </div>
+
+        <div class="gallery-lightbox-stage">
+          <button
+            *ngIf="hasMultipleImages"
+            type="button"
+            class="stage-nav stage-nav-prev"
+            (click)="stepSelection(-1)"
+            aria-label="Show previous frame"
+          >
+            Prev
+          </button>
+
+          <img [src]="image.imageUrl" [alt]="image.altText" decoding="async">
+
+          <button
+            *ngIf="hasMultipleImages"
+            type="button"
+            class="stage-nav stage-nav-next"
+            (click)="stepSelection(1)"
+            aria-label="Show next frame"
+          >
+            Next
+          </button>
+        </div>
+
+        <div class="gallery-lightbox-copy">
+          <span>{{ image.date || 'Gallery Frame' }}</span>
+          <h2>{{ image.caption }}</h2>
+          <p>{{ set.subtitle }}</p>
+        </div>
+      </div>
+    </div>
   </ng-container>
 
   <ng-template #missingState>
     <section class="gallery-set-empty-state">
-      <h1>That story set could not be found.</h1>
-      <p>The gallery collections are still available below, so you can jump back into the visual journey from there.</p>
+      <span>Missing Collection</span>
+      <h1>That gallery set could not be found.</h1>
+      <p>The main gallery is still available, so you can head back and open another collection.</p>
       <a routerLink="/gallery" class="back-link">Return To Gallery</a>
     </section>
   </ng-template>

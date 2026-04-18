@@ -4,17 +4,20 @@ import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { FooterComponent } from '../../components/footer/footer.component';
+import { FloatingMusicPlayerComponent } from '../../components/floating-music-player/floating-music-player.component';
+import { SiteNotificationService } from '../../services/site-notification.service';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterModule, CommonModule, NavbarComponent, FooterComponent],
+  imports: [RouterModule, CommonModule, NavbarComponent, FooterComponent, FloatingMusicPlayerComponent],
   template: `
     <app-navbar *ngIf="!isHomeRoute"></app-navbar>
     <main>
       <router-outlet></router-outlet>
     </main>
     <app-footer></app-footer>
+    <app-floating-music-player></app-floating-music-player>
 
     <!-- Back to Top Button -->
     <button
@@ -28,7 +31,10 @@ import { FooterComponent } from '../../components/footer/footer.component';
     </button>
   `,
   styles: [`
-    main { min-height: calc(100vh - 160px); }
+    main {
+      min-height: calc(100vh - 160px);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -40,8 +46,9 @@ export class MainLayoutComponent {
   showBackToTop = false;
   isHomeRoute = true;
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private siteNotificationService: SiteNotificationService) {
     this.syncRouteState(this.router.url);
+    this.siteNotificationService.initialize();
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.syncRouteState(event.urlAfterRedirects);

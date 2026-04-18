@@ -65,6 +65,16 @@ export const routes: Routes = [
         title: 'Gallery | Samantha Ruth Prabhu'
       },
       {
+        path: 'timeline',
+        loadComponent: () => import('./pages/timeline/timeline.component').then(c => c.TimelineComponent),
+        title: 'Timeline | Samantha Ruth Prabhu'
+      },
+      {
+        path: 'wallpapers',
+        loadComponent: () => import('./pages/wallpapers/wallpapers.component').then(c => c.WallpapersComponent),
+        title: 'Wallpapers | Samantha Ruth Prabhu'
+      },
+      {
         path: 'media',
         loadComponent: () => import('./pages/media/media.component').then(c => c.MediaComponent),
         title: 'Media & Press | Samantha Ruth Prabhu'
@@ -78,6 +88,11 @@ export const routes: Routes = [
         path: 'fan-zone',
         loadComponent: () => import('./pages/fan-zone/fan-zone.component').then(c => c.FanZoneComponent),
         title: 'Fan Zone | Samantha Ruth Prabhu'
+      },
+      {
+        path: 'fan-wall',
+        loadComponent: () => import('./pages/fan-wall/fan-wall.component').then(c => c.FanWallComponent),
+        title: 'Fan Wall | Samantha Ruth Prabhu'
       },
       {
         path: 'contact',

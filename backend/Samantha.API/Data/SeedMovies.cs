@@ -1,4 +1,3 @@
-using Samantha.API.Data;
 using Samantha.API.Models;
 
 namespace Samantha.API.Data;
@@ -7,21 +6,29 @@ public static class SeedMovies
 {
     public static void Initialize(AppDbContext context)
     {
+        var movies = GetSeedMovies();
+
         if (context.Movies.Any())
         {
-            // Sync specific movie poster if needed
-            var movieToSync = context.Movies.FirstOrDefault(m => m.Title == "Maa Inti Bangaram");
-            if (movieToSync != null && movieToSync.Poster != "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg")
-            {
-                movieToSync.Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg";
-                // Also ensure year/description match if needed
-                context.SaveChanges();
-            }
+            SyncExistingMovie(context, movies, "Alludu Seenu");
+            SyncExistingMovie(context, movies, "Yashoda");
+            SyncExistingMovie(context, movies, "Subham");
+            SyncExistingMovie(context, movies, "Maa Inti Bangaram");
+            SyncExistingMovie(context, movies, "Citadel: Honey Bunny");
+            SyncExistingMovie(context, movies, "Rakt Brahmand: The Bloody Kingdom");
+
+            context.SaveChanges();
             return;
         }
 
-        var movies = new List<Movie>
-        {
+        context.Movies.AddRange(movies);
+        context.SaveChanges();
+    }
+
+    private static List<Movie> GetSeedMovies()
+    {
+        return
+        [
             new Movie { Title = "Ye Maaya Chesave", Year = 2010, ReleaseDate = "2010-02-26", Language = "Telugu", Genre = new List<string> { "Romance", "Drama" }, Role = "Jessie", Director = "Gautham Vasudev Menon", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/big_72182_2b57b25f6b78309614a6d526b9419b5a_q3uhir.jpg", Description = "Released February 26, 2010.", Trailer = "" },
             new Movie { Title = "Vinnaithaandi Varuvaayaa", Year = 2010, ReleaseDate = "2010-02-26", Language = "Tamil", Genre = new List<string> { "Romance", "Drama" }, Role = "Cameo", Director = "Gautham Vasudev Menon", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748156999/O_My_Friend_Telugu_Movie_Images_ccvjle.jpg", Description = "Cameo. Released February 26, 2010.", Trailer = "" },
             new Movie { Title = "Baana Kaathadi", Year = 2010, ReleaseDate = "2010-08-06", Language = "Tamil", Genre = new List<string> { "Drama" }, Role = "Priya", Director = "Badri Venkatesh", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122620/MV5BMTJiODNjYjMtZmQxNC00Zjk0LTgyMjUtNGUzMmJiYzJjMjMyXkEyXkFqcGdeQXVyODk1MzE5NDA_._V1__h5q6lx.jpg", Description = "Released August 6, 2010.", Trailer = "" },
@@ -37,7 +44,7 @@ public static class SeedMovies
             new Movie { Title = "Ramayya Vasthavayya", Year = 2013, ReleaseDate = "2013-10-11", Language = "Telugu", Genre = new List<string> { "Action", "Drama" }, Role = "Akkam", Director = "Harish Shankar", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/1600862506.Ramayya_Vastavayya__21_zybu6u.jpg", Description = "Released October 11, 2013.", Trailer = "" },
             new Movie { Title = "Manam", Year = 2014, ReleaseDate = "2014-05-23", Language = "Telugu", Genre = new List<string> { "Drama", "Fantasy" }, Role = "Anjali", Director = "Vikram Kumar", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/Manam_Movie_release_date_Posters_1_vdkoet.jpg", Description = "Released May 23, 2014.", Trailer = "" },
             new Movie { Title = "Autonagar Surya", Year = 2014, ReleaseDate = "2014-06-27", Language = "Telugu", Genre = new List<string> { "Action", "Drama" }, Role = "Siri", Director = "Deva Katta", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/Autonagar_Surya_Movie_New_Wallpapers_1_pcdxpo.jpg", Description = "Released June 27, 2014.", Trailer = "" },
-            new Movie { Title = "Alludu Seenu", Year = 2014, ReleaseDate = "2014-07-24", Language = "Telugu", Genre = new List<string> { "Action", "Comedy" }, Role = "Cameo", Director = "V. V. Vinayak", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/0Alludu_Srinu_profile_j45i0m.png", Description = "Cameo. Released July 24, 2014.", Trailer = "" },
+            new Movie { Title = "Alludu Seenu", Year = 2014, ReleaseDate = "2014-07-25", Language = "Telugu", Genre = new List<string> { "Action", "Comedy" }, Role = "Anjali", Director = "V. V. Vinayak", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/0Alludu_Srinu_profile_j45i0m.png", Description = "Released July 25, 2014.", Trailer = "" },
             new Movie { Title = "Anjaan", Year = 2014, ReleaseDate = "2014-08-15", Language = "Tamil", Genre = new List<string> { "Action", "Thriller" }, Role = "Jeeva", Director = "N. Lingusamy", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/suriya_samantha_anjaan_movie_first_look_posters_wallpapers_57d4c8e_vltwnp.jpg", Description = "Released August 15, 2014.", Trailer = "" },
             new Movie { Title = "Rabhasa", Year = 2014, ReleaseDate = "2014-08-29", Language = "Telugu", Genre = new List<string> { "Action", "Comedy" }, Role = "Indu", Director = "Santosh Srinivas", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/rabhasa_movie_wallpapers_jr_ntr_samantha_07031d8_byb8bb.jpg", Description = "Released August 29, 2014.", Trailer = "" },
             new Movie { Title = "Kaththi", Year = 2014, ReleaseDate = "2014-10-22", Language = "Tamil", Genre = new List<string> { "Action", "Drama" }, Role = "Ankitha", Director = "A. R. Murugadoss", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/f0f76f373519ae46b739b1b78a4f9473_xrxmvb.jpg", Description = "Released October 22, 2014.", Trailer = "" },
@@ -64,17 +71,57 @@ public static class SeedMovies
             new Movie { Title = "Jaanu", Year = 2020, ReleaseDate = "2020-02-07", Language = "Telugu", Genre = new List<string> { "Romance", "Drama" }, Role = "Jaanu", Director = "C. Prem Kumar", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122619/Picsart_25-05-24_13-38-39-468_j8y5qf.jpg", Description = "Released February 7, 2020.", Trailer = "" },
             new Movie { Title = "Pushpa: The Rise", Year = 2021, ReleaseDate = "2021-12-17", Language = "Telugu", Genre = new List<string> { "Action", "Drama" }, Role = "Special Appearance", Director = "Sukumar", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122616/IMG_20211208_214018_nawid7.jpg", Description = "Special appearance. Released December 17, 2021.", Trailer = "" },
             new Movie { Title = "Kaathuvaakula Rendu Kaadhal", Year = 2022, ReleaseDate = "2022-04-28", Language = "Tamil", Genre = new List<string> { "Romance", "Comedy" }, Role = "Khatija", Director = "Vignesh Shivan", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122617/IMG_20220527_124415_mxmev1.jpg", Description = "Released April 28, 2022.", Trailer = "" },
-            new Movie { Title = "Yashoda", Year = 2022, ReleaseDate = "2022-11-11", Language = "Telugu", Genre = new List<string> { "Action", "Thriller" }, Role = "Yashoda", Director = "Hari–Harish", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122614/Picsart_22-09-08_22-58-25-225_zupgqe.jpg", Description = "Released November 11, 2022.", Trailer = "" },
+            new Movie { Title = "Yashoda", Year = 2022, ReleaseDate = "2022-11-11", Language = "Telugu", Genre = new List<string> { "Action", "Thriller" }, Role = "Yashoda", Director = "Hari-Harish", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122614/Picsart_22-09-08_22-58-25-225_zupgqe.jpg", Description = "Released November 11, 2022.", Trailer = "" },
             new Movie { Title = "Shaakuntalam", Year = 2023, ReleaseDate = "2023-04-14", Language = "Telugu", Genre = new List<string> { "Mythology", "Drama", "Romance" }, Role = "Shakuntala", Director = "Gunasekhar", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122615/PicsArt_04-28-01.30.05_jdpk8h.jpg", Description = "Released April 14, 2023.", Trailer = "" },
             new Movie { Title = "Kushi", Year = 2023, ReleaseDate = "2023-09-01", Language = "Telugu", Genre = new List<string> { "Romance", "Comedy", "Drama" }, Role = "Aradhya", Director = "Shiva Nirvana", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122707/20220909_210838_vrhgsu.jpg", Description = "Released September 1, 2023.", Trailer = "" },
-            new Movie { Title = "Subham", Year = 2025, ReleaseDate = "Expected May 9, 2025", Language = "Telugu", Genre = new List<string> { "Drama" }, Role = "Maata", Director = "TBA", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748018718/subham-et00440249-1747030168_rsxwsc.avif", Description = "Expected May 9, 2025.", Trailer = "" },
-            new Movie { Title = "Maa Inti Bangaram", Year = 2025, ReleaseDate = "Expected 2025", Language = "Telugu", Genre = new List<string> { "Drama" }, Role = "TBA", Director = "TBA", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg", Description = "Expected 2025.", Trailer = "" },
+            new Movie { Title = "Subham", Year = 2025, ReleaseDate = "2025-05-09", Language = "Telugu", Genre = new List<string> { "Comedy", "Horror" }, Role = "Maya Matasri (cameo appearance)", Director = "Praveen Kandregula", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748018718/subham-et00440249-1747030168_rsxwsc.avif", Description = "Cameo appearance. Released May 9, 2025.", Trailer = "" },
+            new Movie { Title = "Maa Inti Bangaram", Year = 2026, ReleaseDate = "2026-05-15", Language = "Telugu", Genre = new List<string> { "Action", "Drama" }, Role = "Lead role", Director = "B. V. Nandini Reddy", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg", Description = "Scheduled for theatrical release on May 15, 2026.", Trailer = "" },
             new Movie { Title = "The Family Man (Season 2)", Year = 2021, ReleaseDate = "2021-06-04", Language = "Hindi", Genre = new List<string> { "Action", "Thriller", "Drama" }, Role = "Raji", Director = "Raj & DK", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122617/IMG_20210808_132006_uoe7py.jpg", Description = "Web series. Released June 4, 2021. Samantha plays Raji in the acclaimed second season.", Trailer = "" },
-            new Movie { Title = "Citadel: Honey Bunny", Year = 2024, ReleaseDate = "2024-11-06", Language = "Hindi", Genre = new List<string> { "Spy", "Thriller" }, Role = "TBA", Director = "Raj & DK", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122749/Picsart_24-11-07_07-15-26-570_tgv1zm.jpg", Description = "Web series. Scheduled for release November 6, 2024.", Trailer = "" },
-            new Movie { Title = "Rakt Brahmand: The Bloody Kingdom", Year = 2025, ReleaseDate = "Scheduled for release in 2025", Language = "Hindi", Genre = new List<string> { "Crime", "Drama" }, Role = "TBA", Director = "TBA", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122747/20240727_100042_wgs661.jpg", Description = "Web series. Scheduled for release in 2025.", Trailer = "" }
-        };
+            new Movie { Title = "Citadel: Honey Bunny", Year = 2024, ReleaseDate = "2024-11-06", Language = "Hindi", Genre = new List<string> { "Spy", "Thriller" }, Role = "Honey", Director = "Raj & DK", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122749/Picsart_24-11-07_07-15-26-570_tgv1zm.jpg", Description = "Web series. Released November 6, 2024. Samantha plays Honey.", Trailer = "" },
+            new Movie { Title = "Rakt Brahmand: The Bloody Kingdom", Year = 2026, ReleaseDate = "Release date to be announced", Language = "Hindi", Genre = new List<string> { "Action", "Adventure", "Fantasy" }, Role = "TBA", Director = "Rahi Anil Barve", Poster = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122747/20240727_100042_wgs661.jpg", Description = "Upcoming web series. Release date to be announced.", Trailer = "" }
+        ];
+    }
 
-        context.Movies.AddRange(movies);
-        context.SaveChanges();
+    private static void SyncExistingMovie(AppDbContext context, IReadOnlyCollection<Movie> seededMovies, string title)
+    {
+        var seededMovie = seededMovies.FirstOrDefault(movie => movie.Title == title);
+        if (seededMovie == null)
+        {
+            return;
+        }
+
+        var existingMovie = context.Movies.FirstOrDefault(movie => movie.Title == title);
+        if (existingMovie == null)
+        {
+            context.Movies.Add(CloneMovie(seededMovie));
+            return;
+        }
+
+        existingMovie.Year = seededMovie.Year;
+        existingMovie.ReleaseDate = seededMovie.ReleaseDate;
+        existingMovie.Language = seededMovie.Language;
+        existingMovie.Genre = seededMovie.Genre.ToList();
+        existingMovie.Role = seededMovie.Role;
+        existingMovie.Director = seededMovie.Director;
+        existingMovie.Poster = seededMovie.Poster;
+        existingMovie.Description = seededMovie.Description;
+        existingMovie.Trailer = seededMovie.Trailer;
+    }
+
+    private static Movie CloneMovie(Movie movie)
+    {
+        return new Movie
+        {
+            Title = movie.Title,
+            Year = movie.Year,
+            ReleaseDate = movie.ReleaseDate,
+            Language = movie.Language,
+            Genre = movie.Genre.ToList(),
+            Role = movie.Role,
+            Director = movie.Director,
+            Poster = movie.Poster,
+            Description = movie.Description,
+            Trailer = movie.Trailer
+        };
     }
 }

@@ -105,6 +105,7 @@ import { AdminImageUploadFieldComponent } from '../../components/admin-image-upl
                 label="Poster Image"
                 [value]="currentMovie.poster"
                 (valueChange)="currentMovie.poster = $event"
+                (uploadCompleted)="persistEditedMoviePoster()"
                 placeholder="Paste poster URL"
                 uploadButtonLabel="Upload Poster"
                 uploadFolder="movies"
@@ -232,5 +233,19 @@ export class ManageMoviesComponent implements OnInit {
         }
       });
     }
+  }
+
+  persistEditedMoviePoster(): void {
+    if (!this.isEditing || !this.currentMovie.id || !this.currentMovie.title?.trim()) {
+      return;
+    }
+
+    this.apiService.updateMovie(this.currentMovie.id, this.currentMovie).subscribe({
+      next: () => this.refreshMovies(),
+      error: (error) => {
+        console.error('Failed to auto-save uploaded movie poster', error);
+        alert('The poster uploaded, but the movie was not saved automatically. Please click Update Movie.');
+      }
+    });
   }
 }

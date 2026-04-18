@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService, Movie } from '../../services/api.service';
 import {
+  FALLBACK_POSTER_URL,
   getMovieFallbackDescription,
   getMovieGenres,
   getMovieReleaseLabel,
@@ -20,9 +21,10 @@ import {
           <div class="sr-hero-panel min-h-[520px]">
             <div class="sr-hero-media">
               <img
-                [src]="movie?.poster || fallbackBackdrop"
+                [src]="heroImageUrl"
                 [alt]="movie?.title || 'Film detail'"
                 class="object-[center_18%]"
+                (error)="onHeroImageError($event)"
               />
             </div>
 
@@ -53,7 +55,12 @@ import {
         <div *ngIf="movie" class="grid gap-6 lg:grid-cols-[0.82fr_1.18fr]">
           <article class="sr-surface overflow-hidden">
             <div class="movie-detail-poster-wrap">
-              <img [src]="movie.poster" [alt]="movie.title" class="movie-detail-poster" />
+              <img
+                [src]="movie.poster"
+                [alt]="movie.title"
+                class="movie-detail-poster"
+                (error)="onPosterImageError($event)"
+              />
             </div>
           </article>
 
@@ -131,6 +138,8 @@ export class MovieDetailComponent implements OnInit {
   loading = true;
   movie: Movie | null = null;
   fallbackBackdrop = 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748036070/behance_download_1696968314742_bg6c1a.jpg';
+  posterFallbackUrl = FALLBACK_POSTER_URL;
+  heroImageUrl = this.fallbackBackdrop;
 
   constructor(
     private route: ActivatedRoute,
@@ -143,6 +152,7 @@ export class MovieDetailComponent implements OnInit {
 
       if (!movieId) {
         this.movie = null;
+        this.heroImageUrl = this.fallbackBackdrop;
         this.loading = false;
         return;
       }
@@ -151,11 +161,13 @@ export class MovieDetailComponent implements OnInit {
       this.apiService.getMovie(movieId).subscribe({
         next: (movie) => {
           this.movie = normalizeMovie(movie);
+          this.heroImageUrl = this.movie.poster || this.fallbackBackdrop;
           this.loading = false;
         },
         error: (error) => {
           console.error('Failed to load movie details', error);
           this.movie = null;
+          this.heroImageUrl = this.fallbackBackdrop;
           this.loading = false;
         }
       });
@@ -172,5 +184,27 @@ export class MovieDetailComponent implements OnInit {
 
   getMovieFallbackDescription(movie: Movie): string {
     return getMovieFallbackDescription(movie);
+  }
+
+  onHeroImageError(event?: Event): void {
+    this.heroImageUrl = this.fallbackBackdrop;
+
+    const image = event?.target;
+    if (image instanceof HTMLImageElement) {
+      image.src = this.fallbackBackdrop;
+    }
+  }
+
+  onPosterImageError(event?: Event): void {
+    if (!this.movie || this.movie.poster === this.posterFallbackUrl) {
+      return;
+    }
+
+    this.movie.poster = this.posterFallbackUrl;
+
+    const image = event?.target;
+    if (image instanceof HTMLImageElement) {
+      image.src = this.posterFallbackUrl;
+    }
   }
 }

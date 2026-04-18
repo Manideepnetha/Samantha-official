@@ -18,6 +18,7 @@ export const ADMIN_ROUTES: Routes = [
             { path: 'fashion', loadComponent: () => import('./pages/manage-fashion/manage-fashion.component').then(m => m.ManageFashionComponent), title: 'Manage Fashion | Admin Panel' },
             { path: 'gallery', loadComponent: () => import('./pages/manage-gallery/manage-gallery.component').then(m => m.ManageGalleryComponent), title: 'Manage Gallery | Admin Panel' },
             { path: 'fan-zone', loadComponent: () => import('./pages/manage-fan-zone/manage-fan-zone.component').then(m => m.ManageFanZoneComponent), title: 'Manage Fan Zone | Admin Panel' },
+            { path: 'fan-wall', loadComponent: () => import('./pages/manage-fan-wall/manage-fan-wall.component').then(m => m.ManageFanWallComponent), title: 'Manage Fan Wall | Admin Panel' },
             { path: 'settings', loadComponent: () => import('./pages/manage-settings/manage-settings.component').then(m => m.ManageSettingsComponent), title: 'Manage Settings | Admin Panel' },
             { path: 'news', loadComponent: () => import('./pages/manage-news/manage-news.component').then(m => m.ManageNewsComponent), title: 'Manage News | Admin Panel' },
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Samantha.API.Data;
+using Samantha.API.Infrastructure;
 using Samantha.API.Models;
 using System.Text;
 
@@ -22,7 +23,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"] ?? "super_secret_key_which_should_be_long_enough_for_security";
+var secretKey = AppSecurityOptions.GetRequiredJwtSecret(builder.Configuration);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -112,13 +113,23 @@ using (var scope = app.Services.CreateScope())
 
     if (!db.Users.Any())
     {
-        db.Users.Add(new User 
-        { 
-            Email = "admin@samantha.com", 
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
-            Role = "Admin"
-        });
-        db.SaveChanges();
+        var bootstrapAdmin = AppSecurityOptions.GetBootstrapAdminCredentials(app.Configuration);
+        if (bootstrapAdmin is not null)
+        {
+            db.Users.Add(new User
+            {
+                Email = bootstrapAdmin.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(bootstrapAdmin.Password),
+                Role = "Admin"
+            });
+            db.SaveChanges();
+            app.Logger.LogInformation("Bootstrapped the initial admin account for {Email}.", bootstrapAdmin.Email);
+        }
+        else
+        {
+            app.Logger.LogWarning(
+                "No users exist yet and no bootstrap admin credentials were configured. Set BootstrapAdmin:Email and BootstrapAdmin:Password to seed the first admin account.");
+        }
     }
 
     try

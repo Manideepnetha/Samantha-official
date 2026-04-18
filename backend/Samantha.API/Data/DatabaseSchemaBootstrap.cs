@@ -152,6 +152,38 @@ public static class DatabaseSchemaBootstrap
             ALTER TABLE IF EXISTS ""VisitorEntries"" ADD COLUMN IF NOT EXISTS ""FirstCompletedAt"" timestamp with time zone NOT NULL DEFAULT NOW();
             ALTER TABLE IF EXISTS ""VisitorEntries"" ADD COLUMN IF NOT EXISTS ""LastCompletedAt"" timestamp with time zone NOT NULL DEFAULT NOW();
         ");
+
+        Execute(context, logger, "fan wall and poll schema", @"
+            CREATE TABLE IF NOT EXISTS ""FanWallMessages"" (
+                ""Id"" serial NOT NULL,
+                ""Name"" text NOT NULL,
+                ""City"" text NULL,
+                ""Message"" text NOT NULL,
+                ""Status"" text NOT NULL DEFAULT 'Pending',
+                ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT NOW(),
+                CONSTRAINT ""PK_FanWallMessages"" PRIMARY KEY (""Id"")
+            );
+
+            CREATE INDEX IF NOT EXISTS ""IX_FanWallMessages_Status"" ON ""FanWallMessages"" (""Status"");
+
+            ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""City"" text;
+            ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""Status"" text NOT NULL DEFAULT 'Pending';
+            ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT NOW();
+
+            CREATE TABLE IF NOT EXISTS ""FanPollVotes"" (
+                ""Id"" serial NOT NULL,
+                ""PollKey"" text NOT NULL,
+                ""OptionKey"" text NOT NULL,
+                ""ClientId"" text NOT NULL,
+                ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT NOW(),
+                CONSTRAINT ""PK_FanPollVotes"" PRIMARY KEY (""Id"")
+            );
+
+            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_FanPollVotes_PollKey_ClientId"" ON ""FanPollVotes"" (""PollKey"", ""ClientId"");
+            CREATE INDEX IF NOT EXISTS ""IX_FanPollVotes_PollKey"" ON ""FanPollVotes"" (""PollKey"");
+
+            ALTER TABLE IF EXISTS ""FanPollVotes"" ADD COLUMN IF NOT EXISTS ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT NOW();
+        ");
     }
 
     private static void Execute(AppDbContext context, ILogger logger, string operation, string sql)

@@ -3,8 +3,8 @@ import { readFile } from 'node:fs/promises';
 
 const LOCAL_API = process.env.LOCAL_API_URL || 'http://localhost:5035/api';
 const PROD_API = process.env.PROD_API_URL || 'https://samantha-official-website-api.onrender.com/api';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@samantha.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+const PROD_ADMIN_EMAIL = process.env.PROD_ADMIN_EMAIL || process.env.ADMIN_EMAIL || '';
+const PROD_ADMIN_PASSWORD = process.env.PROD_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || '';
 const REQUEST_TIMEOUT_MS = 30000;
 const DEFAULT_UPLOAD_FOLDER = 'samantha-official-website';
 const LOCAL_WEB_ROOT = path.join(process.cwd(), 'backend', 'Samantha.API', 'wwwroot');
@@ -128,11 +128,15 @@ async function requestJson(url, options = {}) {
 }
 
 async function login(baseApiUrl) {
+  if (!PROD_ADMIN_EMAIL || !PROD_ADMIN_PASSWORD) {
+    throw new Error('Production admin credentials are required. Set PROD_ADMIN_EMAIL and PROD_ADMIN_PASSWORD before running the sync.');
+  }
+
   const response = await requestJson(`${baseApiUrl}/auth/login`, {
     method: 'POST',
     body: JSON.stringify({
-      email: ADMIN_EMAIL,
-      password: ADMIN_PASSWORD
+      email: PROD_ADMIN_EMAIL,
+      password: PROD_ADMIN_PASSWORD
     })
   });
 

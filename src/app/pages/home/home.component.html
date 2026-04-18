@@ -10,6 +10,7 @@
               [alt]="slide.alt"
               class="hero-backdrop"
               [class.is-active]="currentSlide === i"
+              (error)="slide.image = fallbackImage"
             />
           </div>
 
@@ -33,17 +34,31 @@
               <a *ngFor="let item of heroNavItems" [routerLink]="item.route">{{ item.label }}</a>
             </nav>
 
-            <button
-              type="button"
-              class="hero-menu-button"
-              (click)="toggleMobileMenu()"
-              [attr.aria-expanded]="isMobileMenuOpen"
-              aria-label="Open menu"
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
+            <div class="hero-topbar-actions">
+              <app-notification-bell [compact]="true"></app-notification-bell>
+
+              <button
+                type="button"
+                class="hero-theme-button"
+                (click)="toggleTheme()"
+                aria-label="Toggle theme"
+              >
+                <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd" /></svg>
+                <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
+              </button>
+
+              <button
+                type="button"
+                class="hero-menu-button"
+                (click)="toggleMobileMenu()"
+                [attr.aria-expanded]="isMobileMenuOpen"
+                aria-label="Open menu"
+              >
+                <span></span>
+                <span></span>
+                <span></span>
+              </button>
+            </div>
           </header>
 
           <div class="hero-content">
@@ -139,6 +154,13 @@
     <span class="update-arrow">Explore</span>
   </section>
 
+  <section class="home-section countdown-history-section">
+    <div class="countdown-history-grid">
+      <app-birthday-countdown></app-birthday-countdown>
+      <app-this-day-history></app-this-day-history>
+    </div>
+  </section>
+
   <section class="home-section performances-section">
     <div class="performances-header">
       <div class="performances-heading">
@@ -176,7 +198,12 @@
           class="performance-media"
           [style.--performance-image-position]="performance.imagePosition || 'center center'"
         >
-          <img [src]="performance.image" [alt]="performance.imageAlt" loading="lazy" />
+          <img
+            [src]="performance.image"
+            [alt]="performance.imageAlt"
+            loading="lazy"
+            (error)="performance.image = fallbackImage"
+          />
         </div>
       </article>
     </div>
@@ -199,6 +226,9 @@
           [src]="instagramSpotlight.image"
           [alt]="instagramSpotlight.imageAlt"
           class="feature-spotlight-avatar"
+          loading="lazy"
+          decoding="async"
+          (error)="instagramSpotlight.image = fallbackImage"
         />
         <div class="feature-spotlight-copy">
           <h3>{{ instagramSpotlight.title }}</h3>
@@ -211,7 +241,7 @@
 
     <div class="features-grid">
       <figure class="feature-showcase">
-        <img [src]="featureShowcaseImage.url" [alt]="featureShowcaseImage.alt" loading="lazy" />
+        <img [src]="featureShowcaseImage.url" [alt]="featureShowcaseImage.alt" loading="lazy" decoding="async" (error)="featureShowcaseImage.url = fallbackImage" />
         <figcaption>{{ featureShowcaseImage.caption }}</figcaption>
       </figure>
 
@@ -257,7 +287,7 @@
       <div class="news-layout">
         <article class="news-feature news-card">
           <div class="news-media">
-            <img [src]="primaryNews.image" [alt]="primaryNews.title" />
+            <img [src]="primaryNews.image" [alt]="primaryNews.title" loading="lazy" decoding="async" (error)="primaryNews.image = fallbackImage" />
           </div>
           <div class="news-copy">
             <span class="card-meta">{{ primaryNews.date || 'Featured story' }}</span>
@@ -277,7 +307,7 @@
         <div class="news-stack">
           <article *ngFor="let news of secondaryNews" class="news-card news-compact">
             <div class="news-media">
-              <img [src]="news.image" [alt]="news.title" />
+              <img [src]="news.image" [alt]="news.title" loading="lazy" decoding="async" (error)="news.image = fallbackImage" />
             </div>
             <div class="news-copy">
               <span class="card-meta">{{ news.date || 'Latest feature' }}</span>
@@ -313,7 +343,7 @@
       <div class="projects-layout">
         <article class="project-feature project-card">
           <div class="project-poster">
-            <img [src]="spotlightProject.image" [alt]="spotlightProject.title" />
+            <img [src]="spotlightProject.image" [alt]="spotlightProject.title" loading="lazy" decoding="async" (error)="spotlightProject.image = fallbackImage" />
           </div>
           <div class="project-copy">
             <span class="card-meta">
@@ -330,7 +360,7 @@
         <div class="project-grid">
           <article *ngFor="let project of remainingProjects" class="project-card project-compact">
             <div class="project-poster">
-              <img [src]="project.image" [alt]="project.title" />
+              <img [src]="project.image" [alt]="project.title" loading="lazy" decoding="async" (error)="project.image = fallbackImage" />
             </div>
             <div class="project-copy">
               <span class="card-meta">
@@ -365,7 +395,7 @@
         [class.gallery-tile-wide]="i === 0 || i % 5 === 0"
         [class.gallery-tile-tall]="i === 0 || i % 4 === 0"
       >
-        <img [src]="image.url" [alt]="image.alt" />
+        <img [src]="image.url" [alt]="image.alt" loading="lazy" decoding="async" (error)="image.url = fallbackImage" />
         <div class="gallery-overlay">
           <span>{{ image.caption || 'Samantha Ruth Prabhu' }}</span>
         </div>
@@ -377,13 +407,36 @@
     </div>
   </section>
 
+  <section class="home-section extras-section">
+    <div class="home-section-heading">
+      <span class="section-kicker">Fan Extras</span>
+      <h2>Return-worthy corners built for the fandom.</h2>
+      <p>More ways to revisit the archive, leave a message, and carry the visual world onto your own devices.</p>
+    </div>
+
+    <div class="extras-grid">
+      <a routerLink="/timeline" class="extra-card">
+        <span class="section-kicker">Timeline</span>
+        <h3>Walk the career year by year.</h3>
+        <p>Films, awards, and key shifts mapped into one scrolling narrative.</p>
+      </a>
+      <a routerLink="/fan-wall" class="extra-card">
+        <span class="section-kicker">Fan Wall</span>
+        <h3>Leave a message for Samantha.</h3>
+        <p>Public notes from fans around the world, moderated and displayed like a living guestbook.</p>
+      </a>
+      <a routerLink="/wallpapers" class="extra-card">
+        <span class="section-kicker">Wallpapers</span>
+        <h3>Take the visual language with you.</h3>
+        <p>Curated mobile and desktop downloads built from the site’s strongest imagery.</p>
+      </a>
+    </div>
+  </section>
+
   <section class="quote-section">
-    <div class="quote-card">
-      <span class="section-kicker">Signature Quote</span>
-      <blockquote>
-        &ldquo;I have never met a strong person with an easy past.&rdquo;
-      </blockquote>
-      <p>Samantha Ruth Prabhu</p>
+    <div class="quote-grid">
+      <app-quote-of-the-day></app-quote-of-the-day>
+      <app-instagram-feed-embed></app-instagram-feed-embed>
     </div>
   </section>
 

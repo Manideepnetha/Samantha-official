@@ -103,6 +103,7 @@ import { ApiService, FanCreation, UploadedMediaAsset } from '../../../services/a
               [label]="imageFieldLabel"
               [value]="currentItem.imageUrl"
               (valueChange)="currentItem.imageUrl = $event"
+              (uploadCompleted)="persistEditedFanCreationImage()"
               [placeholder]="imagePlaceholder"
               [uploadButtonLabel]="uploadButtonLabel"
               [bulkButtonLabel]="bulkButtonLabel"
@@ -293,6 +294,33 @@ export class ManageFanZoneComponent implements OnInit {
       error: (error) => {
         console.error('Failed to delete fan creation', error);
         alert('Could not delete this entry right now.');
+      }
+    });
+  }
+
+  persistEditedFanCreationImage(): void {
+    if (!this.currentItem.id || !this.currentItem.title.trim()) {
+      return;
+    }
+
+    const payload: FanCreation = {
+      ...this.currentItem,
+      type: this.activeType,
+      title: this.currentItem.title.trim(),
+      creatorName: (this.currentItem.creatorName || '').trim(),
+      description: (this.currentItem.description || '').trim(),
+      imageUrl: this.currentItem.imageUrl.trim(),
+      mediaUrl: (this.currentItem.mediaUrl || '').trim(),
+      dateLabel: (this.currentItem.dateLabel || '').trim(),
+      platform: (this.currentItem.platform || '').trim(),
+      isFeatured: !!this.currentItem.isFeatured
+    };
+
+    this.apiService.updateFanCreation(payload.id!, payload).subscribe({
+      next: () => this.loadCreations(),
+      error: (error) => {
+        console.error('Failed to auto-save uploaded fan creation image', error);
+        alert('The image uploaded, but the fan entry was not saved automatically. Please click Update Entry.');
       }
     });
   }

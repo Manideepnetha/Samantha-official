@@ -49,70 +49,71 @@ interface AboutPageContent {
 const DEFAULT_ABOUT_CONTENT: AboutPageContent = {
   heroImage: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748011805/8F9A6978_1_jd2efv.jpg',
   heroAlt: 'Samantha Ruth Prabhu Portrait',
-  heroTitle: 'The Journey of Samantha',
-  heroSubtitle: 'An inspiring tale of passion, perseverance, and purpose.',
+  heroTitle: 'Samantha Ruth Prabhu',
+  heroSubtitle: 'Actor, producer, entrepreneur, and founder of Pratyusha Support.',
   portraitImage: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748010072/8F9A7985_m86vsc.jpg',
   portraitAlt: 'Samantha Ruth Prabhu',
   glanceTitle: 'At a Glance',
   glanceItems: [
     { label: 'Full Name', value: 'Samantha Ruth Prabhu' },
-    { label: 'Born', value: 'April 28, 1987' },
-    { label: 'Nationality', value: 'Indian' },
-    { label: 'Languages', value: 'Tamil, Telugu, English, Hindi' },
-    { label: 'Debut Film', value: 'Ye Maaya Chesave (2010)' },
-    { label: 'Notable Awards', value: '4 Filmfare Awards South' }
+    { label: 'Born', value: '28 April 1987' },
+    { label: 'Birthplace', value: 'Chennai, Tamil Nadu, India' },
+    { label: 'Languages', value: 'Tamil, Telugu, English' },
+    { label: 'Acting Debut', value: 'Ye Maaya Chesave (2010)' },
+    { label: 'Major Honours', value: '4 Filmfare Awards South, 2 Nandi Awards' }
   ],
   sections: [
     {
       title: 'Overview',
       paragraphs: [
-        'Samantha Ruth Prabhu stands as one of Indian cinema\'s most versatile and acclaimed actresses, with a career spanning over a decade across Tamil and Telugu film industries. Born in Chennai to a Telugu father and a Malayali mother, Samantha\'s journey to stardom is a testament to her unwavering determination and exceptional talent.'
+        'Samantha Ruth Prabhu is an Indian actress who works predominantly in Telugu and Tamil films. Since her screen debut in 2010, she has built a career that spans theatrical films, streaming series, entrepreneurship, philanthropy, and film production.'
       ]
     },
     {
       title: 'Early Life & Education',
       paragraphs: [
-        'Raised in Chennai, Samantha completed her schooling at Holy Angels Anglo Indian Higher Secondary School and pursued a degree in Commerce at Stella Maris College. Her entry into the entertainment industry began through modeling during her college days, where her natural presence in front of the camera caught the attention of filmmakers.'
+        'Born to Joseph Prabhu and Ninette, Samantha grew up in the Pallavaram neighbourhood of Chennai. She studied at Holy Angels Anglo Indian Higher Secondary School and later completed a degree in commerce at Stella Maris College.',
+        'Near the end of college, she began taking up modelling assignments, including work for Naidu Hall. That phase opened the door to screen opportunities and led to her entry into films.'
       ]
     },
     {
       title: 'Rise to Prominence',
       paragraphs: [
-        'Samantha\'s cinematic journey began with Gautham Menon\'s Telugu romantic drama "Ye Maaya Chesave" (2010), where her portrayal of Jessie, a complex character torn between love and family obligations, immediately established her as a performer of remarkable depth. This debut earned her the Filmfare Award for Best Female Debut - South, marking the beginning of an illustrious career.',
-        'What followed was a series of powerful performances across diverse genres - from the heartwrenching "Eega" (2012) to the socially conscious "Mahanati" (2018). Her versatility shone through in commercial blockbusters like "Theri" (2016) and critically acclaimed films such as "Super Deluxe" (2019). With each role, Samantha pushed boundaries and challenged herself, refusing to be typecast.'
+        'Samantha began her acting career with Gautham Menon\'s Telugu romance "Ye Maaya Chesave" (2010), in which she played Jessie. The performance earned her the Filmfare Award for Best Female Debut - South and a Nandi Special Jury Award.',
+        'In 2012, she became only the second actress to win Filmfare\'s Best Actress awards in both Tamil and Telugu in the same year, for "Neethaane En Ponvasantham" and "Eega". Over the next decade, she balanced major commercial successes with acclaimed performances in films such as "Attarintiki Daredi", "Theri", "Rangasthalam", "Mahanati", "Oh! Baby", "Super Deluxe", and "Majili".'
       ]
     },
     {
       title: 'Breaking New Ground',
       paragraphs: [
-        'Samantha\'s career took a revolutionary turn with her digital debut in "The Family Man 2" (2021), where she portrayed Raji, a Sri Lankan Tamil liberation fighter. This performance showcased her incredible range and commitment to her craft, earning unprecedented acclaim across India and internationally.'
+        'Samantha made her streaming debut in "The Family Man 2" (2021), where she played Raji, a skilled operative with a complex past tied to the Sri Lankan conflict. The role widened her audience beyond theatrical cinema and earned her a Filmfare OTT Award.'
       ]
     },
     {
       title: 'Beyond Cinema',
       paragraphs: [
-        'While her on-screen presence continues to captivate audiences, Samantha\'s influence extends far beyond cinema. In 2012, she established the Pratyusha Foundation, focusing on providing medical support, education, and other essential services to underprivileged women and children.',
-        'As an entrepreneur, she launched her own fashion label, Saaki, which reflects her personal style philosophy of blending tradition with contemporary aesthetics. The brand embodies her commitment to sustainable fashion and ethical business practices.'
+        'Beyond acting, Samantha founded Pratyusha Support in 2014. According to the organisation\'s official website, it focuses on medical care, menstrual dignity, and crisis support for women and children in need.',
+        'She has also expanded into entrepreneurship through the fashion label Saaki, which she co-created as a separate venture outside her film work.'
       ]
     },
     {
       title: 'Personal Journey & Resilience',
       paragraphs: [
-        'In 2022, Samantha revealed her diagnosis with Myositis, an autoimmune condition. With characteristic courage, she has shared her health journey openly, becoming an inspiration for millions facing similar challenges. Her candor about personal struggles has redefined celebrity vulnerability in the Indian context.',
-        'Throughout personal and professional challenges, Samantha has maintained an unwavering commitment to her craft and her causes, emerging stronger with each chapter of her life.'
+        'In 2022, Samantha publicly revealed that she had been diagnosed with myositis, an autoimmune condition. She later spoke about that period in interviews and on social media, making health and recovery a visible part of her public life.',
+        'In 2024, she launched "Take 20", a health-focused podcast, presenting it as a way to share accessible wellness conversations shaped by her own experience.'
       ]
     },
     {
       title: 'Legacy in the Making',
       paragraphs: [
-        'As she continues to evolve as an artist, activist, and entrepreneur, Samantha Ruth Prabhu\'s legacy is characterized by her refusal to conform to industry norms and her determination to use her platform for meaningful change. Her journey represents the changing face of Indian cinema - one that embraces authenticity, diversity, and social responsibility.',
-        'With upcoming international projects and growing global recognition, Samantha stands at the threshold of a new chapter that promises to further cement her position as one of India\'s most significant cultural ambassadors.'
+        'By the mid-2020s, Samantha\'s career had expanded across film, streaming, fashion, philanthropy, and production. In 2024, she starred in "Citadel: Honey Bunny", and in 2025, she made her producer debut with "Subham" under her banner Tralala Moving Pictures.',
+        'That blend of mainstream success and self-directed work now defines the next phase of her career.'
       ]
     }
   ],
   quote: {
-    text: 'I believe in constantly reinventing myself and never settling for what\'s comfortable. Growth happens outside your comfort zone.',
-    author: 'Samantha Ruth Prabhu'
+    text: 'Accepting this vulnerability is something I am still struggling with.',
+    author: 'Samantha Ruth Prabhu, Instagram (2022)'
   },
   milestonesHeading: {
     kicker: 'Career Highlights',
@@ -123,37 +124,32 @@ const DEFAULT_ABOUT_CONTENT: AboutPageContent = {
     {
       year: '2010',
       title: 'Early Career & Breakthrough',
-      description: 'Made her film debut with Ye Maaya Chesave (Telugu) and Vinnaithaandi Varuvaayaa (Tamil). Her performance won her the Filmfare Award for Best Female Debut - South and a Nandi Award.'
+      description: 'Made her acting debut in Ye Maaya Chesave and won the Filmfare Award for Best Female Debut - South along with a Nandi Special Jury Award.'
     },
     {
       year: '2012',
       title: 'Rise to Prominence',
-      description: 'Starred in the critically acclaimed Eega (Best Actress - Telugu) and Neethaane En Ponvasantham (Best Actress - Tamil), winning top honors in both languages in the same year.'
+      description: 'Won Filmfare Best Actress - Telugu for Eega and Best Actress - Tamil for Neethaane En Ponvasantham in the same year.'
     },
     {
       year: '2014',
       title: 'Philanthropy',
-      description: 'Founded the Pratyusha Support Foundation, providing medical support to underprivileged women and children.'
+      description: 'Founded Pratyusha Support, a non-profit focused on medical care and crisis support for women and children.'
     },
     {
       year: '2013-2019',
       title: 'Leading Actress & Critical Acclaim',
-      description: 'Delivered commercial hits like Attarintiki Daredi, Mersal, and Rangasthalam. Won Filmfare for A Aa (2016) and earned acclaim for roles in Mahanati, Oh! Baby, and Majili.'
+      description: 'Balanced commercial hits such as Attarintiki Daredi, Theri, and Rangasthalam with acclaimed roles in Mahanati, Oh! Baby, Super Deluxe, and Majili.'
     },
     {
       year: '2021',
       title: 'Pan-India Recognition',
-      description: 'Made her digital debut as Raji in The Family Man 2, winning the Filmfare OTT Award for Best Actress. Performed the chart-topping Oo Antava in Pushpa: The Rise.'
+      description: 'Made her streaming debut in The Family Man 2, earned a Filmfare OTT Award, and expanded her reach beyond theatrical cinema.'
     },
     {
-      year: '2023-2024',
-      title: 'Producer & Global Ventures',
-      description: 'Launched Tralala Moving Pictures with its first production Subham. Starred in Citadel: Honey Bunny (2024) and launched the "Take 20" podcast advocating for health after her myositis diagnosis.'
-    },
-    {
-      year: '2025-2026',
-      title: 'Legacy & New Beginnings',
-      description: 'Celebrated 15 years in cinema and entered a new phase focused on projects with deeper personal meaning, balancing work with well-being and long-term impact.',
+      year: '2024-2025',
+      title: 'Producer, Podcaster & Streaming Lead',
+      description: 'Launched the health podcast Take 20, starred in Citadel: Honey Bunny, and made her producer debut with Subham under Tralala Moving Pictures.',
       wide: true
     }
   ]
@@ -242,21 +238,76 @@ const DEFAULT_ABOUT_CONTENT: AboutPageContent = {
           <p>{{ content.milestonesHeading.description }}</p>
         </div>
 
-        <div class="grid gap-5 md:grid-cols-2">
-          <div
-            *ngFor="let milestone of content.milestones"
-            class="sr-surface p-6 about-timeline-item"
-            [ngClass]="milestone.wide ? 'md:col-span-2' : null"
-          >
-            <span class="sr-meta">{{ milestone.year }}</span>
-            <h3 class="sr-card-title mt-3 mb-3">{{ milestone.title }}</h3>
-            <p class="sr-card-text">{{ milestone.description }}</p>
+        <div class="about-timeline">
+          <div *ngFor="let milestone of content.milestones; let i = index"
+               class="about-milestone" [class.about-milestone--wide]="milestone.wide">
+            <div class="about-milestone-year">
+              <span>{{ milestone.year }}</span>
+              <div class="about-milestone-dot"></div>
+            </div>
+            <div class="sr-surface p-6 about-timeline-item sr-hover-card">
+              <h3 class="sr-card-title mb-3">{{ milestone.title }}</h3>
+              <p class="sr-card-text">{{ milestone.description }}</p>
+            </div>
           </div>
         </div>
       </section>
     </div>
   `,
-  styles: []
+  styles: [`
+    .about-timeline {
+      position: relative;
+      padding-left: 2.5rem;
+    }
+    .about-timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.35rem; top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(214,169,93,0.4) 8%, rgba(214,169,93,0.4) 92%, transparent);
+    }
+    .about-milestone {
+      position: relative;
+      display: grid;
+      grid-template-columns: 5rem 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      align-items: start;
+    }
+    .about-milestone:last-child { margin-bottom: 0; }
+    .about-milestone--wide .sr-surface { grid-column: 1 / -1; }
+    .about-milestone-year {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-top: 1.4rem;
+    }
+    .about-milestone-year span {
+      font-family: 'Manrope','Inter',sans-serif;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #d6a95d;
+      white-space: nowrap;
+    }
+    .about-milestone-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #d6a95d;
+      border: 2px solid rgba(214,169,93,0.25);
+      box-shadow: 0 0 0 3px rgba(214,169,93,0.1);
+      flex-shrink: 0;
+      position: absolute;
+      left: -2.15rem;
+      top: 1.4rem;
+    }
+    @media (max-width: 640px) {
+      .about-milestone { grid-template-columns: 1fr; }
+      .about-milestone-year { padding-top: 0; }
+      .about-milestone-dot { display: none; }
+    }
+  `]
 })
 export class AboutComponent implements OnInit, AfterViewInit {
   content: AboutPageContent = DEFAULT_ABOUT_CONTENT;

@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService, FanCreation, QuizLeaderboardEntry } from '../../services/api.service';
+import { FanPollComponent } from '../../components/fan-poll/fan-poll.component';
 
 interface Question {
   id: number;
@@ -44,7 +45,7 @@ const TOTAL_TIME = 90;
 @Component({
   selector: 'app-fan-zone',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, FanPollComponent],
   templateUrl: './fan-zone.component.html',
   styleUrls: ['./fan-zone.component.css']
 })
@@ -267,6 +268,15 @@ export class FanZoneComponent implements OnInit, OnDestroy {
   getCreationMeta(item: FanCreation): string {
     const bits = [item.type, item.platform, item.dateLabel].filter(Boolean);
     return bits.join(' · ');
+  }
+
+  shareScore(platform: 'twitter' | 'whatsapp'): void {
+    const message = `I scored ${this.score}/300 on the Samantha Ruth Prabhu fan quiz! Can you beat me?`;
+    const shareUrl = platform === 'whatsapp'
+      ? `https://wa.me/?text=${encodeURIComponent(message)}`
+      : `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
+
+    window.open(shareUrl, '_blank', 'noopener');
   }
 
   private loadLandingData(): void {

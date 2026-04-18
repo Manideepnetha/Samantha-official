@@ -125,6 +125,7 @@ import { AdminImageUploadFieldComponent } from '../../components/admin-image-upl
                   label="Story Image"
                   [value]="currentItem.imageUrl || ''"
                   (valueChange)="currentItem.imageUrl = $event"
+                  (uploadCompleted)="persistEditedStoryImage()"
                   placeholder="Paste image URL"
                   uploadButtonLabel="Upload Story Image"
                   uploadFolder="philanthropy"
@@ -206,6 +207,20 @@ export class ManagePhilanthropyComponent implements OnInit {
         this.closeModal();
       });
     }
+  }
+
+  persistEditedStoryImage(): void {
+    if (!this.isEditing || !this.currentItem.id || !this.currentItem.title?.trim() || this.currentItem.type !== 'Story') {
+      return;
+    }
+
+    this.apiService.updatePhilanthropy(this.currentItem.id, this.currentItem).subscribe({
+      next: () => this.loadPhilanthropies(),
+      error: (error) => {
+        console.error('Failed to auto-save uploaded philanthropy image', error);
+        alert('The image uploaded, but the story was not saved automatically. Please click Update Item.');
+      }
+    });
   }
 
   deleteItem(id: number) {

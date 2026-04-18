@@ -18,7 +18,14 @@ public class LoginResponse
 {
 
     public required string Token { get; set; }
-    public required User User { get; set; }
+    public required AuthenticatedUserResponse User { get; set; }
+}
+
+public class AuthenticatedUserResponse
+{
+    public int Id { get; set; }
+    public required string Email { get; set; }
+    public required string Role { get; set; }
 }
 
 public class Project
@@ -195,12 +202,42 @@ public class VisitorEntry
     public DateTime LastCompletedAt { get; set; } = DateTime.UtcNow;
 }
 
+public class FanWallMessage
+{
+    public int Id { get; set; }
+    public required string Name { get; set; }
+    public string? City { get; set; }
+    public required string Message { get; set; }
+    public string Status { get; set; } = "Pending";
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class FanPollVote
+{
+    public int Id { get; set; }
+    public required string PollKey { get; set; }
+    public required string OptionKey { get; set; }
+    public required string ClientId { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
 public class RecordVisitorEntryRequest
 {
     public required string ClientVisitorId { get; set; }
     public required string Name { get; set; }
     public string? SocialMediaId { get; set; }
     public string? Source { get; set; }
+}
+
+public class UpdateFanWallStatusRequest
+{
+    public required string Status { get; set; }
+}
+
+public class SubmitFanPollVoteRequest
+{
+    public required string OptionKey { get; set; }
+    public required string ClientId { get; set; }
 }
 
 public class PageContent

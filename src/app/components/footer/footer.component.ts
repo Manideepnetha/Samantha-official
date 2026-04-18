@@ -119,7 +119,7 @@ import { RouterLink } from '@angular/router';
 
           <div class="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p class="sr-muted-text text-center text-sm md:text-left">
-              Copyright 2025 Samantha Ruth Prabhu Website. All rights reserved.
+              Copyright {{ currentYear }} Samantha Ruth Prabhu Website. All rights reserved.
             </p>
             <p class="sr-muted-text text-sm">
               Designed in a cinematic editorial style for the official experience.
@@ -131,4 +131,6 @@ import { RouterLink } from '@angular/router';
   `,
   styles: []
 })
-export class FooterComponent {}
+export class FooterComponent {
+  readonly currentYear = new Date().getFullYear();
+}

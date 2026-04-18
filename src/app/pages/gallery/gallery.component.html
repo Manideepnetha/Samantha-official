@@ -1,96 +1,141 @@
-<div class="gallery-shell">
-  <section class="gallery-hero">
-    <div class="hero-frame">
-      <span class="hero-kicker">Gallery</span>
-      <h1>Visual Journey</h1>
+<div class="gallery-page sr-page" [style.--gallery-accent]="featuredSet?.accentTone || '#d5b18c'">
+  <section *ngIf="loading" class="sr-section gallery-state">
+    <div class="gallery-state-card sr-surface-soft">
+      <span class="sr-kicker">Loading</span>
+      <h2>Preparing Samantha&apos;s gallery...</h2>
+      <p>The official collections and photos are loading now.</p>
+    </div>
+  </section>
+
+  <section *ngIf="!loading && storySets.length === 0" class="sr-section gallery-state">
+    <div class="gallery-state-card sr-surface-soft">
+      <span class="sr-kicker">No Collections</span>
+      <h2>The gallery is being curated.</h2>
+      <p>Official photo collections will appear here once the archive is published.</p>
+    </div>
+  </section>
+
+  <section *ngIf="!loading && featuredSet as set" class="sr-hero-shell gallery-hero-shell">
+    <div class="sr-hero-frame">
+      <div class="sr-hero-panel gallery-hero-panel">
+        <div class="sr-hero-media">
+          <img [src]="set.coverImageUrl || set.leadImage?.imageUrl" [alt]="set.title || 'Samantha Ruth Prabhu Gallery'">
+        </div>
+
+        <div class="sr-hero-copy gallery-hero-copy">
+          <span class="sr-kicker">Official Gallery</span>
+
+          <div class="gallery-hero-intro">
+            <h1 class="sr-hero-title">Samantha Ruth Prabhu</h1>
+            <p class="sr-hero-subtitle">
+              A clear and curated visual archive of Samantha&apos;s editorials, event appearances, film stills, and
+              behind-the-scenes moments.
+            </p>
+          </div>
+
+          <div class="gallery-hero-actions">
+            <a href="#gallery-collections" class="sr-button">Browse Collections</a>
+            <a [routerLink]="['/gallery/set', set.key]" class="sr-button-outline">Open Highlight</a>
+          </div>
+
+          <div class="gallery-hero-stats">
+            <article class="gallery-stat sr-surface-soft">
+              <span class="gallery-stat-value">{{ storySets.length }}</span>
+              <span class="gallery-stat-label">Collections</span>
+            </article>
+            <article class="gallery-stat sr-surface-soft">
+              <span class="gallery-stat-value">{{ totalImageCount }}</span>
+              <span class="gallery-stat-label">Photos</span>
+            </article>
+            <article class="gallery-stat sr-surface-soft">
+              <span class="gallery-stat-value">{{ activeCategoryLabel }}</span>
+              <span class="gallery-stat-label">Current View</span>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section *ngIf="!loading && storySets.length > 0" class="sr-section gallery-toolbar">
+    <div class="gallery-toolbar-shell sr-surface-soft">
+      <div class="gallery-toolbar-head">
+        <div class="gallery-toolbar-copy">
+          <span class="sr-kicker">Gallery Collections</span>
+          <h2 class="gallery-toolbar-title">Simple, official, and easy to explore.</h2>
+          <p class="sr-muted-text">
+            Each collection opens into its own dedicated gallery page, so visitors always know what they are viewing.
+          </p>
+        </div>
+
+        <div class="gallery-toolbar-meta">
+          <span class="gallery-toolbar-pill">{{ filteredStorySets.length }} Collections</span>
+          <span class="gallery-toolbar-pill">{{ activeImageCount }} Photos</span>
+          <span class="gallery-toolbar-pill">{{ activeCategoryLabel }}</span>
+        </div>
+      </div>
+
+      <div class="gallery-chip-row" aria-label="Gallery categories">
+        <button
+          *ngFor="let category of categories"
+          type="button"
+          class="sr-chip gallery-chip"
+          [class.is-active]="selectedCategory === category.value"
+          (click)="selectCategory(category.value)"
+        >
+          <span>{{ category.label }}</span>
+          <strong>{{ getCategoryCount(category.value) }}</strong>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section *ngIf="!loading && filteredStorySets.length > 0" id="gallery-collections" class="sr-section gallery-collections">
+    <div class="sr-section-heading gallery-section-heading">
+      <span class="sr-kicker">Collections</span>
+      <h2>Choose a collection and enter the full gallery.</h2>
       <p>
-        The gallery now moves in curated story sets. Each set opens into its own screen with the related images grouped together,
-        giving the archive a more editorial rhythm instead of a flat image wall.
+        No repeated slides, no extra clutter. Just a polished official archive that makes every section feel clear and
+        intentional.
       </p>
     </div>
-  </section>
 
-  <section class="gallery-toolbar">
-    <div class="toolbar-copy">
-      <span>Story Sets</span>
-      <h2>Browse the archive by mood, moment, and visual language.</h2>
-    </div>
-
-    <div class="category-chips">
-      <button
-        *ngFor="let category of categories"
-        type="button"
-        class="category-chip"
-        [class.is-active]="selectedCategory === category.value"
-        (click)="selectedCategory = category.value"
+    <div class="gallery-grid">
+      <a
+        *ngFor="let set of filteredStorySets; let i = index; trackBy: trackBySet"
+        [routerLink]="['/gallery/set', set.key]"
+        class="gallery-card sr-surface-soft sr-hover-card"
+        [style.--gallery-card-accent]="set.accentTone"
       >
-        {{ category.label }}
-      </button>
-    </div>
-  </section>
-
-  <section *ngIf="loading" class="gallery-empty-state">
-    Loading the visual journey...
-  </section>
-
-  <section *ngIf="!loading && featuredSet as set" class="journey-stage" [style.--stage-accent]="set.accentTone">
-    <div class="journey-stage-copy">
-      <span>{{ getGalleryCategoryLabel(set.category) }}</span>
-      <h2>{{ set.title }}</h2>
-      <p>{{ set.description }}</p>
-
-      <div class="set-meta">
-        <div>
-          <strong>{{ set.itemCount }}</strong>
-          <small>Images in this set</small>
+        <div class="gallery-card-media">
+          <img [src]="set.coverImageUrl || set.leadImage?.imageUrl" [alt]="set.title" loading="lazy" decoding="async">
+          <span class="gallery-card-badge">{{ getGalleryCategoryLabel(set.category) }}</span>
         </div>
-        <div>
-          <strong>{{ set.subtitle }}</strong>
-          <small>Editorial direction</small>
-        </div>
-      </div>
 
-      <a [routerLink]="['/gallery/set', set.key]" class="stage-link">Open Story Set</a>
-    </div>
-
-    <a [routerLink]="['/gallery/set', set.key]" class="journey-stage-preview">
-      <div class="preview-backdrop" [style.background-image]="'url(' + (set.coverImageUrl || set.leadImage?.imageUrl) + ')'"></div>
-      <div class="preview-rail">
-        <article *ngFor="let image of set.previewImages" class="preview-card">
-          <img [src]="image.imageUrl" [alt]="image.altText">
-          <div class="preview-caption">
-            <span>{{ image.date || 'Gallery Frame' }}</span>
-            <strong>{{ image.caption }}</strong>
+        <div class="gallery-card-body">
+          <div class="gallery-card-head">
+            <span class="gallery-card-index">{{ getDisplayIndex(i) }}</span>
+            <span class="gallery-card-count">{{ set.itemCount }} Photos</span>
           </div>
-        </article>
-      </div>
-    </a>
+
+          <h3 class="sr-card-title">{{ set.title }}</h3>
+          <p class="gallery-card-subtitle">{{ set.subtitle }}</p>
+          <p class="sr-card-text">{{ set.description }}</p>
+        </div>
+
+        <div class="gallery-card-footer">
+          <span class="gallery-card-footer-note">Official Collection</span>
+          <span class="sr-link gallery-card-link">View Collection</span>
+        </div>
+      </a>
+    </div>
   </section>
 
-  <section *ngIf="!loading && supportingSets.length > 0" class="story-grid">
-    <a
-      *ngFor="let set of supportingSets; trackBy: trackBySet"
-      [routerLink]="['/gallery/set', set.key]"
-      class="story-card"
-      [style.--story-accent]="set.accentTone"
-    >
-      <div class="story-card-cover">
-        <img [src]="set.coverImageUrl || set.leadImage?.imageUrl" [alt]="set.title">
-      </div>
-
-      <div class="story-card-copy">
-        <span>{{ getGalleryCategoryLabel(set.category) }}</span>
-        <h3>{{ set.title }}</h3>
-        <p>{{ set.subtitle }}</p>
-      </div>
-
-      <div class="story-card-strip">
-        <img *ngFor="let image of set.previewImages" [src]="image.imageUrl" [alt]="image.altText">
-      </div>
-    </a>
-  </section>
-
-  <section *ngIf="!loading && filteredStorySets.length === 0" class="gallery-empty-state">
-    No story sets are available for this category yet.
+  <section *ngIf="!loading && filteredStorySets.length === 0 && storySets.length > 0" class="sr-section gallery-state">
+    <div class="gallery-state-card sr-surface-soft">
+      <span class="sr-kicker">No Match</span>
+      <h2>No collection matches this filter right now.</h2>
+      <p>Try another category to continue exploring Samantha&apos;s gallery.</p>
+    </div>
   </section>
 </div>

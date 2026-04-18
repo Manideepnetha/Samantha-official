@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Samantha.API.Data;
+using Samantha.API.Infrastructure;
 using Samantha.API.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -25,7 +26,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        var email = request.Email.Trim();
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
         // In a real app, use proper password hashing (e.g., BCrypt). 
         // For this demo/setup, we are doing direct comparison or simple storage.
@@ -38,13 +40,22 @@ public class AuthController : ControllerBase
 
         var token = GenerateJwtToken(user);
 
-        return Ok(new LoginResponse { Token = token, User = user });
+        return Ok(new LoginResponse
+        {
+            Token = token,
+            User = new AuthenticatedUserResponse
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Role = user.Role
+            }
+        });
     }
 
     private string GenerateJwtToken(User user)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"] ?? "super_secret_key_which_should_be_long_enough_for_security";
+        var secretKey = AppSecurityOptions.GetRequiredJwtSecret(_configuration);
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

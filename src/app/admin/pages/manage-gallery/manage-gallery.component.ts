@@ -93,8 +93,8 @@ export class ManageGalleryComponent implements OnInit {
     this.loading = true;
 
     forkJoin({
-      collections: this.apiService.getGalleryCollections(),
-      images: this.apiService.getMediaGalleries()
+      collections: this.apiService.getGalleryCollections(true),
+      images: this.apiService.getMediaGalleries(true)
     }).subscribe({
       next: ({ collections, images }) => {
         this.galleryCollections = collections;
@@ -206,6 +206,32 @@ export class ManageGalleryComponent implements OnInit {
     });
   }
 
+  persistEditedCollectionCover(): void {
+    if (!this.isEditingCollection || !this.currentCollection.id || !this.currentCollection.title.trim()) {
+      return;
+    }
+
+    const payload: GalleryCollection = {
+      ...this.currentCollection,
+      title: this.currentCollection.title.trim(),
+      subtitle: this.currentCollection.subtitle?.trim() || '',
+      description: this.currentCollection.description?.trim() || '',
+      key: normalizeGalleryCollectionKey(this.currentCollection.key || this.currentCollection.title),
+      category: this.currentCollection.category || 'fashion',
+      coverImageUrl: this.currentCollection.coverImageUrl?.trim() || '',
+      accentTone: this.currentCollection.accentTone?.trim() || '#d0a05a',
+      sortOrder: Number(this.currentCollection.sortOrder) || this.getNextCollectionSortOrder()
+    };
+
+    this.apiService.updateGalleryCollection(payload.id!, payload).subscribe({
+      next: () => this.loadGalleryData(),
+      error: (error: unknown) => {
+        console.error('Failed to auto-save uploaded collection cover image', error);
+        this.setError('The cover image uploaded, but the story set was not saved automatically.');
+      }
+    });
+  }
+
   saveImage(): void {
     this.resetMessages();
 
@@ -246,6 +272,25 @@ export class ManageGalleryComponent implements OnInit {
       error: (error: unknown) => {
         console.error('Failed to save gallery image', error);
         this.setError('Gallery image could not be saved.');
+      }
+    });
+  }
+
+  persistEditedGalleryImage(): void {
+    if (!this.isEditingImage || !this.currentMedia.id || !this.currentMedia.caption.trim()) {
+      return;
+    }
+
+    const payload = this.prepareMediaPayload(this.currentMedia);
+    if (!payload.imageUrl) {
+      return;
+    }
+
+    this.apiService.updateMediaGallery(payload.id!, payload).subscribe({
+      next: () => this.loadGalleryData(),
+      error: (error: unknown) => {
+        console.error('Failed to auto-save uploaded gallery image', error);
+        this.setError('The image uploaded, but the gallery record was not saved automatically.');
       }
     });
   }

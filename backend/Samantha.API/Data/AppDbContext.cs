@@ -24,4 +24,6 @@ public class AppDbContext : DbContext
     public DbSet<QuizEntry> QuizEntries { get; set; }
     public DbSet<FanCreation> FanCreations { get; set; }
     public DbSet<VisitorEntry> VisitorEntries { get; set; }
+    public DbSet<FanWallMessage> FanWallMessages { get; set; }
+    public DbSet<FanPollVote> FanPollVotes { get; set; }
 }

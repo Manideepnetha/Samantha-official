@@ -1,7 +1,8 @@
-import { Component, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, Output, EventEmitter, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
+import { NotificationBellComponent } from '../notification-bell/notification-bell.component';
 
 @Component({
    selector: 'app-navbar',
@@ -9,65 +10,94 @@ import { ThemeService } from '../../services/theme.service';
    imports: [
       CommonModule,
       RouterLink,
-      RouterLinkActive
+      RouterLinkActive,
+      NotificationBellComponent
    ],
    template: `
-    <div class="hidden md:block">
-      <div class="fixed top-0 left-0 right-0 z-[60] flex justify-center px-4 pt-2 pointer-events-none">
-        <nav
-          class="pointer-events-auto w-full max-w-7xl rounded-[1.9rem] border border-[rgba(228,196,163,0.18)] bg-[rgba(18,9,7,0.84)] backdrop-blur-xl shadow-[0_24px_70px_rgba(0,0,0,0.28)] transition-all duration-500"
-          [class.py-2]="scrolled"
-          [class.py-3]="!scrolled"
-          [class.px-5]="scrolled"
-          [class.px-7]="!scrolled"
-        >
-          <div class="flex items-center gap-8 justify-between">
-            <a routerLink="/" class="flex items-center gap-3 group">
-              <span class="flex h-11 w-11 items-center justify-center rounded-full border border-[rgba(228,196,163,0.16)] bg-[rgba(243,232,220,0.05)] text-[var(--editorial-accent-strong)] shadow-[inset_0_0_0_1px_rgba(228,196,163,0.12)]">
-                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-7 w-7">
-                  <circle cx="32" cy="32" r="10.5" stroke="currentColor" stroke-width="2.4" />
-                  <circle cx="32" cy="13" r="6.5" stroke="currentColor" stroke-width="2.2" />
-                  <circle cx="49" cy="22" r="6.5" stroke="currentColor" stroke-width="2.2" />
-                  <circle cx="49" cy="42" r="6.5" stroke="currentColor" stroke-width="2.2" />
-                  <circle cx="32" cy="51" r="6.5" stroke="currentColor" stroke-width="2.2" />
-                  <circle cx="15" cy="42" r="6.5" stroke="currentColor" stroke-width="2.2" />
-                  <circle cx="15" cy="22" r="6.5" stroke="currentColor" stroke-width="2.2" />
-                </svg>
-              </span>
-              <span
-                class="font-['Manrope'] text-[11px] font-extrabold uppercase tracking-[0.34em] text-[rgba(243,232,220,0.84)] transition-all duration-500 ease-out"
-                [class.opacity-100]="scrolled"
-                [class.opacity-90]="!scrolled"
+    <div class="navbar-desktop hidden md:block" [class.is-scrolled]="scrolled">
+      <div class="navbar-shell">
+        <header class="navbar-topbar">
+          <a routerLink="/" class="hero-brand navbar-home-brand" aria-label="Samantha Ruth Prabhu home">
+            <span class="brand-emblem" aria-hidden="true">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-7 w-7">
+                <circle cx="32" cy="32" r="10.5" stroke="currentColor" stroke-width="2.4" />
+                <circle cx="32" cy="13" r="6.5" stroke="currentColor" stroke-width="2.2" />
+                <circle cx="49" cy="22" r="6.5" stroke="currentColor" stroke-width="2.2" />
+                <circle cx="49" cy="42" r="6.5" stroke="currentColor" stroke-width="2.2" />
+                <circle cx="32" cy="51" r="6.5" stroke="currentColor" stroke-width="2.2" />
+                <circle cx="15" cy="42" r="6.5" stroke="currentColor" stroke-width="2.2" />
+                <circle cx="15" cy="22" r="6.5" stroke="currentColor" stroke-width="2.2" />
+              </svg>
+            </span>
+            <span class="brand-text">Samantha</span>
+          </a>
+
+          <div class="navbar-desktop-actions">
+            <nav class="hero-nav navbar-home-nav" aria-label="Primary">
+              <a
+                *ngFor="let item of primaryNavItems"
+                [routerLink]="item.route"
+                routerLinkActive="is-active"
+                [routerLinkActiveOptions]="{exact: item.exact}"
+                class="navbar-home-link"
               >
-                Samantha
-              </span>
-            </a>
-
-            <div class="flex items-center gap-8">
-              <a *ngFor="let item of navItems" 
-                 [routerLink]="item.route" 
-                 routerLinkActive="text-[var(--editorial-accent-strong)]"
-                 [routerLinkActiveOptions]="{exact: item.exact}"
-                 class="font-['Manrope'] text-[12px] font-extrabold uppercase tracking-[0.14em] text-[rgba(243,232,220,0.74)] transition-colors relative group hover:text-[var(--editorial-accent-strong)]">
-                {{item.label}}
-                <span class="absolute -bottom-1 left-1/2 h-px w-full -translate-x-1/2 scale-x-0 bg-[var(--editorial-accent)] opacity-0 transition-all duration-300 group-hover:scale-x-100 group-hover:opacity-100"></span>
+                {{ item.label }}
               </a>
-            </div>
 
-            <div class="flex items-center gap-4">
-               <button
-                  (click)="toggleTheme()"
-                  class="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(228,196,163,0.14)] bg-[rgba(243,232,220,0.04)] text-[rgba(243,232,220,0.64)] transition-colors hover:text-[var(--editorial-accent-strong)]"
-               >
-                  <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd" /></svg>
-                  <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
-               </button>
+              <div class="navbar-more" [class.is-open]="isDesktopMenuOpen">
+                <button
+                  type="button"
+                  class="navbar-home-link navbar-more-trigger"
+                  [class.is-active]="hasActiveSecondaryRoute()"
+                  [attr.aria-expanded]="isDesktopMenuOpen"
+                  aria-haspopup="menu"
+                  (click)="toggleDesktopMenu($event)"
+                >
+                  Explore
+                  <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
 
-               <a routerLink="/fan-zone" class="sr-button">Fan Zone</a>
-            </div>
+                <div *ngIf="isDesktopMenuOpen" class="navbar-more-panel" role="menu">
+                  <a
+                    *ngFor="let item of secondaryNavItems"
+                    [routerLink]="item.route"
+                    class="navbar-more-link"
+                    (click)="closeDesktopMenu()"
+                    role="menuitem"
+                  >
+                    {{ item.label }}
+                  </a>
+                </div>
+              </div>
+            </nav>
+
+            <app-notification-bell [compact]="true"></app-notification-bell>
+
+            <button
+              (click)="toggleTheme()"
+              class="navbar-theme-button navbar-home-theme"
+              aria-label="Toggle theme"
+            >
+              <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd" /></svg>
+              <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
+            </button>
           </div>
-        </nav>
+        </header>
       </div>
+    </div>
+
+    <div class="md:hidden fixed right-4 top-4 z-[111] flex items-center gap-2">
+      <app-notification-bell [compact]="true"></app-notification-bell>
+      <button
+        (click)="toggleTheme()"
+        class="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(228,196,163,0.14)] bg-[rgba(18,9,7,0.9)] text-[rgba(243,232,220,0.82)] backdrop-blur-lg transition-colors hover:bg-[rgba(243,232,220,0.08)]"
+        aria-label="Toggle theme"
+      >
+        <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd" /></svg>
+        <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
+      </button>
     </div>
 
     <div class="md:hidden fixed bottom-0 left-0 right-0 z-[100] border-t border-[rgba(228,196,163,0.16)] bg-[rgba(18,9,7,0.92)] backdrop-blur-lg pb-safe">
@@ -111,7 +141,7 @@ import { ThemeService } from '../../services/theme.service';
           </div>
           
           <div class="grid grid-cols-3 gap-6">
-             <a *ngFor="let item of navItems" 
+             <a *ngFor="let item of mobileNavItems" 
                  [routerLink]="item.route" 
                  (click)="toggleMobileMenu()"
                  class="flex flex-col items-center gap-3 rounded-xl border border-[rgba(228,196,163,0.08)] bg-[rgba(243,232,220,0.03)] p-3 transition-colors hover:bg-[rgba(243,232,220,0.06)]">
@@ -125,6 +155,313 @@ import { ThemeService } from '../../services/theme.service';
     </div>
   `,
    styles: [`
+    :host {
+      --navbar-accent: var(--editorial-accent, #d7b18a);
+      --navbar-accent-strong: var(--editorial-accent-strong, #e4c4a3);
+      --navbar-ink: var(--editorial-ink, #f3e8dc);
+      display: block;
+    }
+
+    .hero-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      color: var(--navbar-accent-strong);
+    }
+
+    .brand-emblem {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.8rem;
+      height: 2.8rem;
+      border-radius: 999px;
+      background: rgba(243, 232, 220, 0.08);
+      color: var(--navbar-accent-strong);
+      box-shadow: inset 0 0 0 1px rgba(228, 196, 163, 0.16);
+      transition: transform 0.35s ease, background 0.35s ease;
+    }
+
+    .hero-brand:hover .brand-emblem {
+      transform: scale(1.04);
+      background: rgba(243, 232, 220, 0.12);
+    }
+
+    .brand-text {
+      font-family: "Manrope", "Inter", sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+      color: rgba(248, 239, 228, 0.92);
+      text-shadow: 0 1px 12px rgba(8, 4, 4, 0.4);
+    }
+
+    .hero-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.55rem;
+      margin-left: 0;
+    }
+
+    .hero-nav a,
+    .navbar-more-trigger {
+      position: relative;
+      font-family: "Manrope", "Inter", sans-serif;
+      font-size: 0.73rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(248, 239, 228, 0.94);
+      text-shadow: 0 1px 12px rgba(8, 4, 4, 0.42);
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .hero-nav a::after,
+    .navbar-more-trigger::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -0.45rem;
+      height: 1px;
+      background: var(--navbar-accent);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.3s ease;
+    }
+
+    .hero-nav a:hover,
+    .navbar-more-trigger:hover {
+      color: var(--navbar-accent-strong);
+      text-shadow: 0 1px 16px rgba(8, 4, 4, 0.54);
+    }
+
+    .navbar-desktop {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      margin-bottom: -5.25rem;
+      padding: 0 clamp(1rem, 2vw, 1.75rem);
+      background: transparent;
+      transition: background 0.35s ease, padding 0.35s ease, margin-bottom 0.35s ease;
+    }
+
+    .navbar-desktop::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(8, 4, 4, 0.58) 0%, rgba(8, 4, 4, 0.2) 60%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .navbar-desktop.is-scrolled {
+      background:
+        linear-gradient(180deg, rgba(8, 4, 4, 0.82) 0%, rgba(8, 4, 4, 0.34) 68%, transparent 100%);
+    }
+
+    .navbar-shell {
+      width: min(100%, 1520px);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .navbar-topbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1.2rem 2rem 0;
+      transition: padding 0.35s ease, background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .navbar-desktop.is-scrolled .navbar-topbar {
+      padding: 0.85rem 1.35rem;
+      border: 1px solid rgba(228, 196, 163, 0.12);
+      border-radius: 999px;
+      background: rgba(18, 9, 7, 0.48);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+    }
+
+    .navbar-home-brand {
+      min-width: max-content;
+    }
+
+    .navbar-desktop-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-left: auto;
+      min-width: 0;
+    }
+
+    .navbar-home-nav {
+      justify-content: center;
+      gap: 1.35rem;
+      min-width: 0;
+      flex-wrap: nowrap;
+    }
+
+    .navbar-home-link {
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .navbar-home-link.is-active {
+      color: var(--navbar-accent-strong);
+    }
+
+    .navbar-home-link.is-active::after,
+    .navbar-more-trigger.is-active::after,
+    .navbar-home-link:hover::after,
+    .navbar-more-trigger:hover::after {
+      transform: scaleX(1);
+    }
+
+    .navbar-more {
+      position: relative;
+    }
+
+    .navbar-more-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .navbar-more-trigger svg {
+      width: 0.9rem;
+      height: 0.9rem;
+      transition: transform 0.25s ease;
+    }
+
+    .navbar-more-trigger.is-active {
+      color: var(--navbar-accent-strong);
+    }
+
+    .navbar-more.is-open .navbar-more-trigger {
+      color: var(--navbar-accent-strong);
+    }
+
+    .navbar-more.is-open .navbar-more-trigger::after {
+      transform: scaleX(1);
+    }
+
+    .navbar-more.is-open .navbar-more-trigger svg {
+      transform: rotate(180deg);
+    }
+
+    .navbar-more-panel {
+      position: absolute;
+      top: calc(100% + 1rem);
+      right: 0;
+      min-width: 14rem;
+      display: grid;
+      gap: 0.35rem;
+      padding: 0.8rem;
+      border: 1px solid rgba(228, 196, 163, 0.16);
+      border-radius: 1.25rem;
+      background:
+        linear-gradient(180deg, rgba(27, 14, 11, 0.96), rgba(12, 7, 6, 0.96)),
+        rgba(18, 9, 7, 0.94);
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.28);
+      animation: slide-in 0.22s ease-out;
+    }
+
+    .navbar-more-link {
+      display: block;
+      padding: 0.82rem 0.95rem;
+      border-radius: 0.9rem;
+      color: rgba(243, 232, 220, 0.82);
+      font-family: "Manrope", "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: background 0.28s ease, color 0.28s ease;
+    }
+
+    .navbar-more-link:hover {
+      background: rgba(243, 232, 220, 0.06);
+      color: var(--navbar-accent-strong);
+    }
+
+    .navbar-home-theme {
+      width: 2.8rem;
+      height: 2.8rem;
+      border: 1px solid rgba(228, 196, 163, 0.16);
+      background: rgba(243, 232, 220, 0.06);
+      color: rgba(243, 232, 220, 0.72);
+    }
+
+    .navbar-home-theme:hover {
+      color: var(--navbar-accent-strong);
+      background: rgba(243, 232, 220, 0.1);
+    }
+
+    .navbar-theme-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    }
+
+    .navbar-theme-button:hover {
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 1420px) {
+      .navbar-home-nav {
+        gap: 1.1rem;
+      }
+
+      .navbar-home-link {
+        font-size: 0.69rem;
+        letter-spacing: 0.12em;
+      }
+    }
+
+    @media (max-width: 1199px) {
+      .navbar-desktop {
+        margin-bottom: -4.8rem;
+      }
+
+      .navbar-topbar {
+        gap: 1rem;
+        padding: 1rem 1rem 0;
+      }
+
+      .navbar-desktop.is-scrolled .navbar-topbar {
+        padding: 0.8rem 1rem;
+      }
+
+      .brand-text {
+        display: none;
+      }
+
+      .navbar-home-nav {
+        gap: 0.95rem;
+      }
+
+      .navbar-home-link {
+        font-size: 0.67rem;
+        letter-spacing: 0.12em;
+      }
+
+      .navbar-more-link {
+        font-size: 0.68rem;
+      }
+    }
+
     @keyframes slide-in {
       from { transform: translateY(-10px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
@@ -132,27 +469,39 @@ import { ThemeService } from '../../services/theme.service';
     .animate-slide-in { animation: slide-in 0.3s ease-out; }
   `]
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnDestroy {
    @Output() themeToggle = new EventEmitter<void>();
 
    scrolled = false;
    isMobileMenuOpen = false;
+   isDesktopMenuOpen = false;
    isDarkMode = false;
 
-   navItems = [
-      { label: 'Home', route: '/', exact: true },
-      { label: 'About', route: '/about', exact: false },
-      { label: 'Films', route: '/filmography', exact: false },
+   primaryNavItems = [
+      { label: 'About Me', route: '/about', exact: false },
+      { label: 'Filmography', route: '/filmography', exact: false },
       { label: 'Awards', route: '/awards', exact: false },
-      { label: 'Fashion', route: '/fashion', exact: false },
-      { label: 'Philanthropy', route: '/philanthropy', exact: false },
-      { label: 'Blog', route: '/blog', exact: false },
-      { label: 'Press', route: '/media', exact: false },
       { label: 'Gallery', route: '/gallery', exact: false },
       { label: 'Fan Zone', route: '/fan-zone', exact: false }
    ];
 
-   constructor(private themeService: ThemeService) {
+   secondaryNavItems = [
+      { label: 'Fashion', route: '/fashion', exact: false },
+      { label: 'Philanthropy', route: '/philanthropy', exact: false },
+      { label: 'Timeline', route: '/timeline', exact: false },
+      { label: 'Fan Wall', route: '/fan-wall', exact: false },
+      { label: 'Wallpapers', route: '/wallpapers', exact: false },
+      { label: 'Blog', route: '/blog', exact: false },
+      { label: 'Press', route: '/media', exact: false }
+   ];
+
+   mobileNavItems = [
+      { label: 'Home', route: '/', exact: true },
+      ...this.primaryNavItems,
+      ...this.secondaryNavItems
+   ];
+
+   constructor(private themeService: ThemeService, private router: Router) {
       this.themeService.isDarkMode$.subscribe(isDark => {
          this.isDarkMode = isDark;
       });
@@ -163,12 +512,53 @@ export class NavbarComponent {
       this.scrolled = window.scrollY > 20;
    }
 
+   @HostListener('document:click', ['$event'])
+   onDocumentClick(event: MouseEvent) {
+      const target = event.target as HTMLElement | null;
+      if (!target?.closest('.navbar-more')) {
+         this.isDesktopMenuOpen = false;
+      }
+   }
+
+   @HostListener('document:keydown.escape')
+   onEscapeKey() {
+      this.closeDesktopMenu();
+      if (this.isMobileMenuOpen) {
+         this.toggleMobileMenu();
+      }
+   }
+
    toggleMobileMenu() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen;
       document.body.style.overflow = this.isMobileMenuOpen ? 'hidden' : '';
    }
 
+   toggleDesktopMenu(event: Event) {
+      event.stopPropagation();
+      this.isDesktopMenuOpen = !this.isDesktopMenuOpen;
+   }
+
+   closeDesktopMenu() {
+      this.isDesktopMenuOpen = false;
+   }
+
+   hasActiveSecondaryRoute(): boolean {
+      return this.secondaryNavItems.some(item => this.isCurrentRoute(item.route, item.exact));
+   }
+
+   isCurrentRoute(route: string, exact = false): boolean {
+      if (route === '/') {
+         return this.router.url === '/';
+      }
+
+      return exact ? this.router.url === route : this.router.url.startsWith(route);
+   }
+
    toggleTheme() {
       this.themeService.toggleDarkMode();
+   }
+
+   ngOnDestroy(): void {
+      document.body.style.overflow = '';
    }
 }

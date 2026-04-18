@@ -24,17 +24,20 @@
   --editorial-accent-strong: #e4c4a3;
   --editorial-line: rgba(228, 196, 163, 0.18);
   --editorial-card: rgba(29, 15, 12, 0.8);
+  --editorial-border: rgba(255, 249, 242, 0.9);
 }
 
+/* Site is always dark-themed — no light mode override */
+
 body {
-  @apply font-lora text-charcoal bg-ivory;
+  @apply font-lora;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  /* Frame only on Desktop (md+) */
-  @apply border-0 md:border-[6px] border-white;
   min-height: 100vh;
   box-sizing: border-box;
+  background: var(--editorial-bg);
+  color: var(--editorial-ink);
 }
 
 /* Ensure the border stays on top/visible */
@@ -45,10 +48,19 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  /* Frame only on Desktop (md+) */
-  @apply border-0 md:border-[6px] border-white;
   pointer-events: none;
   z-index: 9999;
+}
+
+@media (min-width: 768px) {
+  body {
+    border: 3px solid var(--editorial-border);
+  }
+
+  body::before {
+    border: 3px solid var(--editorial-border);
+    box-sizing: border-box;
+  }
 }
 
 h1,
@@ -153,6 +165,17 @@ h6 {
 
 /* Dark mode styles */
 .dark {
+  --editorial-bg: #080404;
+  --editorial-panel: #120907;
+  --editorial-panel-strong: #1a0d0a;
+  --editorial-ink: #f3e8dc;
+  --editorial-muted: rgba(243, 232, 220, 0.74);
+  --editorial-soft: rgba(243, 232, 220, 0.5);
+  --editorial-accent: #d7b18a;
+  --editorial-accent-strong: #e4c4a3;
+  --editorial-line: rgba(228, 196, 163, 0.18);
+  --editorial-card: rgba(29, 15, 12, 0.8);
+  --editorial-border: rgba(255, 249, 242, 0.9);
   @apply text-ivory bg-deep-black;
 }
 
@@ -204,23 +227,24 @@ h6 {
 .sr-hero-frame {
   position: relative;
   border-radius: 2.8rem;
-  padding: 0.78rem;
-  background: linear-gradient(180deg, #ffffff 0%, #f8f4ef 100%);
+  padding: 0.44rem;
+  background:
+    linear-gradient(180deg, rgba(252, 247, 240, 0.94) 0%, rgba(237, 227, 216, 0.9) 100%);
   box-shadow:
-    0 30px 90px rgba(14, 6, 5, 0.48),
-    0 0 0 1px rgba(255, 255, 255, 0.65);
+    0 26px 76px rgba(14, 6, 5, 0.42),
+    0 0 0 1px rgba(255, 246, 236, 0.36);
 }
 
 .sr-hero-frame::before {
   content: '';
   position: absolute;
-  inset: -0.45rem 1.6rem 1.2rem;
+  inset: -0.3rem 1.6rem 1rem;
   border-radius: 3rem;
   background:
-    radial-gradient(circle at center, rgba(191, 217, 226, 0.24), transparent 46%),
-    radial-gradient(circle at center, rgba(182, 168, 214, 0.2), transparent 60%);
-  filter: blur(26px);
-  opacity: 0.7;
+    radial-gradient(circle at center, rgba(191, 217, 226, 0.18), transparent 46%),
+    radial-gradient(circle at center, rgba(182, 168, 214, 0.14), transparent 60%);
+  filter: blur(20px);
+  opacity: 0.5;
   z-index: -1;
 }
 
@@ -1038,7 +1062,7 @@ h6 {
   }
 
   .sr-hero-frame {
-    padding: 0.62rem;
+    padding: 0.34rem;
     border-radius: 2rem;
   }
 
@@ -1137,8 +1161,33 @@ h6 {
     0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Smooth transitions for all interactive elements */
-* {
-  transition-property: all;
+/* ── Page transition ── */
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Only animate sr-page (editorial pages), not home/filmography which have their own bg */
+.sr-page {
+  animation: pageFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* ── Role text fade transition ── */
+@keyframes roleFade {
+  0%   { opacity: 0; transform: translateY(6px); }
+  12%  { opacity: 1; transform: translateY(0); }
+  88%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+.role-fade {
+  animation: roleFade 3.2s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* ── Smooth transitions for interactive elements only (not all properties) ── */
+a, button, input, select, textarea,
+.sr-hover-card, .sr-button, .sr-button-outline,
+.sr-button-ghost, .sr-tab, .sr-chip, .sr-link,
+.sr-admin-nav-link, .sr-close-button {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }

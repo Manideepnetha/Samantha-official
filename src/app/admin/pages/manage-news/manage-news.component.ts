@@ -81,6 +81,7 @@ import { AdminImageUploadFieldComponent } from '../../components/admin-image-upl
               label="Image URL"
               [value]="currentNews.imageUrl || ''"
               (valueChange)="currentNews.imageUrl = $event"
+              (uploadCompleted)="persistEditedNewsImage()"
               placeholder="Paste image URL"
               uploadButtonLabel="Upload Highlight Image"
               uploadFolder="news"
@@ -146,6 +147,20 @@ export class ManageNewsComponent implements OnInit {
         this.closeModal();
       });
     }
+  }
+
+  persistEditedNewsImage(): void {
+    if (!this.isEditing || !this.currentNews.id || !this.currentNews.title?.trim()) {
+      return;
+    }
+
+    this.apiService.updateNews(this.currentNews.id, this.currentNews).subscribe({
+      next: () => this.loadNews(),
+      error: (error) => {
+        console.error('Failed to auto-save uploaded highlight image', error);
+        alert('The image uploaded, but the highlight was not saved automatically. Please click Save.');
+      }
+    });
   }
 
   deleteNews(id: number): void {

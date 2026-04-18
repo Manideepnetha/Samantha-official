@@ -34,20 +34,22 @@ import { ApiService, Award } from '../../services/api.service';
         <div class="sr-section-heading">
           <span class="sr-kicker">Timeline</span>
           <h2>Recognition Over Time</h2>
-          <p>Major honors, defining moments, and milestones mapped into an editorial timeline without changing the underlying award data.</p>
+          <p>Major honors, defining moments, and milestones mapped into an editorial timeline.</p>
         </div>
 
-        <div *ngIf="timelineAwards.length === 0" class="sr-empty-state">
-          Loading awards...
-        </div>
+        <div *ngIf="timelineAwards.length === 0" class="sr-empty-state">Loading awards...</div>
 
-        <div class="grid gap-6 md:grid-cols-2" *ngIf="timelineAwards.length > 0">
-          <div *ngFor="let award of timelineAwards" class="sr-surface p-6 md:p-7 sr-hover-card h-full">
-            <div class="sr-meta mb-4 text-base">{{ award.year }}</div>
-            <div>
+        <!-- Vertical timeline -->
+        <div *ngIf="timelineAwards.length > 0" class="awards-timeline">
+          <div *ngFor="let award of timelineAwards; let i = index; let odd = odd"
+               class="timeline-item" [class.timeline-item--right]="odd">
+            <div class="timeline-dot"></div>
+            <div class="sr-surface p-6 md:p-7 sr-hover-card timeline-card">
+              <div class="sr-meta mb-3">{{ award.year }}</div>
               <h3 class="sr-card-title mb-3">{{ award.title }}</h3>
               <p class="sr-card-text">{{ award.description }}</p>
-              <blockquote *ngIf="award.quote" class="mt-4 border-l border-[rgba(228,196,163,0.28)] pl-4 font-['Cormorant_Garamond'] text-2xl italic text-[#f6ecdf]">
+              <blockquote *ngIf="award.quote"
+                class="mt-4 border-l-2 border-[rgba(228,196,163,0.4)] pl-4 font-['Cormorant_Garamond'] text-xl italic text-[#f6ecdf]">
                 "{{ award.quote }}"
               </blockquote>
             </div>
@@ -82,7 +84,72 @@ import { ApiService, Award } from '../../services/api.service';
       </section>
     </div>
   `,
-  styles: []
+  styles: [`
+    /* Two-column timeline — cards side by side, center line, no gaps */
+    .awards-timeline {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    /* Center vertical line */
+    .awards-timeline::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0; bottom: 0;
+      width: 1px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, transparent, rgba(214,169,93,0.5) 3%, rgba(214,169,93,0.5) 97%, transparent);
+      z-index: 0;
+    }
+    /* Every item spans both columns but uses padding to sit in one half */
+    .timeline-item {
+      position: relative;
+      grid-column: 1;
+      padding: 0 2rem 1rem 0;
+    }
+    .timeline-item--right {
+      grid-column: 2;
+      padding: 0 0 1rem 2rem;
+      /* Pull up to align with the previous left item */
+      margin-top: 0;
+    }
+    /* Dot sits on the center line */
+    .timeline-dot {
+      position: absolute;
+      top: 1.4rem;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: #d6a95d;
+      border: 2px solid rgba(214,169,93,0.3);
+      box-shadow: 0 0 0 4px rgba(214,169,93,0.12);
+      z-index: 1;
+    }
+    /* Left item dot on right edge */
+    .timeline-item:not(.timeline-item--right) .timeline-dot {
+      right: -6px;
+      left: auto;
+    }
+    /* Right item dot on left edge */
+    .timeline-item--right .timeline-dot {
+      left: -6px;
+    }
+    .timeline-card { width: 100%; }
+
+    @media (max-width: 768px) {
+      .awards-timeline { grid-template-columns: 1fr; }
+      .awards-timeline::before { left: 0.75rem; }
+      .timeline-item, .timeline-item--right {
+        grid-column: 1;
+        padding: 0 0 1rem 2.5rem;
+      }
+      .timeline-item .timeline-dot,
+      .timeline-item--right .timeline-dot {
+        left: 0.25rem; right: auto;
+      }
+    }
+  `]
 })
 export class AwardsComponent implements OnInit {
   timelineAwards: Award[] = [];

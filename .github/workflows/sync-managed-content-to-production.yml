@@ -1,0 +1,81 @@
+name: Sync Managed Content To Production
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/**'
+      - 'backend/Samantha.API/**'
+      - 'tools/sync-managed-content-to-production.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/sync-managed-content-to-production.yml'
+  workflow_dispatch:
+
+jobs:
+  sync-managed-content:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: samantha_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d samantha_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://127.0.0.1:5035
+      ConnectionStrings__DefaultConnection: Host=127.0.0.1;Database=samantha_db;Username=postgres;Password=postgres
+      LOCAL_API_URL: http://127.0.0.1:5035/api
+      PROD_API_URL: https://samantha-official-website-api.onrender.com/api
+      PROD_ADMIN_EMAIL: ${{ secrets.PROD_ADMIN_EMAIL }}
+      PROD_ADMIN_PASSWORD: ${{ secrets.PROD_ADMIN_PASSWORD }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Restore backend dependencies
+        run: dotnet restore backend/Samantha.API/Samantha.API.csproj
+
+      - name: Start local API
+        run: nohup dotnet run --project backend/Samantha.API/Samantha.API.csproj > backend.log 2>&1 &
+
+      - name: Wait for local API
+        run: |
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:5035/api/pagecontent/home-page > /dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Local API did not become ready in time."
+          cat backend.log
+          exit 1
+
+      - name: Sync managed content to production
+        run: npm run sync:managed-content:prod

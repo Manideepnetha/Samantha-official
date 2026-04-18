@@ -12,6 +12,16 @@ namespace Samantha.API.Controllers;
 [Authorize(Roles = "Admin")]
 public class UploadsController : ControllerBase
 {
+    private const long MaxFileSizeBytes = 10 * 1024 * 1024;
+    private static readonly HashSet<string> AllowedImageContentTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+        "image/avif"
+    };
+
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
@@ -39,10 +49,13 @@ public class UploadsController : ControllerBase
             return BadRequest(new { message = "At least one image file is required." });
         }
 
-        var cloudName = _configuration["Cloudinary:CloudName"] ?? "dpnd6ve1e";
-        var uploadPreset = _configuration["Cloudinary:UnsignedUploadPreset"] ?? "ml_default";
-        var apiKey = _configuration["Cloudinary:ApiKey"];
-        var apiSecret = _configuration["Cloudinary:ApiSecret"];
+        var (cloudName, uploadPreset, apiKey, apiSecret) = ResolveCloudinarySettings();
+        _logger.LogInformation(
+            "Resolved Cloudinary settings. CloudNamePresent={CloudNamePresent}, ApiKeyPresent={ApiKeyPresent}, ApiSecretPresent={ApiSecretPresent}, UploadPresetPresent={UploadPresetPresent}",
+            !string.IsNullOrWhiteSpace(cloudName),
+            !string.IsNullOrWhiteSpace(apiKey),
+            !string.IsNullOrWhiteSpace(apiSecret),
+            !string.IsNullOrWhiteSpace(uploadPreset));
         var defaultFolder = _configuration["Cloudinary:DefaultFolder"] ?? "samantha-official-website";
         var targetFolder = BuildFolder(defaultFolder, folder);
 
@@ -56,13 +69,10 @@ public class UploadsController : ControllerBase
                 continue;
             }
 
-            if (string.IsNullOrWhiteSpace(file.ContentType) ||
-                !file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            var validationError = ValidateFile(file);
+            if (validationError is not null)
             {
-                return BadRequest(new
-                {
-                    message = $"'{file.FileName}' is not a supported image file."
-                });
+                return validationError;
             }
 
             var uploaded = await TryUploadToCloudinaryAsync(file, targetFolder, cloudName, uploadPreset, apiKey, apiSecret, client);
@@ -81,6 +91,46 @@ public class UploadsController : ControllerBase
         }
 
         return Ok(results);
+    }
+
+    private (string CloudName, string UploadPreset, string? ApiKey, string? ApiSecret) ResolveCloudinarySettings()
+    {
+        var cloudName = _configuration["Cloudinary:CloudName"]
+            ?? Environment.GetEnvironmentVariable("Cloudinary__CloudName")
+            ?? "dpnd6ve1e";
+        var uploadPreset = _configuration["Cloudinary:UnsignedUploadPreset"]
+            ?? Environment.GetEnvironmentVariable("Cloudinary__UnsignedUploadPreset")
+            ?? "ml_default";
+        var apiKey = _configuration["Cloudinary:ApiKey"]
+            ?? Environment.GetEnvironmentVariable("Cloudinary__ApiKey");
+        var apiSecret = _configuration["Cloudinary:ApiSecret"]
+            ?? Environment.GetEnvironmentVariable("Cloudinary__ApiSecret");
+
+        if (!string.IsNullOrWhiteSpace(apiKey) && !string.IsNullOrWhiteSpace(apiSecret))
+        {
+            return (cloudName, uploadPreset, apiKey, apiSecret);
+        }
+
+        var cloudinaryUrl = Environment.GetEnvironmentVariable("CLOUDINARY_URL");
+        if (string.IsNullOrWhiteSpace(cloudinaryUrl))
+        {
+            return (cloudName, uploadPreset, apiKey, apiSecret);
+        }
+
+        if (!Uri.TryCreate(cloudinaryUrl, UriKind.Absolute, out var uri))
+        {
+            return (cloudName, uploadPreset, apiKey, apiSecret);
+        }
+
+        var parsedCloudName = string.IsNullOrWhiteSpace(uri.Host) ? cloudName : uri.Host;
+        var parsedApiKey = Uri.UnescapeDataString(uri.UserInfo.Split(':', 2).FirstOrDefault() ?? string.Empty);
+        var parsedApiSecret = Uri.UnescapeDataString(uri.UserInfo.Split(':', 2).Skip(1).FirstOrDefault() ?? string.Empty);
+
+        return (
+            parsedCloudName,
+            uploadPreset,
+            string.IsNullOrWhiteSpace(parsedApiKey) ? apiKey : parsedApiKey,
+            string.IsNullOrWhiteSpace(parsedApiSecret) ? apiSecret : parsedApiSecret);
     }
 
     private async Task<UploadedImageResponse?> TryUploadToCloudinaryAsync(
@@ -116,12 +166,8 @@ public class UploadsController : ControllerBase
 
             if (!string.IsNullOrWhiteSpace(apiKey) && !string.IsNullOrWhiteSpace(apiSecret))
             {
-                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-                var signature = CreateCloudinarySignature(targetFolder, timestamp, apiSecret);
-
-                content.Add(new StringContent(apiKey), "api_key");
-                content.Add(new StringContent(timestamp), "timestamp");
-                content.Add(new StringContent(signature), "signature");
+                var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{apiKey}:{apiSecret}"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
             }
             else if (!string.IsNullOrWhiteSpace(uploadPreset))
             {
@@ -265,7 +311,11 @@ public class UploadsController : ControllerBase
         var extension = Path.GetExtension(file.FileName);
         if (!string.IsNullOrWhiteSpace(extension))
         {
-            return extension;
+            extension = extension.ToLowerInvariant();
+            if (extension is ".jpg" or ".jpeg" or ".png" or ".webp" or ".gif" or ".avif")
+            {
+                return extension;
+            }
         }
 
         return file.ContentType.ToLowerInvariant() switch
@@ -273,25 +323,32 @@ public class UploadsController : ControllerBase
             "image/png" => ".png",
             "image/webp" => ".webp",
             "image/gif" => ".gif",
+            "image/avif" => ".avif",
             _ => ".jpg"
         };
     }
 
-    private static string CreateCloudinarySignature(string folder, string timestamp, string apiSecret)
+    private static ActionResult? ValidateFile(IFormFile file)
     {
-        var parts = new List<string>();
-
-        if (!string.IsNullOrWhiteSpace(folder))
+        if (string.IsNullOrWhiteSpace(file.ContentType) || !AllowedImageContentTypes.Contains(file.ContentType))
         {
-            parts.Add($"folder={folder}");
+            return new BadRequestObjectResult(new
+            {
+                message = $"'{file.FileName}' must be a JPG, PNG, WebP, GIF, or AVIF image."
+            });
         }
 
-        parts.Add($"timestamp={timestamp}");
+        if (file.Length > MaxFileSizeBytes)
+        {
+            return new BadRequestObjectResult(new
+            {
+                message = $"'{file.FileName}' exceeds the 10 MB upload limit."
+            });
+        }
 
-        var payload = string.Join("&", parts) + apiSecret;
-        var hash = SHA1.HashData(Encoding.UTF8.GetBytes(payload));
-        return Convert.ToHexString(hash).ToLowerInvariant();
+        return null;
     }
+
 }
 
 public sealed record UploadedImageResponse(

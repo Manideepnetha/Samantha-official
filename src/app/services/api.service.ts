@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, concat } from 'rxjs';
-import { tap, shareReplay, map } from 'rxjs/operators';
+import { Observable, of, concat, EMPTY, throwError } from 'rxjs';
+import { tap, shareReplay, map, catchError, retry } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { clearStoredAuth, getStoredToken, hasValidSession, isTokenExpired } from './auth-session.utils';
 
@@ -168,6 +168,47 @@ export interface VisitorEntry {
   isFirstVisit?: boolean;
 }
 
+export interface FanWallMessage {
+  id?: number;
+  name: string;
+  city?: string;
+  message: string;
+  status?: 'Pending' | 'Approved' | 'Rejected';
+  createdAt?: string;
+}
+
+export interface FanPollVoteRequest {
+  optionKey: string;
+  clientId: string;
+}
+
+export interface FanPollOptionResult {
+  optionKey: string;
+  label: string;
+  votes: number;
+  percentage: number;
+}
+
+export interface FanPollResult {
+  pollKey: string;
+  title: string;
+  totalVotes: number;
+  hasVoted: boolean;
+  userOptionKey?: string | null;
+  options: FanPollOptionResult[];
+}
+
+export interface AuthenticatedUser {
+  id: number;
+  email: string;
+  role: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  user?: AuthenticatedUser;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -274,6 +315,12 @@ export class ApiService {
     }
   }
 
+  private finalizeContentMutation<T>(request$: Observable<T>): Observable<T> {
+    return request$.pipe(
+      tap(() => this.clearAllCachedContent())
+    );
+  }
+
   clearAllCachedContent() {
     this.moviesCache$ = null;
     this.awardsCache$ = null;
@@ -319,17 +366,23 @@ export class ApiService {
 
   createMovie(movie: Movie): Observable<Movie> {
     this.clearCache('movies');
-    return this.http.post<Movie>(`${this.apiUrl}/movies`, movie, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.post<Movie>(`${this.apiUrl}/movies`, movie, this.getOptions())
+    );
   }
 
   updateMovie(id: number, movie: Movie): Observable<void> {
     this.clearCache('movies');
-    return this.http.put<void>(`${this.apiUrl}/movies/${id}`, movie, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.put<void>(`${this.apiUrl}/movies/${id}`, movie, this.getOptions())
+    );
   }
 
   deleteMovie(id: number): Observable<void> {
     this.clearCache('movies');
-    return this.http.delete<void>(`${this.apiUrl}/movies/${id}`, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.delete<void>(`${this.apiUrl}/movies/${id}`, this.getOptions())
+    );
   }
 
   // --- AWARDS ---
@@ -343,17 +396,23 @@ export class ApiService {
 
   createAward(award: Award): Observable<Award> {
     this.clearCache('awards');
-    return this.http.post<Award>(`${this.apiUrl}/awards`, award, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.post<Award>(`${this.apiUrl}/awards`, award, this.getOptions())
+    );
   }
 
   updateAward(id: number, award: Award): Observable<void> {
     this.clearCache('awards');
-    return this.http.put<void>(`${this.apiUrl}/awards/${id}`, award, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.put<void>(`${this.apiUrl}/awards/${id}`, award, this.getOptions())
+    );
   }
 
   deleteAward(id: number): Observable<void> {
     this.clearCache('awards');
-    return this.http.delete<void>(`${this.apiUrl}/awards/${id}`, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.delete<void>(`${this.apiUrl}/awards/${id}`, this.getOptions())
+    );
   }
 
   // --- PHILANTHROPY ---
@@ -367,17 +426,23 @@ export class ApiService {
 
   createPhilanthropy(philanthropy: Philanthropy): Observable<Philanthropy> {
     this.clearCache('philanthropy');
-    return this.http.post<Philanthropy>(`${this.apiUrl}/philanthropy`, philanthropy, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.post<Philanthropy>(`${this.apiUrl}/philanthropy`, philanthropy, this.getOptions())
+    );
   }
 
   updatePhilanthropy(id: number, philanthropy: Philanthropy): Observable<void> {
     this.clearCache('philanthropy');
-    return this.http.put<void>(`${this.apiUrl}/philanthropy/${id}`, philanthropy, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.put<void>(`${this.apiUrl}/philanthropy/${id}`, philanthropy, this.getOptions())
+    );
   }
 
   deletePhilanthropy(id: number): Observable<void> {
     this.clearCache('philanthropy');
-    return this.http.delete<void>(`${this.apiUrl}/philanthropy/${id}`, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.delete<void>(`${this.apiUrl}/philanthropy/${id}`, this.getOptions())
+    );
   }
 
   // --- NEWS ---
@@ -400,27 +465,42 @@ export class ApiService {
 
   createNews(news: NewsArticle): Observable<NewsArticle> {
     this.clearCache('news');
-    return this.http.post<NewsArticle>(`${this.apiUrl}/news`, news, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.post<NewsArticle>(`${this.apiUrl}/news`, news, this.getOptions())
+    );
   }
 
   updateNews(id: number, news: NewsArticle): Observable<void> {
     this.clearCache('news');
-    return this.http.put<void>(`${this.apiUrl}/news/${id}`, news, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.put<void>(`${this.apiUrl}/news/${id}`, news, this.getOptions())
+    );
   }
 
   deleteNews(id: number): Observable<void> {
     this.clearCache('news');
-    return this.http.delete<void>(`${this.apiUrl}/news/${id}`, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.delete<void>(`${this.apiUrl}/news/${id}`, this.getOptions())
+    );
   }
 
   // --- MEDIA GALLERY ---
-  getMediaGalleries(): Observable<MediaGallery[]> {
+  getMediaGalleries(forceRefresh = false): Observable<MediaGallery[]> {
     const cached = this.loadFromStorage<MediaGallery[]>('media');
 
-    if (!this.mediaCache$) {
+    if (!this.mediaCache$ || forceRefresh) {
       this.mediaCache$ = this.http.get<MediaGallery[]>(`${this.apiUrl}/mediagallery`)
         .pipe(
           tap(data => this.saveToStorage('media', data)),
+          retry({ count: 2, delay: 1000 }),
+          catchError(error => {
+            if (cached) {
+              console.warn('Media gallery request failed. Falling back to cached media data.', error);
+              return EMPTY;
+            }
+
+            return throwError(() => error);
+          }),
           shareReplay(1)
         );
     }
@@ -433,27 +513,42 @@ export class ApiService {
 
   createMediaGallery(media: MediaGallery): Observable<MediaGallery> {
     this.clearCache('media');
-    return this.http.post<MediaGallery>(`${this.apiUrl}/mediagallery`, media, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.post<MediaGallery>(`${this.apiUrl}/mediagallery`, media, this.getOptions())
+    );
   }
 
   updateMediaGallery(id: number, media: MediaGallery): Observable<void> {
     this.clearCache('media');
-    return this.http.put<void>(`${this.apiUrl}/mediagallery/${id}`, media, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.put<void>(`${this.apiUrl}/mediagallery/${id}`, media, this.getOptions())
+    );
   }
 
   deleteMediaGallery(id: number): Observable<void> {
     this.clearCache('media');
-    return this.http.delete<void>(`${this.apiUrl}/mediagallery/${id}`, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.delete<void>(`${this.apiUrl}/mediagallery/${id}`, this.getOptions())
+    );
   }
 
   // --- GALLERY COLLECTIONS ---
-  getGalleryCollections(): Observable<GalleryCollection[]> {
+  getGalleryCollections(forceRefresh = false): Observable<GalleryCollection[]> {
     const cached = this.loadFromStorage<GalleryCollection[]>('galleryCollections');
 
-    if (!this.galleryCollectionsCache$) {
+    if (!this.galleryCollectionsCache$ || forceRefresh) {
       this.galleryCollectionsCache$ = this.http.get<GalleryCollection[]>(`${this.apiUrl}/gallerycollections`, this.getPublicOptions())
         .pipe(
           tap(data => this.saveToStorage('galleryCollections', data)),
+          retry({ count: 2, delay: 1000 }),
+          catchError(error => {
+            if (cached) {
+              console.warn('Gallery collections request failed. Falling back to cached gallery collections.', error);
+              return EMPTY;
+            }
+
+            return throwError(() => error);
+          }),
           shareReplay(1)
         );
     }
@@ -467,19 +562,25 @@ export class ApiService {
 
   createGalleryCollection(collection: GalleryCollection): Observable<GalleryCollection> {
     this.clearCache('galleryCollections');
-    return this.http.post<GalleryCollection>(`${this.apiUrl}/gallerycollections`, collection, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.post<GalleryCollection>(`${this.apiUrl}/gallerycollections`, collection, this.getOptions())
+    );
   }
 
   updateGalleryCollection(id: number, collection: GalleryCollection): Observable<void> {
     this.clearCache('galleryCollections');
     this.clearCache('media');
-    return this.http.put<void>(`${this.apiUrl}/gallerycollections/${id}`, collection, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.put<void>(`${this.apiUrl}/gallerycollections/${id}`, collection, this.getOptions())
+    );
   }
 
   deleteGalleryCollection(id: number): Observable<void> {
     this.clearCache('galleryCollections');
     this.clearCache('media');
-    return this.http.delete<void>(`${this.apiUrl}/gallerycollections/${id}`, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.delete<void>(`${this.apiUrl}/gallerycollections/${id}`, this.getOptions())
+    );
   }
 
   // --- FASHION ---
@@ -493,17 +594,23 @@ export class ApiService {
 
   createFashion(fashion: FashionItem): Observable<FashionItem> {
     this.clearCache('fashion');
-    return this.http.post<FashionItem>(`${this.apiUrl}/fashion`, fashion, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.post<FashionItem>(`${this.apiUrl}/fashion`, fashion, this.getOptions())
+    );
   }
 
   updateFashion(id: number, fashion: FashionItem): Observable<void> {
     this.clearCache('fashion');
-    return this.http.put<void>(`${this.apiUrl}/fashion/${id}`, fashion, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.put<void>(`${this.apiUrl}/fashion/${id}`, fashion, this.getOptions())
+    );
   }
 
   deleteFashion(id: number): Observable<void> {
     this.clearCache('fashion');
-    return this.http.delete<void>(`${this.apiUrl}/fashion/${id}`, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.delete<void>(`${this.apiUrl}/fashion/${id}`, this.getOptions())
+    );
   }
 
   // --- FAN CREATIONS ---
@@ -527,17 +634,23 @@ export class ApiService {
 
   createFanCreation(item: FanCreation): Observable<FanCreation> {
     this.clearCache('fanCreations');
-    return this.http.post<FanCreation>(`${this.apiUrl}/fancreations`, item, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.post<FanCreation>(`${this.apiUrl}/fancreations`, item, this.getOptions())
+    );
   }
 
   updateFanCreation(id: number, item: FanCreation): Observable<void> {
     this.clearCache('fanCreations');
-    return this.http.put<void>(`${this.apiUrl}/fancreations/${id}`, item, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.put<void>(`${this.apiUrl}/fancreations/${id}`, item, this.getOptions())
+    );
   }
 
   deleteFanCreation(id: number): Observable<void> {
     this.clearCache('fanCreations');
-    return this.http.delete<void>(`${this.apiUrl}/fancreations/${id}`, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.delete<void>(`${this.apiUrl}/fancreations/${id}`, this.getOptions())
+    );
   }
 
   // --- CONTACTS ---
@@ -578,7 +691,9 @@ export class ApiService {
 
   upsertSetting(setting: SiteSetting): Observable<SiteSetting> {
     this.clearCache('settings');
-    return this.http.post<SiteSetting>(`${this.apiUrl}/settings`, setting, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.post<SiteSetting>(`${this.apiUrl}/settings`, setting, this.getOptions())
+    );
   }
 
   // --- PAGE CONTENT ---
@@ -606,7 +721,9 @@ export class ApiService {
 
   upsertPageContent<T>(key: string, content: T): Observable<any> {
     this.clearPageContentCache(key);
-    return this.http.post(`${this.apiUrl}/pagecontent/${encodeURIComponent(key)}`, content, this.getOptions());
+    return this.finalizeContentMutation(
+      this.http.post(`${this.apiUrl}/pagecontent/${encodeURIComponent(key)}`, content, this.getOptions())
+    );
   }
 
   syncSiteContent(): Observable<any> {
@@ -641,6 +758,37 @@ export class ApiService {
     return this.http.get<VisitorEntry[]>(`${this.apiUrl}/visitorentries`, this.getOptions());
   }
 
+  // --- FAN WALL ---
+  getFanWallMessages(): Observable<FanWallMessage[]> {
+    return this.http.get<FanWallMessage[]>(`${this.apiUrl}/fanwall`, this.getPublicOptions());
+  }
+
+  submitFanWallMessage(message: FanWallMessage): Observable<FanWallMessage> {
+    return this.http.post<FanWallMessage>(`${this.apiUrl}/fanwall`, message, this.getPublicOptions());
+  }
+
+  getAdminFanWallMessages(): Observable<FanWallMessage[]> {
+    return this.http.get<FanWallMessage[]>(`${this.apiUrl}/fanwall/admin`, this.getOptions());
+  }
+
+  updateFanWallMessageStatus(id: number, status: NonNullable<FanWallMessage['status']>): Observable<FanWallMessage> {
+    return this.http.put<FanWallMessage>(`${this.apiUrl}/fanwall/${id}/status`, { status }, this.getOptions());
+  }
+
+  deleteFanWallMessage(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/fanwall/${id}`, this.getOptions());
+  }
+
+  // --- FAN POLLS ---
+  getFanPollResult(pollKey: string, clientId?: string): Observable<FanPollResult> {
+    const query = clientId?.trim() ? `?clientId=${encodeURIComponent(clientId.trim())}` : '';
+    return this.http.get<FanPollResult>(`${this.apiUrl}/fanpoll/${encodeURIComponent(pollKey)}${query}`, this.getPublicOptions());
+  }
+
+  submitFanPollVote(pollKey: string, payload: FanPollVoteRequest): Observable<FanPollResult> {
+    return this.http.post<FanPollResult>(`${this.apiUrl}/fanpoll/${encodeURIComponent(pollKey)}/vote`, payload, this.getPublicOptions());
+  }
+
   // --- QUIZ ---
   checkQuizStatus(email: string): Observable<QuizCheckResponse> {
     return this.http.get<QuizCheckResponse>(`${this.apiUrl}/quiz/check?email=${encodeURIComponent(email.trim())}`, this.getPublicOptions());
@@ -659,10 +807,10 @@ export class ApiService {
   }
 
   // --- AUTH ---
-  login(credentials: { email: string, password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/login`, credentials)
+  login(credentials: { email: string, password: string }): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, credentials)
       .pipe(
-        tap((response: any) => {
+        tap((response: LoginResponse) => {
           if (response && response.token) {
             localStorage.setItem('token', response.token);
             if (response.user) {

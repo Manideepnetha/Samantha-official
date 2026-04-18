@@ -67,6 +67,7 @@ export class AdminImageUploadFieldComponent {
 
   @Output() valueChange = new EventEmitter<string>();
   @Output() bulkUploaded = new EventEmitter<UploadedMediaAsset[]>();
+  @Output() uploadCompleted = new EventEmitter<UploadedMediaAsset>();
 
   isUploading = false;
   uploadLabel = 'Uploading...';
@@ -91,6 +92,7 @@ export class AdminImageUploadFieldComponent {
     this.apiService.uploadImage(files[0], this.uploadFolder).subscribe({
       next: (asset) => {
         this.valueChange.emit(asset.url);
+        this.uploadCompleted.emit(asset);
         this.statusMessage = 'Image uploaded successfully.';
         this.isUploading = false;
       },

@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd, RouterModule, Scroll } from '@angular/router';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { WelcomePopupComponent } from './components/welcome-popup/welcome-popup.component';
 import { PreloaderComponent } from './components/preloader/preloader.component';
 import { ApiService } from './services/api.service';
-import { ViewportScroller } from '@angular/common';
 import {
   ENTRY_EXPERIENCE_COMPLETED_STORAGE_KEY,
   PENDING_VISITOR_ENTRY_STORAGE_KEY
@@ -32,22 +31,13 @@ export class AppComponent implements OnInit {
   isLoading = true; // Start in loading state
   private hasShownPopup = false;
 
-  constructor(private router: Router, private apiService: ApiService, private viewportScroller: ViewportScroller) { }
+  constructor(private router: Router, private apiService: ApiService) { }
 
   ngOnInit() {
-    // 1. Wake up the backend
-    this.apiService.getNews().subscribe({
-      next: () => {
-        this.retryPendingVisitorEntry();
-        this.finishLoading();
-      },
-      error: () => {
-        this.retryPendingVisitorEntry();
-        this.finishLoading();
-      }
-    });
+    this.finishLoading();
+    this.warmBackend();
 
-    // 2. Scroll to top on every navigation
+    // 1. Scroll to top on every navigation
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
@@ -59,22 +49,27 @@ export class AppComponent implements OnInit {
   }
 
   finishLoading() {
-    // Reduce forced delay to 1s for better UX
     setTimeout(() => {
       this.isLoading = false;
       this.checkPopupVisibility();
-    }, 1000);
+    }, 250);
   }
 
   checkPopupVisibility() {
-    // Check if current route is restricted
     const currentUrl = this.router.url;
-    const isRestricted = currentUrl.includes('/admin') || currentUrl.includes('/login');
+    const routePath = currentUrl.split('?')[0].replace(/\/+$/, '') || '/';
+    const isRestricted = routePath.includes('/admin') || routePath.includes('/login');
+    const isWelcomeRoute = routePath === '/';
+
+    if (isRestricted || !isWelcomeRoute || this.isLoading) {
+      this.showWelcomePopup = false;
+      return;
+    }
 
     // Persist popup state in localStorage so it only shows once per user (not every session)
     const hasSeenPopup = localStorage.getItem(ENTRY_EXPERIENCE_COMPLETED_STORAGE_KEY) === 'true';
 
-    if (!isRestricted && !this.hasShownPopup && !this.isLoading && !hasSeenPopup) {
+    if (!this.hasShownPopup && !hasSeenPopup) {
       setTimeout(() => {
         this.showWelcomePopup = true;
         this.hasShownPopup = true;
@@ -84,6 +79,13 @@ export class AppComponent implements OnInit {
 
   onWelcomePopupClose() {
     this.showWelcomePopup = false;
+  }
+
+  private warmBackend() {
+    this.apiService.getNews().subscribe({
+      next: () => this.retryPendingVisitorEntry(),
+      error: () => this.retryPendingVisitorEntry()
+    });
   }
 
   private retryPendingVisitorEntry() {
