@@ -3,6 +3,7 @@ name: Sync Managed Content To Production
 on:
   push:
     branches:
+      - main
       - master
     paths:
       - 'src/**'
