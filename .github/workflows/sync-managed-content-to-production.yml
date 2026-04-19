@@ -63,16 +63,19 @@ jobs:
       - name: Restore backend dependencies
         run: dotnet restore backend/Samantha.API/Samantha.API.csproj
 
+      - name: Build backend
+        run: dotnet build backend/Samantha.API/Samantha.API.csproj --configuration Debug --no-restore
+
       - name: Start local API
-        run: nohup dotnet run --project backend/Samantha.API/Samantha.API.csproj > backend.log 2>&1 &
+        run: nohup dotnet run --project backend/Samantha.API/Samantha.API.csproj --configuration Debug --no-build > backend.log 2>&1 &
 
       - name: Wait for local API
         run: |
-          for attempt in {1..30}; do
+          for attempt in {1..45}; do
             if curl --silent --fail http://127.0.0.1:5035/api/pagecontent/home-page > /dev/null; then
               exit 0
             fi
-            sleep 5
+            sleep 4
           done
           echo "Local API did not become ready in time."
           cat backend.log
