@@ -103,7 +103,7 @@ const DEFAULT_HOME_CONTENT: HomePageContent = {
     imageAlt: 'Samantha Ruth Prabhu Instagram spotlight portrait'
   },
   featureShowcaseImage: {
-    url: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045346/Samantha29_clxsnm.jpg',
+    url: 'https://samantha-official-website-api.onrender.com/uploads/samantha-official-website/home/key-aspects/c3f30b347a3440389e017af2b6316a11.jpg',
     alt: 'Samantha Ruth Prabhu editorial feature portrait',
     caption: 'A cinematic portrait layer inspired by the reference design.'
   },
@@ -119,7 +119,7 @@ const DEFAULT_HOME_CONTENT: HomePageContent = {
         'Wikipedia credits the performance with winning the Filmfare Award for Best Female Debut - South.',
         'The same debut also earned her a Nandi Special Jury Award.'
       ],
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008414/8F9A7087_koclpw.jpg',
+      image: 'https://samantha-official-website-api.onrender.com/uploads/samantha-official-website/home/main-roles/b37d3bada8f7461e85b3e81293dec89d.JPG',
       imageAlt: 'Samantha Ruth Prabhu portrait for Ye Maaya Chesave feature',
       imagePosition: 'center 14%'
     },
@@ -134,7 +134,7 @@ const DEFAULT_HOME_CONTENT: HomePageContent = {
         'Samantha won the Filmfare Award for Best Actress - Telugu for this performance.',
         'Wikipedia lists the film among the year\'s biggest Telugu box-office successes.'
       ],
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008413/PAND7159_k4qlvo.jpg',
+      image: 'https://samantha-official-website-api.onrender.com/uploads/samantha-official-website/home/main-roles/22104b3ab4264f048de0e15b5e0ed21d.jpg',
       imageAlt: 'Samantha Ruth Prabhu editorial image for Eega feature',
       imagePosition: 'center 18%'
     },
@@ -149,7 +149,7 @@ const DEFAULT_HOME_CONTENT: HomePageContent = {
         'Mahanati won the National Film Award for Best Feature Film in Telugu.',
         'The film was screened at festivals including IFFI, Shanghai, and Melbourne.'
       ],
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008412/DSC_9143-1_ayf7fl.jpg',
+      image: 'https://samantha-official-website-api.onrender.com/uploads/samantha-official-website/home/main-roles/5abe0c872cc0487bbceec7ff840114d6.jpg',
       imageAlt: 'Samantha Ruth Prabhu portrait for Mahanati feature',
       imagePosition: 'center 10%'
     },
@@ -164,7 +164,7 @@ const DEFAULT_HOME_CONTENT: HomePageContent = {
         'The page also records Best Actress wins for her at SIIMA and Zee Cine Awards Telugu.',
         'The story follows a grandmother rediscovering youth, music, and family from a fresh perspective.'
       ],
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748010072/8F9A7985_m86vsc.jpg',
+      image: 'https://samantha-official-website-api.onrender.com/uploads/samantha-official-website/home/main-roles/57f947a993f34f75883d6e828f6a83e1.jpg',
       imageAlt: 'Samantha Ruth Prabhu portrait for Oh Baby feature',
       imagePosition: 'center 22%'
     },
@@ -179,7 +179,7 @@ const DEFAULT_HOME_CONTENT: HomePageContent = {
         'The role marked her digital debut on streaming.',
         'Indian Express reported that the show also became her first major action turn, with Samantha performing her own stunts.'
       ],
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748011805/8F9A6978_1_jd2efv.jpg',
+      image: 'https://samantha-official-website-api.onrender.com/uploads/samantha-official-website/home/main-roles/e39a3cc4cc1a4b9caf934ebe54eb5b57.png',
       imageAlt: 'Samantha Ruth Prabhu portrait for The Family Man 2 feature',
       imagePosition: 'center 18%'
     },
@@ -194,7 +194,7 @@ const DEFAULT_HOME_CONTENT: HomePageContent = {
         'Samantha\'s Wikipedia page identifies Honey as Nadia Sinh\'s mother.',
         'Wikipedia also notes that this was Samantha\'s only release of 2024.'
       ],
-      image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045346/Samantha29_clxsnm.jpg',
+      image: 'https://samantha-official-website-api.onrender.com/uploads/samantha-official-website/home/main-roles/b03898cf933341a29397bb9bb59ef499.jpg',
       imageAlt: 'Samantha Ruth Prabhu portrait for Citadel Honey Bunny feature',
       imagePosition: 'center 14%'
     }
