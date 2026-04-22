@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,10 @@ namespace Samantha.API.Controllers;
 [Route("api/[controller]")]
 public class PageContentController : ControllerBase
 {
+    private static readonly Regex LocalUploadUrlPattern = new(
+        @"^https?://(?:localhost|127\.0\.0\.1)(?::\d+)?(?<path>/uploads/.*)$",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     private readonly AppDbContext _context;
 
     public PageContentController(AppDbContext context)
@@ -37,7 +43,7 @@ public class PageContentController : ControllerBase
         Response.Headers.LastModified = pageContent.UpdatedAt.ToUniversalTime().ToString("R");
         Response.Headers["X-Content-Updated-At"] = pageContent.UpdatedAt.ToUniversalTime().ToString("O");
 
-        return Content(pageContent.ContentJson, "application/json");
+        return Content(NormalizePageContentJson(pageContent.ContentJson), "application/json");
     }
 
     [HttpPost("{key}")]
@@ -49,7 +55,7 @@ public class PageContentController : ControllerBase
             return BadRequest(new { message = "Page content payload is required." });
         }
 
-        var contentJson = payload.GetRawText();
+        var contentJson = NormalizePageContentJson(payload.GetRawText());
         var existing = await _context.PageContents.FirstOrDefaultAsync(item => item.Key == key);
 
         if (existing == null)
@@ -70,5 +76,119 @@ public class PageContentController : ControllerBase
 
         await _context.SaveChangesAsync();
         return Ok(existing);
+    }
+
+    private string NormalizePageContentJson(string contentJson)
+    {
+        if (string.IsNullOrWhiteSpace(contentJson))
+        {
+            return contentJson;
+        }
+
+        var uploadsOrigin = GetUploadsOrigin();
+        if (string.IsNullOrWhiteSpace(uploadsOrigin))
+        {
+            return contentJson;
+        }
+
+        try
+        {
+            var node = JsonNode.Parse(contentJson);
+            if (node == null)
+            {
+                return contentJson;
+            }
+
+            NormalizeUploadUrls(node, uploadsOrigin);
+            return node.ToJsonString();
+        }
+        catch (JsonException)
+        {
+            return contentJson;
+        }
+    }
+
+    private string GetUploadsOrigin()
+    {
+        if (Request?.Host.HasValue == true && !string.IsNullOrWhiteSpace(Request.Scheme))
+        {
+            return $"{Request.Scheme}://{Request.Host.Value}";
+        }
+
+        return string.Empty;
+    }
+
+    private static void NormalizeUploadUrls(JsonNode node, string uploadsOrigin)
+    {
+        if (node is JsonObject jsonObject)
+        {
+            var propertyNames = new List<string>();
+            foreach (var property in jsonObject)
+            {
+                propertyNames.Add(property.Key);
+            }
+
+            foreach (var propertyName in propertyNames)
+            {
+                var childNode = jsonObject[propertyName];
+                if (childNode == null)
+                {
+                    continue;
+                }
+
+                var normalizedValue = NormalizeUploadString(childNode, uploadsOrigin);
+                if (normalizedValue != null)
+                {
+                    jsonObject[propertyName] = normalizedValue;
+                    continue;
+                }
+
+                NormalizeUploadUrls(childNode, uploadsOrigin);
+            }
+
+            return;
+        }
+
+        if (node is JsonArray jsonArray)
+        {
+            for (var index = 0; index < jsonArray.Count; index++)
+            {
+                var childNode = jsonArray[index];
+                if (childNode == null)
+                {
+                    continue;
+                }
+
+                var normalizedValue = NormalizeUploadString(childNode, uploadsOrigin);
+                if (normalizedValue != null)
+                {
+                    jsonArray[index] = normalizedValue;
+                    continue;
+                }
+
+                NormalizeUploadUrls(childNode, uploadsOrigin);
+            }
+        }
+    }
+
+    private static string? NormalizeUploadString(JsonNode node, string uploadsOrigin)
+    {
+        if (node is not JsonValue jsonValue || !jsonValue.TryGetValue<string>(out var currentValue) || string.IsNullOrWhiteSpace(currentValue))
+        {
+            return null;
+        }
+
+        if (currentValue.StartsWith("/uploads/", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{uploadsOrigin}{currentValue}";
+        }
+
+        var localUploadMatch = LocalUploadUrlPattern.Match(currentValue);
+        if (localUploadMatch.Success)
+        {
+            return $"{uploadsOrigin}{localUploadMatch.Groups["path"].Value}";
+        }
+
+        return null;
     }
 }
