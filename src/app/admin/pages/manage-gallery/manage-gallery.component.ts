@@ -73,7 +73,9 @@ export class ManageGalleryComponent implements OnInit {
 
   get filteredGallery(): MediaGallery[] {
     return this.galleryList.filter(item => {
-      if (this.filterCategory !== 'all' && item.type !== this.filterCategory) {
+      const normalizedType = (item.type || '').trim().toLowerCase();
+
+      if (this.filterCategory !== 'all' && normalizedType !== this.filterCategory) {
         return false;
       }
 
@@ -98,7 +100,10 @@ export class ManageGalleryComponent implements OnInit {
     }).subscribe({
       next: ({ collections, images }) => {
         this.galleryCollections = collections;
-        this.galleryList = images.filter(item => item.type !== 'Home');
+        this.galleryList = images.filter(item => {
+          const normalizedType = (item.type || '').trim().toLowerCase();
+          return normalizedType !== 'home' && normalizedType !== 'hero';
+        });
         this.loading = false;
       },
       error: (error) => {

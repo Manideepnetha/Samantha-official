@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService, Movie } from '../../services/api.service';
+import { enrichMoviesWithDownloads, getMovieDownloadAssets } from './movie-downloads';
 import {
   FALLBACK_POSTER_URL,
   getMovieFallbackDescription,
@@ -38,6 +39,15 @@ import {
                 <a routerLink="/filmography" class="sr-button-ghost">Back To Filmography</a>
                 <a *ngIf="movie?.trailer" [href]="movie?.trailer" target="_blank" rel="noopener noreferrer" class="sr-button">
                   Watch Trailer
+                </a>
+                <a
+                  *ngFor="let asset of getDownloadAssets(movie)"
+                  [href]="asset.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="sr-button-outline"
+                >
+                  {{ asset.label }}
                 </a>
               </div>
             </div>
@@ -158,10 +168,11 @@ export class MovieDetailComponent implements OnInit {
       }
 
       this.loading = true;
-      this.apiService.getMovie(movieId).subscribe({
-        next: (movie) => {
-          this.movie = normalizeMovie(movie);
-          this.heroImageUrl = this.movie.poster || this.fallbackBackdrop;
+      this.apiService.getMovies().subscribe({
+        next: (movies) => {
+          const normalizedMovies = enrichMoviesWithDownloads(movies.map(movie => normalizeMovie(movie)));
+          this.movie = normalizedMovies.find(movie => movie.id === movieId) || null;
+          this.heroImageUrl = this.movie?.poster || this.fallbackBackdrop;
           this.loading = false;
         },
         error: (error) => {
@@ -184,6 +195,10 @@ export class MovieDetailComponent implements OnInit {
 
   getMovieFallbackDescription(movie: Movie): string {
     return getMovieFallbackDescription(movie);
+  }
+
+  getDownloadAssets(movie: Movie | null): NonNullable<Movie['downloadAssets']> {
+    return movie ? getMovieDownloadAssets(movie) : [];
   }
 
   onHeroImageError(event?: Event): void {

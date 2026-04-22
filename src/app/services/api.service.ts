@@ -17,6 +17,12 @@ export interface Movie {
   poster: string;
   description: string;
   trailer?: string;
+  downloadAssets?: MovieDownloadAsset[];
+}
+
+export interface MovieDownloadAsset {
+  label: string;
+  url: string;
 }
 
 export interface Award {
@@ -254,8 +260,12 @@ export class ApiService {
 
   private resolveApiUrl(): string {
     if (typeof window !== 'undefined') {
-      const { hostname } = window.location;
+      const { hostname, origin, port } = window.location;
       if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        if (port === '5035') {
+          return `${origin}/api`;
+        }
+
         return 'http://localhost:5035/api';
       }
     }

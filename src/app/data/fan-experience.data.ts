@@ -50,6 +50,9 @@ export interface InstagramFeedConfig {
     imageUrl: string;
     caption: string;
     href: string;
+    alt: string;
+    typeLabel: 'Post' | 'Reel';
+    dateLabel: string;
   }>;
 }
 
@@ -63,6 +66,45 @@ export interface FanPollDefinition {
     label: string;
   }>;
 }
+
+export const LATEST_INSTAGRAM_POSTS: InstagramFeedConfig['previewCards'] = [
+  {
+    title: 'The Bapu Bomma Series',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1776619514/samantha-official-website/instagram-highlights/the-bapu-bomma-series_cmnq5g.jpg',
+    caption: 'Samantha shared new Bapu Bomma Series artwork by @lakshmi_2_8.',
+    href: 'https://www.instagram.com/p/DXTMo3Wmjbs/',
+    alt: 'The Bapu Bomma Series Instagram artwork post',
+    typeLabel: 'Post',
+    dateLabel: 'April 18, 2026'
+  },
+  {
+    title: 'Maa Inti Bangaram Tease',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1776619514/samantha-official-website/instagram-highlights/maa-inti-bangaram-tease_etvcnb.jpg',
+    caption: 'A new Maa Inti Bangaram teaser reel with the line "Ammayi annaaka... Aa maatram undaale!"',
+    href: 'https://www.instagram.com/reel/DXRTsIBgT0F/',
+    alt: 'Maa Inti Bangaram teaser reel preview',
+    typeLabel: 'Reel',
+    dateLabel: 'April 18, 2026'
+  },
+  {
+    title: 'Thassadiya Reel',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1776619513/samantha-official-website/instagram-highlights/thassadiya-reel_qnnf7n.jpg',
+    caption: 'Samantha celebrated the fan response to the Thassadiya reel from Maa Inti Bangaram.',
+    href: 'https://www.instagram.com/reel/DXN5_jkCOhl/',
+    alt: 'Thassadiya reel preview image',
+    typeLabel: 'Reel',
+    dateLabel: 'April 16, 2026'
+  },
+  {
+    title: 'A Wholesome Family Vibe',
+    imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1776619513/samantha-official-website/instagram-highlights/family-vibe-poster_pjk16d.jpg',
+    caption: 'Tra-la-la Moving Pictures shared a new Maa Inti Bangaram family ensemble poster.',
+    href: 'https://www.instagram.com/p/DXLqmHZgT9X/',
+    alt: 'Maa Inti Bangaram family vibe poster',
+    typeLabel: 'Post',
+    dateLabel: 'April 15, 2026'
+  }
+];
 
 export const SAMANTHA_BIRTHDAY = {
   month: 4,
@@ -179,11 +221,7 @@ export const INSTAGRAM_FEED_CONFIG: InstagramFeedConfig = {
   profileUrl: 'https://www.instagram.com/samantharuthprabhuoffl/',
   handle: '@samantharuthprabhuoffl',
   embedUrl: 'https://www.instagram.com/samantharuthprabhuoffl/',
-  previewCards: [
-    { title: 'Editorial Portraits', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748011805/8F9A6978_1_jd2efv.jpg', caption: 'Campaign stills, wellness notes, and close-up editorial moments.', href: 'https://www.instagram.com/samantharuthprabhuoffl/' },
-    { title: 'Behind The Frame', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008412/DSC_9143-1_ayf7fl.jpg', caption: 'On-set atmosphere and process-led glimpses from recent appearances.', href: 'https://www.instagram.com/samantharuthprabhuoffl/' },
-    { title: 'Style Diary', imageUrl: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045346/Samantha29_clxsnm.jpg', caption: 'A rolling moodboard of fashion, travel, and story-led visuals.', href: 'https://www.instagram.com/samantharuthprabhuoffl/' }
-  ]
+  previewCards: LATEST_INSTAGRAM_POSTS
 };
 
 export const FAN_POLL_DEFINITION: FanPollDefinition = {

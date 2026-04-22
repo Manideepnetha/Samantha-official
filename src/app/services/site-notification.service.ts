@@ -97,8 +97,8 @@ export class SiteNotificationService implements OnDestroy {
     if (snapshot.blogId && previousBlogId && snapshot.blogId !== previousBlogId) {
       this.fireNotification(
         'New story added to the journal',
-        snapshot.blogTitle ?? 'A new blog update is available.',
-        '/blog'
+        snapshot.blogTitle ?? 'A new journal entry is available.',
+        '/journal'
       );
     }
 

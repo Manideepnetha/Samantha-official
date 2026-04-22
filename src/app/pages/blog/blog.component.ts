@@ -31,13 +31,13 @@ interface BlogPost {
             <div class="sr-hero-media">
               <img
                 src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008413/PAND7159_k4qlvo.jpg"
-                alt="Blog"
+                alt="Journal"
                 class="object-[center_30%]"
               />
             </div>
             <div class="sr-hero-copy max-w-3xl text-center md:text-left">
               <span class="sr-kicker">Journal</span>
-              <h1 class="sr-hero-title">Samantha's Blog</h1>
+              <h1 class="sr-hero-title">Samantha's Journal</h1>
               <p class="sr-hero-subtitle">
                 Thoughts, stories, and reflections from Samantha's world.
               </p>

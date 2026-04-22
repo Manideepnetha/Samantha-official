@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 var webRootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 Directory.CreateDirectory(webRootPath);
 builder.Environment.WebRootPath = webRootPath;
+var spaEntryPointPath = Path.Combine(webRootPath, "index.html");
+var hasSpaEntryPoint = File.Exists(spaEntryPointPath);
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -94,6 +96,15 @@ if (shouldUseHttpsRedirection)
 {
     app.UseHttpsRedirection();
 }
+
+if (hasSpaEntryPoint)
+{
+    app.UseDefaultFiles(new DefaultFilesOptions
+    {
+        FileProvider = new PhysicalFileProvider(webRootPath)
+    });
+}
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(webRootPath)
@@ -103,6 +114,28 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+if (hasSpaEntryPoint)
+{
+    app.MapFallback(async context =>
+    {
+        var requestPath = context.Request.Path.Value ?? string.Empty;
+        var isReservedPath =
+            requestPath.StartsWith("/api", StringComparison.OrdinalIgnoreCase) ||
+            requestPath.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase) ||
+            requestPath.StartsWith("/uploads", StringComparison.OrdinalIgnoreCase) ||
+            Path.HasExtension(requestPath);
+
+        if (isReservedPath)
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            return;
+        }
+
+        context.Response.ContentType = "text/html; charset=utf-8";
+        await context.Response.SendFileAsync(spaEntryPointPath);
+    });
+}
 
 // Seed Database
 using (var scope = app.Services.CreateScope())

@@ -26,8 +26,11 @@ import { DAILY_QUOTES, DailyQuote } from '../../data/fan-experience.data';
     }
 
     .quote-shell {
-      display: grid;
-      gap: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: clamp(23rem, 30vw, 27rem);
       padding: clamp(1.5rem, 4vw, 2.3rem);
       border-radius: 2rem;
       overflow: hidden;
@@ -40,13 +43,15 @@ import { DAILY_QUOTES, DailyQuote } from '../../data/fan-experience.data';
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(135deg, rgba(228, 196, 163, 0.08), transparent 42%),
-        url("https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748178089/6923df53863279.5943b8caecd81_vxre5s.jpg") center 20% / cover;
-      opacity: 0.18;
+        linear-gradient(180deg, rgba(12, 7, 6, 0.18) 0%, rgba(12, 7, 6, 0.42) 100%),
+        linear-gradient(135deg, rgba(228, 196, 163, 0.09), transparent 42%),
+        url("https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748178089/6923df53863279.5943b8caecd81_vxre5s.jpg") center center / cover;
+      opacity: 0.22;
       z-index: -1;
     }
 
     .quote-copy {
+      max-width: 18rem;
       opacity: 0;
       transform: translateY(12px);
       transition: opacity 0.45s ease, transform 0.45s ease;
@@ -61,9 +66,9 @@ import { DAILY_QUOTES, DailyQuote } from '../../data/fan-experience.data';
       margin: 0;
       max-width: 15ch;
       font-family: "Cormorant Garamond", "Playfair Display", serif;
-      font-size: clamp(2.6rem, 5vw, 4.5rem);
+      font-size: clamp(2.35rem, 4.6vw, 3.95rem);
       font-weight: 500;
-      line-height: 0.96;
+      line-height: 0.98;
       letter-spacing: -0.03em;
       color: #f6ecdf;
     }
@@ -82,6 +87,7 @@ import { DAILY_QUOTES, DailyQuote } from '../../data/fan-experience.data';
       display: flex;
       flex-wrap: wrap;
       gap: 0.75rem;
+      margin-top: auto;
     }
 
     .quote-share {
@@ -101,6 +107,16 @@ import { DAILY_QUOTES, DailyQuote } from '../../data/fan-experience.data';
       background: rgba(243, 232, 220, 0.05);
       color: var(--editorial-accent-strong);
       border: 1px solid rgba(228, 196, 163, 0.16);
+    }
+
+    @media (max-width: 720px) {
+      .quote-shell {
+        min-height: auto;
+      }
+
+      .quote-copy {
+        max-width: none;
+      }
     }
   `]
 })

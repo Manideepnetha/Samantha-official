@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Auto Fix Frontend & Backend",
+  "description": "Monitors Angular and .NET servers. When triggered, checks if both are running and healthy. If Angular has a build error, clears the cache and restarts. If either process is down, kills stale node/dotnet processes and restarts both.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check if the Angular frontend (port 4200) and .NET backend (port 5035) are running using listProcesses. Read the output of both processes. If the Angular build has errors, stop it, run: Remove-Item -Recurse -Force '.angular/cache' -ErrorAction SilentlyContinue, then restart with controlPwshProcess using command 'ng serve --port 4200' in the workspace root. If the backend is down, restart it with 'dotnet run' in backend/Samantha.API. If either process is missing entirely, kill stale processes first with: Get-Process -Name 'node','dotnet' -ErrorAction SilentlyContinue | Stop-Process -Force, then restart both. Wait 40 seconds then read output of both processes and confirm they are live. Report status clearly."
+  }
+}

@@ -11,27 +11,27 @@ public static class SeedHome
         {
             var news = new List<NewsArticle>
             {
-                new NewsArticle 
-                { 
-                    Title = "Galatta Interview", 
-                    Date = "May 15, 2025", 
-                    Excerpt = "In this interview, Baradwaj Rangan has a candid conversation with Samantha for Shubham. They ate a lot, talked a lot, and had lots of fun.", 
+                new NewsArticle
+                {
+                    Title = "Galatta Interview",
+                    Date = "May 15, 2025",
+                    Excerpt = "In this interview, Baradwaj Rangan has a candid conversation with Samantha for Shubham. They ate a lot, talked a lot, and had lots of fun.",
                     ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181752/1KBvNGVxuMg-HD_gvqzhe.jpg",
                     Link = "https://youtu.be/1KBvNGVxuMg?si=6c4pq5wmmkIocelt"
                 },
-                new NewsArticle 
-                { 
-                    Title = "Celebrating 15 Years Of Samantha Promo", 
-                    Date = "April 28, 2025", 
-                    Excerpt = "Celebrating 15 Years Of Samantha Promo | Apsara Awards 2025 | This Saturday at 5:30PM | Zee Telugu", 
+                new NewsArticle
+                {
+                    Title = "Celebrating 15 Years Of Samantha Promo",
+                    Date = "April 28, 2025",
+                    Excerpt = "Celebrating 15 Years Of Samantha Promo | Apsara Awards 2025 | This Saturday at 5:30PM | Zee Telugu",
                     ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181934/5SK0jFVolHU-HD_za0gfe.jpg",
                     Link = "https://youtu.be/5SK0jFVolHU?si=IHIkUwZ-McsgR9Bb"
                 },
-                new NewsArticle 
-                { 
-                    Title = "Samantha on health, stopping junk food ads...", 
-                    Date = "April 10, 2025", 
-                    Excerpt = "Samantha was one of the first people who supported me when I started Label Padhega India...", 
+                new NewsArticle
+                {
+                    Title = "Samantha on health, stopping junk food ads...",
+                    Date = "April 10, 2025",
+                    Excerpt = "Samantha was one of the first people who supported me when I started Label Padhega India...",
                     ImageUrl = "https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748182251/oeK3C-9cbVc-HD_qzprbm.jpg",
                     Link = "https://youtu.be/oeK3C-9cbVc?si=dKNuBerq_MvuxsF_"
                 }

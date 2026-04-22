@@ -65,9 +65,14 @@ export const routes: Routes = [
         title: 'Gallery | Samantha Ruth Prabhu'
       },
       {
+        path: 'journal',
+        loadComponent: () => import('./pages/blog/blog.component').then(c => c.BlogComponent),
+        title: 'Journal | Samantha Ruth Prabhu'
+      },
+      {
         path: 'timeline',
-        loadComponent: () => import('./pages/timeline/timeline.component').then(c => c.TimelineComponent),
-        title: 'Timeline | Samantha Ruth Prabhu'
+        redirectTo: 'journal',
+        pathMatch: 'full'
       },
       {
         path: 'wallpapers',
@@ -101,8 +106,8 @@ export const routes: Routes = [
       },
       {
         path: 'blog',
-        loadComponent: () => import('./pages/blog/blog.component').then(c => c.BlogComponent),
-        title: 'Blog | Samantha Ruth Prabhu'
+        redirectTo: 'journal',
+        pathMatch: 'full'
       }
     ]
   },

@@ -63,7 +63,7 @@ import { RouterLink } from '@angular/router';
               <ul class="space-y-3">
                 <li><a routerLink="/about" class="sr-link">About</a></li>
                 <li><a routerLink="/filmography" class="sr-link">Filmography</a></li>
-                <li><a routerLink="/blog" class="sr-link">Blog</a></li>
+                <li><a routerLink="/journal" class="sr-link">Journal</a></li>
                 <li><a routerLink="/gallery" class="sr-link">Gallery</a></li>
                 <li><a routerLink="/philanthropy" class="sr-link">Philanthropy</a></li>
                 <li><a routerLink="/fan-zone" class="sr-link">Fan Zone</a></li>

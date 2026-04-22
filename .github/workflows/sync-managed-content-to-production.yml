@@ -1,4 +1,4 @@
-name: Sync Managed Content To Production
+name: Validate Managed Content Publish Flow
 
 on:
   push:
@@ -8,39 +8,17 @@ on:
     paths:
       - 'src/**'
       - 'backend/Samantha.API/**'
+      - 'tools/ManagedContentPublisher/**'
       - 'tools/sync-managed-content-to-production.mjs'
+      - 'docs/managed-content-publishing.md'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/sync-managed-content-to-production.yml'
   workflow_dispatch:
 
 jobs:
-  sync-managed-content:
+  validate-managed-content-flow:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: samantha_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d samantha_db"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-
-    env:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://127.0.0.1:5035
-      ConnectionStrings__DefaultConnection: Host=127.0.0.1;Database=samantha_db;Username=postgres;Password=postgres
-      LOCAL_API_URL: http://127.0.0.1:5035/api
-      PROD_API_URL: https://samantha-official-website-api.onrender.com/api
-      PROD_ADMIN_EMAIL: ${{ secrets.PROD_ADMIN_EMAIL }}
-      PROD_ADMIN_PASSWORD: ${{ secrets.PROD_ADMIN_PASSWORD }}
 
     steps:
       - name: Check out repository
@@ -63,23 +41,14 @@ jobs:
       - name: Restore backend dependencies
         run: dotnet restore backend/Samantha.API/Samantha.API.csproj
 
+      - name: Restore managed content publisher dependencies
+        run: dotnet restore tools/ManagedContentPublisher/ManagedContentPublisher.csproj
+
+      - name: Build frontend
+        run: npm run build
+
       - name: Build backend
         run: dotnet build backend/Samantha.API/Samantha.API.csproj --configuration Debug --no-restore
 
-      - name: Start local API
-        run: nohup dotnet run --project backend/Samantha.API/Samantha.API.csproj --configuration Debug --no-build > backend.log 2>&1 &
-
-      - name: Wait for local API
-        run: |
-          for attempt in {1..45}; do
-            if curl --silent --fail http://127.0.0.1:5035/api/pagecontent/home-page > /dev/null; then
-              exit 0
-            fi
-            sleep 4
-          done
-          echo "Local API did not become ready in time."
-          cat backend.log
-          exit 1
-
-      - name: Sync managed content to production
-        run: npm run sync:managed-content:prod
+      - name: Build managed content publisher
+        run: dotnet build tools/ManagedContentPublisher/ManagedContentPublisher.csproj --configuration Debug --no-restore

@@ -488,10 +488,9 @@ export class NavbarComponent implements OnDestroy {
    secondaryNavItems = [
       { label: 'Fashion', route: '/fashion', exact: false },
       { label: 'Philanthropy', route: '/philanthropy', exact: false },
-      { label: 'Timeline', route: '/timeline', exact: false },
+      { label: 'Journal', route: '/journal', exact: false },
       { label: 'Fan Wall', route: '/fan-wall', exact: false },
       { label: 'Wallpapers', route: '/wallpapers', exact: false },
-      { label: 'Blog', route: '/blog', exact: false },
       { label: 'Press', route: '/media', exact: false }
    ];
 

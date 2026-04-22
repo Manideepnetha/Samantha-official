@@ -1,4 +1,4 @@
-import { Movie } from '../../services/api.service';
+import { Movie, MovieDownloadAsset } from '../../services/api.service';
 
 export const FALLBACK_POSTER_URL =
   'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122621/Attarintiki_Daredi_Release_Date_Posters_21_cdba22.jpg';
@@ -15,7 +15,8 @@ export function normalizeMovie(movie: Partial<Movie>): Movie {
     director: normalizeText(movie.director, ''),
     poster: normalizeText(movie.poster, FALLBACK_POSTER_URL),
     description: normalizeText(movie.description, ''),
-    trailer: normalizeOptionalText(movie.trailer)
+    trailer: normalizeOptionalText(movie.trailer),
+    downloadAssets: normalizeDownloadAssets(movie.downloadAssets)
   };
 }
 
@@ -131,6 +132,30 @@ function normalizeOptionalText(value: unknown): string | undefined {
 
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function normalizeDownloadAssets(value: unknown): MovieDownloadAsset[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  const assets = value
+    .map((asset) => {
+      if (!asset || typeof asset !== 'object') {
+        return null;
+      }
+
+      const label = normalizeText((asset as { label?: unknown }).label, '');
+      const url = normalizeOptionalText((asset as { url?: unknown }).url);
+      if (!label || !url) {
+        return null;
+      }
+
+      return { label, url };
+    })
+    .filter((asset): asset is MovieDownloadAsset => asset !== null);
+
+  return assets.length > 0 ? assets : undefined;
 }
 
 function normalizeSearchValue(value: string | undefined): string {

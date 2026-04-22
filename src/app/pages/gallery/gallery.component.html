@@ -18,8 +18,8 @@
   <section *ngIf="!loading && featuredSet as set" class="sr-hero-shell gallery-hero-shell">
     <div class="sr-hero-frame">
       <div class="sr-hero-panel gallery-hero-panel">
-        <div class="sr-hero-media">
-          <img [src]="set.coverImageUrl || set.leadImage?.imageUrl" [alt]="set.title || 'Samantha Ruth Prabhu Gallery'">
+        <div class="sr-hero-media gallery-hero-backdrop" aria-hidden="true">
+          <img [src]="getHeroBackdropImageUrl(set)" alt="">
         </div>
 
         <div class="sr-hero-copy gallery-hero-copy">
@@ -53,6 +53,23 @@
             </article>
           </div>
         </div>
+
+        <div class="gallery-hero-visual" aria-hidden="true">
+          <div class="gallery-hero-portrait-frame">
+            <img [src]="getHeroFocusImageUrl(set)" alt="" loading="eager" decoding="async">
+            <div class="gallery-hero-portrait-meta">
+              <span>Featured Set</span>
+              <strong>{{ set.title }}</strong>
+              <small>{{ set.itemCount }} Photos</small>
+            </div>
+          </div>
+
+          <div *ngIf="getHeroPreviewImages(set).length > 0" class="gallery-hero-filmstrip">
+            <span *ngFor="let preview of getHeroPreviewImages(set); trackBy: trackByImage" class="gallery-hero-film-thumb">
+              <img [src]="preview.imageUrl" alt="" loading="lazy" decoding="async">
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -71,7 +88,7 @@
         <div class="gallery-toolbar-meta">
           <span class="gallery-toolbar-pill">{{ filteredStorySets.length }} Collections</span>
           <span class="gallery-toolbar-pill">{{ activeImageCount }} Photos</span>
-          <span class="gallery-toolbar-pill">{{ activeCategoryLabel }}</span>
+          <span class="gallery-toolbar-pill">{{ activeSortLabel }}</span>
         </div>
       </div>
 
@@ -81,10 +98,62 @@
           type="button"
           class="sr-chip gallery-chip"
           [class.is-active]="selectedCategory === category.value"
+          [attr.aria-pressed]="selectedCategory === category.value"
           (click)="selectCategory(category.value)"
         >
           <span>{{ category.label }}</span>
           <strong>{{ getCategoryCount(category.value) }}</strong>
+        </button>
+      </div>
+
+      <div class="gallery-discovery-grid" aria-label="Search and filter collections">
+        <label class="gallery-filter-field gallery-filter-field-search">
+          <span class="sr-field-label">Search Collections</span>
+          <input
+            #searchField
+            type="search"
+            class="sr-input gallery-search-input"
+            [value]="searchQuery"
+            placeholder="Search collection names, subtitles, or descriptions"
+            (input)="setSearchQuery(searchField.value)"
+          >
+        </label>
+
+        <label class="gallery-filter-field">
+          <span class="sr-field-label">Collection Name</span>
+          <select
+            #collectionField
+            class="sr-select"
+            [value]="selectedCollectionKey"
+            (change)="selectCollection(collectionField.value)"
+          >
+            <option value="all">All Collections</option>
+            <option *ngFor="let set of collectionOptions; trackBy: trackBySet" [value]="set.key">{{ set.title }}</option>
+          </select>
+        </label>
+
+        <label class="gallery-filter-field">
+          <span class="sr-field-label">Sort By</span>
+          <select
+            #sortField
+            class="sr-select"
+            [value]="sortOption"
+            (change)="selectSortOption(sortField.value)"
+          >
+            <option *ngFor="let option of sortOptions" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="gallery-filter-summary">
+        <div class="gallery-filter-pill-row">
+          <span class="gallery-toolbar-pill">{{ activeCategoryLabel }}</span>
+          <span *ngIf="selectedCollectionKey !== 'all'" class="gallery-toolbar-pill">{{ activeCollectionLabel }}</span>
+          <span *ngIf="searchQuery.trim()" class="gallery-toolbar-pill">Search: "{{ searchQuery.trim() }}"</span>
+        </div>
+
+        <button *ngIf="hasActiveFilters" type="button" class="sr-button-ghost gallery-clear-button" (click)="resetFilters()">
+          Clear Filters
         </button>
       </div>
     </div>
@@ -106,10 +175,18 @@
         [routerLink]="['/gallery/set', set.key]"
         class="gallery-card sr-surface-soft sr-hover-card"
         [style.--gallery-card-accent]="set.accentTone"
+        [style.--gallery-card-index]="i"
+        [attr.aria-label]="'Open ' + set.title + ' collection'"
       >
         <div class="gallery-card-media">
           <img [src]="set.coverImageUrl || set.leadImage?.imageUrl" [alt]="set.title" loading="lazy" decoding="async">
           <span class="gallery-card-badge">{{ getGalleryCategoryLabel(set.category) }}</span>
+
+          <div *ngIf="getCardPreviewImages(set).length > 0" class="gallery-card-preview-stack" aria-hidden="true">
+            <span *ngFor="let preview of getCardPreviewImages(set); trackBy: trackByImage" class="gallery-card-preview-thumb">
+              <img [src]="preview.imageUrl" alt="" loading="lazy" decoding="async">
+            </span>
+          </div>
         </div>
 
         <div class="gallery-card-body">
@@ -135,7 +212,10 @@
     <div class="gallery-state-card sr-surface-soft">
       <span class="sr-kicker">No Match</span>
       <h2>No collection matches this filter right now.</h2>
-      <p>Try another category to continue exploring Samantha&apos;s gallery.</p>
+      <p>Try another category, collection name, or clear the current search to continue exploring Samantha&apos;s gallery.</p>
+      <div *ngIf="hasActiveFilters" class="gallery-state-actions">
+        <button type="button" class="sr-button-ghost gallery-clear-button" (click)="resetFilters()">Reset Gallery Filters</button>
+      </div>
     </div>
   </section>
 </div>

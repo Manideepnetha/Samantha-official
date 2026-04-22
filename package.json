@@ -5,10 +5,14 @@
     "backend": "powershell -ExecutionPolicy Bypass -File ./backend/run-api.ps1",
     "backend:nobuild": "powershell -ExecutionPolicy Bypass -File ./backend/run-api.ps1 -NoBuild",
     "ng": "ng",
-    "start": "ng serve",
+    "start": "powershell -ExecutionPolicy Bypass -File ./scripts/start-one-port.ps1",
+    "start:frontend": "ng serve",
+    "start:oneport": "powershell -ExecutionPolicy Bypass -File ./scripts/start-one-port.ps1",
     "build": "ng build",
     "dev": "ng serve",
-    "sync:managed-content:prod": "node ./tools/sync-managed-content-to-production.mjs"
+    "managed-content:verify": "dotnet run --project ./tools/ManagedContentPublisher/ManagedContentPublisher.csproj -- verify",
+    "sync:managed-content:prod": "dotnet run --project ./tools/ManagedContentPublisher/ManagedContentPublisher.csproj -- publish",
+    "sync:managed-content:prod:legacy-api": "node ./tools/sync-managed-content-to-production.mjs"
   },
   "dependencies": {
     "@angular/animations": "^19.2.0",

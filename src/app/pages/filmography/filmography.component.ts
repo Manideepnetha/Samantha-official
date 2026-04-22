@@ -3,6 +3,7 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService, Movie } from '../../services/api.service';
+import { getMovieDownloadAssets, enrichMoviesWithDownloads } from './movie-downloads';
 import {
   FALLBACK_POSTER_URL,
   getMovieAppearanceLabel,
@@ -169,7 +170,18 @@ import {
               <h3 class="film-card-title">{{ movie.title }}</h3>
               <p class="sr-card-text film-card-role">{{ movie.role || 'Role to be announced' }}</p>
               <p class="film-card-detail" *ngIf="movie.director">Directed by {{ movie.director }}</p>
-              <a class="sr-button w-full text-center film-card-button" [routerLink]="['/filmography', movie.id]">View Details</a>
+              <div class="film-card-actions" [class.is-single]="!hasDownloadAssets(movie)">
+                <a class="sr-button text-center film-card-button" [routerLink]="['/filmography', movie.id]">View Details</a>
+                <a
+                  *ngIf="getPrimaryDownloadAsset(movie) as asset"
+                  class="sr-button-outline text-center film-card-button film-card-download-button"
+                  [href]="asset.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ getDownloadButtonLabel(movie) }}
+                </a>
+              </div>
             </div>
           </article>
         </div>
@@ -221,7 +233,18 @@ import {
               <h3 class="film-card-title">{{ series.title }}</h3>
               <p class="sr-card-text film-card-role">{{ series.role || 'Role to be announced' }}</p>
               <p class="film-card-detail" *ngIf="series.director">Directed by {{ series.director }}</p>
-              <a class="sr-button w-full text-center film-card-button" [routerLink]="['/filmography', series.id]">View Details</a>
+              <div class="film-card-actions" [class.is-single]="!hasDownloadAssets(series)">
+                <a class="sr-button text-center film-card-button" [routerLink]="['/filmography', series.id]">View Details</a>
+                <a
+                  *ngIf="getPrimaryDownloadAsset(series) as asset"
+                  class="sr-button-outline text-center film-card-button film-card-download-button"
+                  [href]="asset.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ getDownloadButtonLabel(series) }}
+                </a>
+              </div>
             </div>
           </article>
         </div>
@@ -259,7 +282,18 @@ import {
               <h3 class="film-card-title">{{ movie.title }}</h3>
               <p class="sr-card-text film-card-role">{{ movie.role || 'Role to be announced' }}</p>
               <p class="film-card-detail" *ngIf="movie.director">Directed by {{ movie.director }}</p>
-              <a class="sr-button w-full text-center film-card-button" [routerLink]="['/filmography', movie.id]">View Details</a>
+              <div class="film-card-actions" [class.is-single]="!hasDownloadAssets(movie)">
+                <a class="sr-button text-center film-card-button" [routerLink]="['/filmography', movie.id]">View Details</a>
+                <a
+                  *ngIf="getPrimaryDownloadAsset(movie) as asset"
+                  class="sr-button-outline text-center film-card-button film-card-download-button"
+                  [href]="asset.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ getDownloadButtonLabel(movie) }}
+                </a>
+              </div>
             </div>
           </article>
         </div>
@@ -588,6 +622,31 @@ import {
       box-shadow: 0 14px 28px rgba(212, 177, 140, 0.16);
     }
 
+    .film-card-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: auto;
+    }
+
+    .film-card-actions.is-single {
+      grid-template-columns: 1fr;
+    }
+
+    .film-card-actions .film-card-button {
+      width: 100%;
+      margin-top: 0;
+    }
+
+    .film-card-download-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 3rem;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
     @media (min-width: 1100px) {
       .film-filter-search {
         grid-column: span 2;
@@ -617,6 +676,10 @@ import {
 
       .film-card-poster {
         height: 21rem;
+      }
+
+      .film-card-actions {
+        grid-template-columns: 1fr;
       }
 
       .film-filter-footer {
@@ -745,7 +808,7 @@ export class FilmographyComponent implements OnInit, OnDestroy {
 
     this.apiService.getMovies().subscribe({
       next: (data) => {
-        const normalizedMovies = data.map((movie) => this.normalizeMovie(movie));
+        const normalizedMovies = enrichMoviesWithDownloads(data.map((movie) => this.normalizeMovie(movie)));
         this.webSeries = normalizedMovies.filter((movie) => isWebSeriesMovie(movie));
         this.movies = normalizedMovies.filter((movie) => !isWebSeriesMovie(movie));
 
@@ -849,6 +912,18 @@ export class FilmographyComponent implements OnInit, OnDestroy {
 
   getYearBadge(movie: Movie): string {
     return /to be announced|tba/i.test(movie.releaseDate || '') ? 'TBA' : String(movie.year);
+  }
+
+  getPrimaryDownloadAsset(movie: Movie): NonNullable<Movie['downloadAssets']>[number] | null {
+    return getMovieDownloadAssets(movie)[0] || null;
+  }
+
+  hasDownloadAssets(movie: Movie): boolean {
+    return getMovieDownloadAssets(movie).length > 0;
+  }
+
+  getDownloadButtonLabel(movie: Movie): string {
+    return getMovieDownloadAssets(movie).length > 1 ? 'Downloads' : 'Download';
   }
 
   clearFilters(): void {

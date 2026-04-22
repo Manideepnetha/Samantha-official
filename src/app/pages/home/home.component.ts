@@ -2,14 +2,15 @@ import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { gsap } from 'gsap';
-import { ApiService } from '../../services/api.service';
+import { combineLatest, Subscription } from 'rxjs';
+import { ApiService, MediaGallery } from '../../services/api.service';
 import { ThemeService } from '../../services/theme.service';
 import { NotificationBellComponent } from '../../components/notification-bell/notification-bell.component';
 import { BirthdayCountdownComponent } from '../../components/birthday-countdown/birthday-countdown.component';
 import { QuoteOfTheDayComponent } from '../../components/quote-of-the-day/quote-of-the-day.component';
 import { ThisDayHistoryComponent } from '../../components/this-day-history/this-day-history.component';
 import { InstagramFeedEmbedComponent } from '../../components/instagram-feed-embed/instagram-feed-embed.component';
-import { Subscription } from 'rxjs';
+import { buildGalleryStorySets, GalleryStorySet, getFallbackGalleryStorySets } from '../gallery/gallery-story.utils';
 
 interface HeroSlide {
   image: string;
@@ -23,21 +24,30 @@ interface HomeNewsItem {
   excerpt: string;
   image: string;
   link?: string;
+  frameStyle: 'portrait' | 'landscape' | 'square';
 }
 
 interface HomeProject {
   title: string;
   type: string;
-  releaseDate?: string;
+  releaseLabel: string;
   description: string;
-  director: string;
+  creditsLabel: string;
+  credits: string;
+  cast: string;
   image: string;
 }
 
 interface HomeGalleryImage {
+  key: string;
   url: string;
   alt: string;
   caption: string;
+  collectionKey: string;
+  collectionTitle: string;
+  collectionCount: number;
+  accentTone: string;
+  frameStyle: 'portrait' | 'landscape' | 'square';
 }
 
 interface HomePerformanceLayer {
@@ -217,6 +227,56 @@ const DEFAULT_HOME_CONTENT: HomePageContent = {
   ]
 };
 
+const DEFAULT_CURRENT_HIGHLIGHTS: readonly HomeNewsItem[] = [
+  {
+    title: 'Galatta Interview',
+    date: 'May 15, 2025',
+    excerpt: 'In this interview, Baradwaj Rangan has a candid conversation with Samantha for Shubham. They ate a lot, talked a lot, and had lots of fun.',
+    image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181752/1KBvNGVxuMg-HD_gvqzhe.jpg',
+    link: 'https://youtu.be/1KBvNGVxuMg?si=6c4pq5wmmkIocelt',
+    frameStyle: 'landscape'
+  },
+  {
+    title: 'Celebrating 15 Years Of Samantha Promo',
+    date: 'April 28, 2025',
+    excerpt: 'Celebrating 15 Years Of Samantha Promo | Apsara Awards 2025 | This Saturday at 5:30PM | Zee Telugu',
+    image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181934/5SK0jFVolHU-HD_za0gfe.jpg',
+    link: 'https://youtu.be/5SK0jFVolHU?si=IHIkUwZ-McsgR9Bb',
+    frameStyle: 'landscape'
+  },
+  {
+    title: 'Samantha on health, stopping junk food ads...',
+    date: 'April 10, 2025',
+    excerpt: 'Samantha was one of the first people who supported me when I started Label Padhega India...',
+    image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748182251/oeK3C-9cbVc-HD_qzprbm.jpg',
+    link: 'https://youtu.be/oeK3C-9cbVc?si=dKNuBerq_MvuxsF_',
+    frameStyle: 'landscape'
+  }
+] as const;
+
+const VERIFIED_UPCOMING_PROJECTS: readonly HomeProject[] = [
+  {
+    title: 'Maa Inti Bangaram',
+    type: 'Action Family Drama | Theatrical Film',
+    releaseLabel: 'May 15, 2026',
+    description: 'A female-led Telugu action-family drama set in the 1980s, centered on a newly married woman whose quiet domestic life hides a violent past and a secret mission.',
+    creditsLabel: 'Directed by',
+    credits: 'B. V. Nandini Reddy',
+    cast: 'Samantha Ruth Prabhu, Gulshan Devaiah, Diganth, Gautami, Manjusha',
+    image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg'
+  },
+  {
+    title: 'Rakt Brahmand: The Bloody Kingdom',
+    type: 'Fantasy Action Adventure | Netflix Series',
+    releaseLabel: 'Official release date not announced',
+    description: 'Netflix has officially announced the series and platform, but not a premiere date yet. The project remains in production as Raj & DK’s large-scale fantasy period series.',
+    creditsLabel: 'Created by / Directed by',
+    credits: 'Raj & DK / Rahi Anil Barve',
+    cast: 'Aditya Roy Kapur, Samantha Ruth Prabhu, Ali Fazal, Wamiqa Gabbi, Jaideep Ahlawat',
+    image: 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748122747/20240727_100042_wgs661.jpg'
+  }
+] as const;
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -235,6 +295,8 @@ const DEFAULT_HOME_CONTENT: HomePageContent = {
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   currentSlide = 0;
   currentRole = 0;
+  currentPerformanceSlide = 0;
+  currentNewsSlide = 0;
   isMobileMenuOpen = false;
   isDarkMode = false;
   awardCount = 12;
@@ -242,9 +304,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private roleInterval?: ReturnType<typeof setInterval>;
   private slideInterval?: ReturnType<typeof setInterval>;
+  private newsInterval?: ReturnType<typeof setInterval>;
+  private galleryShuffleTimer?: ReturnType<typeof setTimeout>;
   private themeSubscription?: Subscription;
 
   private readonly CACHE_VERSION = 'v2';
+  private readonly FEATURED_GALLERY_LIMIT = 8;
+  private galleryStorySets: GalleryStorySet[] = [];
 
   readonly debutYear = 2010;
   performanceRange = DEFAULT_HOME_CONTENT.performanceRange;
@@ -261,7 +327,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly secondaryNavItems = [
     { label: 'Fashion', route: '/fashion' },
     { label: 'Philanthropy', route: '/philanthropy' },
-    { label: 'Timeline', route: '/timeline' },
+    { label: 'Journal', route: '/journal' },
     { label: 'Wallpapers', route: '/wallpapers' },
     { label: 'Fan Wall', route: '/fan-wall' },
     { label: 'Press', route: '/media' }
@@ -325,6 +391,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   latestNews: HomeNewsItem[] = [];
   upcomingProjects: HomeProject[] = [];
   featuredGallery: HomeGalleryImage[] = [];
+  galleryArchiveCount = 0;
+  galleryCollectionCount = 0;
+  isGalleryJumbling = false;
   tickerText = '';
   tickerLink = '';
   fallbackImage = 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748045346/Samantha29_clxsnm.jpg?cache=v2';
@@ -343,6 +412,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.latestNews[0] ?? null;
   }
 
+  get newsSlideCount(): number {
+    return this.latestNews.length;
+  }
+
   get secondaryNews(): HomeNewsItem[] {
     return this.latestNews.slice(1);
   }
@@ -351,8 +424,20 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.upcomingProjects[0] ?? null;
   }
 
+  get performanceSlides(): HomePerformanceLayer[] {
+    return this.performanceLayers;
+  }
+
+  get performanceSlideCount(): number {
+    return this.performanceLayers.length;
+  }
+
   get remainingProjects(): HomeProject[] {
     return this.upcomingProjects.slice(1);
+  }
+
+  get canJumbleGallery(): boolean {
+    return this.galleryArchiveCount > 1;
   }
 
   get careerYears(): number {
@@ -375,6 +460,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.stopCarousels();
     if (typeof document !== 'undefined') {
       document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
+    }
+
+    if (this.galleryShuffleTimer) {
+      clearTimeout(this.galleryShuffleTimer);
     }
 
     this.themeSubscription?.unsubscribe();
@@ -413,6 +502,110 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     window.open(url, '_blank', 'noopener');
   }
 
+  goToPerformanceSlide(index: number): void {
+    if (this.performanceSlideCount === 0) {
+      this.currentPerformanceSlide = 0;
+      return;
+    }
+
+    const normalizedIndex = ((index % this.performanceSlideCount) + this.performanceSlideCount) % this.performanceSlideCount;
+    this.currentPerformanceSlide = normalizedIndex;
+  }
+
+  previousPerformanceSlide(): void {
+    this.goToPerformanceSlide(this.currentPerformanceSlide - 1);
+  }
+
+  nextPerformanceSlide(): void {
+    this.goToPerformanceSlide(this.currentPerformanceSlide + 1);
+  }
+
+  goToNewsSlide(index: number): void {
+    if (this.newsSlideCount === 0) {
+      this.currentNewsSlide = 0;
+      return;
+    }
+
+    const normalizedIndex = ((index % this.newsSlideCount) + this.newsSlideCount) % this.newsSlideCount;
+    this.currentNewsSlide = normalizedIndex;
+  }
+
+  previousNewsSlide(): void {
+    this.goToNewsSlide(this.currentNewsSlide - 1);
+  }
+
+  nextNewsSlide(): void {
+    this.goToNewsSlide(this.currentNewsSlide + 1);
+  }
+
+  jumbleFeaturedGallery(): void {
+    if (!this.canJumbleGallery) {
+      return;
+    }
+
+    if (this.galleryStorySets.length > 0) {
+      this.featuredGallery = this.buildFeaturedGallerySelection(this.galleryStorySets);
+    } else {
+      this.featuredGallery = this.shuffleArray([...this.featuredGallery]);
+    }
+
+    this.triggerGalleryShuffleAnimation();
+  }
+
+  trackByFeaturedGallery(_: number, image: HomeGalleryImage): string {
+    return image.key;
+  }
+
+  getFeaturedGalleryLinkParams(image: HomeGalleryImage): Record<string, string> {
+    return image.collectionKey ? { collection: image.collectionKey } : {};
+  }
+
+  getFeaturedGalleryCta(image: HomeGalleryImage): string {
+    return image.collectionCount > 1
+      ? `Open ${image.collectionCount} photo collection`
+      : 'Open in official gallery';
+  }
+
+  onFeaturedGalleryImageLoad(image: HomeGalleryImage, event: Event): void {
+    const target = event.target;
+    if (!(target instanceof HTMLImageElement)) {
+      return;
+    }
+
+    const width = target.naturalWidth || target.width;
+    const height = target.naturalHeight || target.height;
+    if (!width || !height) {
+      return;
+    }
+
+    const ratio = width / height;
+    image.frameStyle = ratio >= 1.12
+      ? 'landscape'
+      : ratio <= 0.92
+        ? 'portrait'
+        : 'square';
+  }
+
+  onNewsImageLoad(item: HomeNewsItem, event: Event): void {
+    const target = event.target;
+    if (!(target instanceof HTMLImageElement)) {
+      return;
+    }
+
+    const width = target.naturalWidth || target.width;
+    const height = target.naturalHeight || target.height;
+    if (!width || !height) {
+      return;
+    }
+
+    const ratio = width / height;
+    item.frameStyle = ratio >= 1.12
+      ? 'landscape'
+      : ratio <= 0.92
+        ? 'portrait'
+        : 'square';
+  }
+
   private startCarousels(): void {
     if (!this.roleInterval) {
       this.roleInterval = setInterval(() => {
@@ -433,6 +626,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.currentSlide = (this.currentSlide + 1) % this.heroSlides.length;
       }, 5200);
     }
+
+    if (!this.newsInterval) {
+      this.newsInterval = setInterval(() => {
+        if (this.latestNews.length <= 1) {
+          return;
+        }
+
+        this.currentNewsSlide = (this.currentNewsSlide + 1) % this.latestNews.length;
+      }, 6800);
+    }
   }
 
   private loadHomepageContent(): void {
@@ -444,61 +647,43 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.featureShowcaseImage = merged.featureShowcaseImage;
         this.performanceLayers = merged.performanceLayers;
         this.keyFeatureCards = merged.keyFeatureCards;
+        this.currentPerformanceSlide = 0;
       },
       error: () => {}
     });
 
     this.apiService.getNews().subscribe(data => {
-      this.latestNews = data.map(item => ({
-        title: item.title,
-        date: item.date,
-        excerpt: item.excerpt,
-        image: this.getCacheBustedUrl(item.imageUrl || 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748181752/1KBvNGVxuMg-HD_gvqzhe.jpg'),
-        link: item.link
-      }));
+      this.latestNews = this.buildCurrentHighlights(data);
+      this.currentNewsSlide = 0;
     });
 
     this.apiService.getMovies().subscribe(data => {
-      this.upcomingProjects = data
-        .filter(movie => movie.year >= 2025)
-        .map(movie => ({
-          title: movie.title,
-          type: movie.genre?.[0] || 'Feature Film',
-          releaseDate: movie.releaseDate,
-          description: movie.description,
-          director: movie.director,
-          image: this.getCacheBustedUrl(
-            movie.title.toLowerCase().includes('bangaram')
-              ? 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1768338977/vdTawCMwiQs-HD_hz86rl.jpg'
-              : (movie.poster || 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748010072/8F9A7985_m86vsc.jpg')
-          )
-        }));
+      this.upcomingProjects = this.buildUpcomingProjects(data);
     });
 
-    this.apiService.getMediaGalleries(true).subscribe(data => {
-      const standaloneMediaItems = data.filter(item => !item.collectionKey?.trim());
-      const homeGalleryItems = standaloneMediaItems.filter(item => !item.type || item.type === 'Home');
-      const featuredGallery = homeGalleryItems.length > 0
-        ? homeGalleryItems
-        : standaloneMediaItems.filter(item => item.type !== 'Hero');
+    combineLatest([
+      this.apiService.getGalleryCollections(true),
+      this.apiService.getMediaGalleries(true)
+    ]).subscribe({
+      next: ([collections, mediaItems]) => {
+        this.syncFeaturedGallery(buildGalleryStorySets(collections, mediaItems), mediaItems);
 
-      this.featuredGallery = featuredGallery.map(item => ({
-        url: this.getCacheBustedUrl(item.imageUrl),
-        alt: item.altText || item.caption || 'Samantha Ruth Prabhu gallery image',
-        caption: item.caption
-      }));
+        const dynamicHeroSlides = mediaItems.filter(item => item.type === 'Hero');
+        if (dynamicHeroSlides.length > 0) {
+          this.heroSlides = dynamicHeroSlides.map(item => ({
+            image: this.getCacheBustedUrl(item.imageUrl),
+            role: item.caption || 'Icon',
+            alt: item.altText || 'Samantha Ruth Prabhu hero portrait'
+          }));
 
-      const dynamicHeroSlides = data.filter(item => item.type === 'Hero');
-      if (dynamicHeroSlides.length > 0) {
-        this.heroSlides = dynamicHeroSlides.map(item => ({
-          image: this.getCacheBustedUrl(item.imageUrl),
-          role: item.caption || 'Icon',
-          alt: item.altText || 'Samantha Ruth Prabhu hero portrait'
-        }));
-
-        this.roles = this.heroSlides.map(item => item.role);
-        this.currentSlide = 0;
-        this.currentRole = 0;
+          this.roles = this.heroSlides.map(item => item.role);
+          this.currentSlide = 0;
+          this.currentRole = 0;
+        }
+      },
+      error: (error) => {
+        console.error('Failed to sync homepage gallery with gallery story sets', error);
+        this.syncFeaturedGallery(getFallbackGalleryStorySets(), []);
       }
     });
 
@@ -547,6 +732,210 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }));
   }
 
+  private buildUpcomingProjects(movies: Array<{ title: string; poster: string }>): HomeProject[] {
+    const moviePosters = new Map(
+      movies.map(movie => [this.normalizeTitle(movie.title), movie.poster])
+    );
+
+    return VERIFIED_UPCOMING_PROJECTS.map(project => ({
+      ...project,
+      image: this.getCacheBustedUrl(
+        moviePosters.get(this.normalizeTitle(project.title)) || project.image
+      )
+    }));
+  }
+
+  private normalizeTitle(value: string): string {
+    return value.trim().toLowerCase();
+  }
+
+  private parseNewsDate(dateLabel?: string): number {
+    if (!dateLabel) {
+      return 0;
+    }
+
+    const parsed = Date.parse(dateLabel);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  private buildCurrentHighlights(
+    items: Array<{ title: string; date?: string; excerpt: string; imageUrl?: string; link?: string }>
+  ): HomeNewsItem[] {
+    const curatedItems = items
+      .filter(item => !this.isInstagramNewsItem(item))
+      .map((item, index) => ({
+        index,
+        item: {
+          title: item.title,
+          date: item.date,
+          excerpt: item.excerpt,
+          image: this.getCacheBustedUrl(item.imageUrl || this.fallbackImage),
+          link: item.link,
+          frameStyle: 'landscape' as const
+        }
+      }))
+      .sort((left, right) => {
+        const dateDifference = this.parseNewsDate(right.item.date) - this.parseNewsDate(left.item.date);
+        return dateDifference !== 0 ? dateDifference : left.index - right.index;
+      })
+      .map(entry => entry.item);
+
+    if (curatedItems.length > 0) {
+      return curatedItems;
+    }
+
+    return DEFAULT_CURRENT_HIGHLIGHTS.map(item => ({
+      ...item,
+      image: this.getCacheBustedUrl(item.image),
+      frameStyle: 'landscape' as const
+    }));
+  }
+
+  private isInstagramNewsItem(item: { title: string; excerpt: string; imageUrl?: string; link?: string }): boolean {
+    const title = item.title.toLowerCase();
+    const excerpt = item.excerpt.toLowerCase();
+    const imageUrl = (item.imageUrl || '').toLowerCase();
+    const link = (item.link || '').toLowerCase();
+
+    return link.includes('instagram.com/')
+      || imageUrl.includes('/instagram-highlights/')
+      || title.includes('instagram')
+      || excerpt.includes('instagram');
+  }
+
+  private syncFeaturedGallery(storySets: GalleryStorySet[], mediaItems: MediaGallery[]): void {
+    this.galleryStorySets = storySets.filter(set => set.itemCount > 0);
+    this.galleryCollectionCount = this.galleryStorySets.length;
+    this.galleryArchiveCount = this.galleryStorySets.reduce((sum, set) => sum + set.itemCount, 0);
+
+    if (this.galleryArchiveCount > 0) {
+      this.featuredGallery = this.buildFeaturedGallerySelection(this.galleryStorySets);
+      return;
+    }
+
+    this.featuredGallery = this.buildLegacyFeaturedGallery(mediaItems);
+    this.galleryArchiveCount = this.featuredGallery.length;
+    this.galleryCollectionCount = this.featuredGallery.length > 0 ? 1 : 0;
+  }
+
+  private buildFeaturedGallerySelection(storySets: GalleryStorySet[]): HomeGalleryImage[] {
+    const availableSets = storySets.filter(set => set.images.length > 0);
+    const selectionLimit = Math.min(
+      this.FEATURED_GALLERY_LIMIT,
+      availableSets.reduce((sum, set) => sum + set.images.length, 0)
+    );
+
+    if (selectionLimit === 0) {
+      return [];
+    }
+
+    const leadImages = this.shuffleArray(
+      availableSets
+        .filter(set => !!set.leadImage)
+        .map(set => this.mapStoryImageToFeaturedGallery(set, set.leadImage!))
+    );
+    const supportingImages = this.shuffleArray(
+      availableSets.flatMap(set =>
+        set.images
+          .filter(image => image.id !== set.leadImage?.id)
+          .map(image => this.mapStoryImageToFeaturedGallery(set, image))
+      )
+    );
+
+    const selection: HomeGalleryImage[] = [];
+
+    for (const image of leadImages) {
+      if (selection.length >= selectionLimit) {
+        break;
+      }
+
+      selection.push(image);
+    }
+
+    for (const image of supportingImages) {
+      if (selection.length >= selectionLimit) {
+        break;
+      }
+
+      if (selection.some(selected => selected.key === image.key)) {
+        continue;
+      }
+
+      selection.push(image);
+    }
+
+    return this.shuffleArray(selection);
+  }
+
+  private mapStoryImageToFeaturedGallery(
+    set: GalleryStorySet,
+    image: GalleryStorySet['images'][number]
+  ): HomeGalleryImage {
+    return {
+      key: `${set.key}-${image.id}`,
+      url: this.getCacheBustedUrl(image.imageUrl),
+      alt: image.altText || image.caption || `${set.title} gallery image`,
+      caption: image.caption || set.title,
+      collectionKey: set.key,
+      collectionTitle: set.title,
+      collectionCount: set.itemCount,
+      accentTone: set.accentTone,
+      frameStyle: 'portrait' as const
+    };
+  }
+
+  private buildLegacyFeaturedGallery(mediaItems: MediaGallery[]): HomeGalleryImage[] {
+    return this.shuffleArray(
+      mediaItems
+        .filter(item => (item.type || '').trim().toLowerCase() !== 'hero')
+        .map((item, index) => ({
+          key: `legacy-${item.id ?? index}`,
+          url: this.getCacheBustedUrl(item.imageUrl),
+          alt: item.altText || item.caption || 'Samantha Ruth Prabhu gallery image',
+          caption: item.caption,
+          collectionKey: item.collectionKey?.trim() || '',
+          collectionTitle: item.collectionKey?.trim() ? this.formatCollectionLabel(item.collectionKey) : 'Official Gallery',
+          collectionCount: 1,
+          accentTone: '#d5b18c',
+          frameStyle: 'portrait' as const
+        }))
+    ).slice(0, this.FEATURED_GALLERY_LIMIT);
+  }
+
+  private triggerGalleryShuffleAnimation(): void {
+    this.isGalleryJumbling = false;
+
+    if (this.galleryShuffleTimer) {
+      clearTimeout(this.galleryShuffleTimer);
+    }
+
+    setTimeout(() => {
+      this.isGalleryJumbling = true;
+      this.galleryShuffleTimer = setTimeout(() => {
+        this.isGalleryJumbling = false;
+      }, 720);
+    });
+  }
+
+  private formatCollectionLabel(value: string): string {
+    return value
+      .replace(/[-_]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, character => character.toUpperCase());
+  }
+
+  private shuffleArray<T>(items: T[]): T[] {
+    const shuffled = [...items];
+
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+    }
+
+    return shuffled;
+  }
+
   private initAnimations(): void {
     gsap.from('.hero-frame', {
       duration: 1.1,
@@ -591,6 +980,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.slideInterval) {
       clearInterval(this.slideInterval);
       this.slideInterval = undefined;
+    }
+
+    if (this.newsInterval) {
+      clearInterval(this.newsInterval);
+      this.newsInterval = undefined;
     }
   }
 

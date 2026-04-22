@@ -171,41 +171,93 @@
         </p>
       </div>
 
-      <div class="performances-range" aria-label="Career range">
-        <span>{{ performanceRange }}</span>
+      <div class="performances-meta">
+        <div class="performances-range" aria-label="Career range">
+          <span>{{ performanceRange }}</span>
+        </div>
+
+        <div class="performances-controls" *ngIf="performanceSlideCount > 1" aria-label="Main role slides">
+          <button type="button" class="performances-arrow" (click)="previousPerformanceSlide()" aria-label="Previous role slide">
+            <span aria-hidden="true">Prev</span>
+          </button>
+          <div class="performances-pagination" aria-hidden="true">
+            <span>{{ currentPerformanceSlide + 1 < 10 ? '0' + (currentPerformanceSlide + 1) : currentPerformanceSlide + 1 }}</span>
+            <span class="performances-pagination-line"></span>
+            <span>{{ performanceSlideCount < 10 ? '0' + performanceSlideCount : performanceSlideCount }}</span>
+          </div>
+          <button type="button" class="performances-arrow" (click)="nextPerformanceSlide()" aria-label="Next role slide">
+            <span aria-hidden="true">Next</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="performances-stack">
-      <article
-        *ngFor="let performance of performanceLayers; let i = index"
-        class="performance-layer"
-        [class.is-reversed]="i % 2 === 1"
+    <div class="performances-slider-shell">
+      <div
+        class="performances-slider-track"
+        [style.transform]="'translateX(-' + (currentPerformanceSlide * 100) + '%)'"
       >
-        <div class="performance-copy">
-          <span class="performance-year">{{ performance.year }}</span>
-          <h3>{{ performance.title }}</h3>
-          <p class="performance-meta">{{ performance.meta }}</p>
-          <p class="performance-detail"><span>Role:</span> {{ performance.role }}</p>
-          <p class="performance-description">{{ performance.description }}</p>
-
-          <ul class="performance-highlights">
-            <li *ngFor="let highlight of performance.highlights">{{ highlight }}</li>
-          </ul>
-        </div>
-
-        <div
-          class="performance-media"
-          [style.--performance-image-position]="performance.imagePosition || 'center center'"
+        <section
+          *ngFor="let performance of performanceSlides; let slideIndex = index"
+          class="performances-slide"
+          [attr.aria-hidden]="currentPerformanceSlide !== slideIndex"
         >
-          <img
-            [src]="performance.image"
-            [alt]="performance.imageAlt"
-            loading="lazy"
-            (error)="performance.image = fallbackImage"
-          />
-        </div>
-      </article>
+          <article class="performance-layer performance-layer-featured">
+            <div class="performance-copy">
+              <div class="performance-copy-top">
+                <span class="performance-year">{{ performance.year }}</span>
+                <span class="performance-slide-index">
+                  {{ slideIndex + 1 < 10 ? '0' + (slideIndex + 1) : slideIndex + 1 }}
+                  <span>/</span>
+                  {{ performanceSlideCount < 10 ? '0' + performanceSlideCount : performanceSlideCount }}
+                </span>
+              </div>
+
+              <h3>{{ performance.title }}</h3>
+              <p class="performance-meta">{{ performance.meta }}</p>
+              <p class="performance-detail"><span>Role:</span> {{ performance.role }}</p>
+              <p class="performance-description">{{ performance.description }}</p>
+
+              <ul class="performance-highlights">
+                <li *ngFor="let highlight of performance.highlights">{{ highlight }}</li>
+              </ul>
+            </div>
+
+            <div class="performance-media-stage">
+              <div class="performance-media-frame">
+                <div
+                  class="performance-media"
+                  [style.--performance-image-position]="performance.imagePosition || 'center center'"
+                >
+                  <img
+                    [src]="performance.image"
+                    [alt]="performance.imageAlt"
+                    loading="lazy"
+                    (error)="performance.image = fallbackImage"
+                  />
+                </div>
+
+                <div class="performance-media-caption">
+                  <span>{{ performance.year }}</span>
+                  <strong>{{ performance.role }}</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+      </div>
+    </div>
+
+    <div class="performances-role-rail" *ngIf="performanceSlideCount > 1">
+      <button
+        *ngFor="let performance of performanceSlides; let i = index"
+        type="button"
+        class="performance-role-chip"
+        [class.is-active]="currentPerformanceSlide === i"
+        (click)="goToPerformanceSlide(i)"
+      >
+        {{ performance.title }}
+      </button>
     </div>
   </section>
 
@@ -278,52 +330,137 @@
 
   <section class="home-section news-section">
     <div class="home-section-heading">
-      <span class="section-kicker">Latest Videos</span>
+      <span class="section-kicker">Latest Highlights</span>
       <h2>Current Highlights</h2>
-      <p>Recent interviews, special appearances, and editorial moments gathered from the existing homepage feed.</p>
+      <p>Recent interviews, special appearances, and editorial moments from the official highlights collection.</p>
     </div>
 
-    <ng-container *ngIf="featuredNews as primaryNews; else emptyNewsState">
-      <div class="news-layout">
-        <article class="news-feature news-card">
-          <div class="news-media">
-            <img [src]="primaryNews.image" [alt]="primaryNews.title" loading="lazy" decoding="async" (error)="primaryNews.image = fallbackImage" />
+    <ng-container *ngIf="latestNews.length; else emptyNewsState">
+      <div class="news-slider-shell">
+        <div class="news-slider-topbar">
+          <div class="news-slider-status">
+            <span class="news-slider-label">Homepage Highlights</span>
+            <span class="news-slider-count">
+              {{ currentNewsSlide + 1 < 10 ? '0' + (currentNewsSlide + 1) : currentNewsSlide + 1 }}
+              <span>/</span>
+              {{ newsSlideCount < 10 ? '0' + newsSlideCount : newsSlideCount }}
+            </span>
           </div>
-          <div class="news-copy">
-            <span class="card-meta">{{ primaryNews.date || 'Featured story' }}</span>
-            <h3>{{ primaryNews.title }}</h3>
-            <p>{{ primaryNews.excerpt }}</p>
-            <a
-              class="card-link"
-              [attr.href]="primaryNews.link || null"
-              [attr.target]="primaryNews.link ? '_blank' : null"
-              rel="noreferrer"
-            >
-              Read More
-            </a>
-          </div>
-        </article>
 
-        <div class="news-stack">
-          <article *ngFor="let news of secondaryNews" class="news-card news-compact">
-            <div class="news-media">
-              <img [src]="news.image" [alt]="news.title" loading="lazy" decoding="async" (error)="news.image = fallbackImage" />
-            </div>
-            <div class="news-copy">
-              <span class="card-meta">{{ news.date || 'Latest feature' }}</span>
-              <h3>{{ news.title }}</h3>
-              <p>{{ news.excerpt }}</p>
+          <div class="news-slider-controls" *ngIf="newsSlideCount > 1" aria-label="Current highlights slides">
+            <button type="button" class="news-slider-arrow" (click)="previousNewsSlide()" aria-label="Previous highlight">
+              <span aria-hidden="true">Prev</span>
+            </button>
+            <button type="button" class="news-slider-arrow" (click)="nextNewsSlide()" aria-label="Next highlight">
+              <span aria-hidden="true">Next</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="news-slider-viewport">
+          <div
+            class="news-slider-track"
+            [style.transform]="'translateX(-' + (currentNewsSlide * 100) + '%)'"
+          >
+            <article *ngFor="let news of latestNews" class="news-slide news-card">
               <a
-                class="card-link"
-                [attr.href]="news.link || null"
-                [attr.target]="news.link ? '_blank' : null"
+                *ngIf="news.link; else staticNewsMedia"
+                class="news-slide-media-link"
+                [href]="news.link"
+                target="_blank"
                 rel="noreferrer"
               >
-                Read More
+                <div
+                  class="news-slide-media"
+                  [class.is-portrait]="news.frameStyle === 'portrait'"
+                  [class.is-square]="news.frameStyle === 'square'"
+                  [class.is-landscape]="news.frameStyle === 'landscape'"
+                >
+                  <img
+                    class="news-slide-media-backdrop"
+                    [src]="news.image"
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                    (error)="news.image = fallbackImage"
+                  />
+                  <div class="news-slide-media-frame">
+                    <img
+                      class="news-slide-media-image"
+                      [src]="news.image"
+                      [alt]="news.title"
+                      loading="lazy"
+                      decoding="async"
+                      (load)="onNewsImageLoad(news, $event)"
+                      (error)="news.image = fallbackImage"
+                    />
+                  </div>
+                </div>
               </a>
-            </div>
-          </article>
+
+              <ng-template #staticNewsMedia>
+                <div
+                  class="news-slide-media"
+                  [class.is-portrait]="news.frameStyle === 'portrait'"
+                  [class.is-square]="news.frameStyle === 'square'"
+                  [class.is-landscape]="news.frameStyle === 'landscape'"
+                >
+                  <img
+                    class="news-slide-media-backdrop"
+                    [src]="news.image"
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                    (error)="news.image = fallbackImage"
+                  />
+                  <div class="news-slide-media-frame">
+                    <img
+                      class="news-slide-media-image"
+                      [src]="news.image"
+                      [alt]="news.title"
+                      loading="lazy"
+                      decoding="async"
+                      (load)="onNewsImageLoad(news, $event)"
+                      (error)="news.image = fallbackImage"
+                    />
+                  </div>
+                </div>
+              </ng-template>
+
+              <div class="news-slide-copy">
+                <span class="card-meta">{{ news.date || 'Current highlight' }}</span>
+                <h3>{{ news.title }}</h3>
+                <p>{{ news.excerpt }}</p>
+                <a
+                  class="card-link"
+                  [attr.href]="news.link || null"
+                  [attr.target]="news.link ? '_blank' : null"
+                  rel="noreferrer"
+                >
+                  Read More
+                </a>
+              </div>
+            </article>
+          </div>
         </div>
+      </div>
+
+      <div class="news-headline-rail" *ngIf="newsSlideCount > 1">
+        <button
+          *ngFor="let news of latestNews; let i = index"
+          type="button"
+          class="news-headline-chip"
+          [class.is-active]="currentNewsSlide === i"
+          (click)="goToNewsSlide(i)"
+        >
+          <span class="news-chip-index">{{ i + 1 < 10 ? '0' + (i + 1) : i + 1 }}</span>
+          <span class="news-chip-copy">
+            <strong>{{ news.title }}</strong>
+            <span>{{ news.date || 'Current highlight' }}</span>
+          </span>
+        </button>
       </div>
     </ng-container>
 
@@ -336,7 +473,7 @@
     <div class="home-section-heading">
       <span class="section-kicker">Coming Soon</span>
       <h2>Upcoming Projects</h2>
-      <p>Upcoming releases from the current movie collection, restyled into a cinematic showcase.</p>
+      <p>Only officially announced upcoming titles are shown here, with verified release and cast details.</p>
     </div>
 
     <ng-container *ngIf="leadProject as spotlightProject; else emptyProjectState">
@@ -346,13 +483,23 @@
             <img [src]="spotlightProject.image" [alt]="spotlightProject.title" loading="lazy" decoding="async" (error)="spotlightProject.image = fallbackImage" />
           </div>
           <div class="project-copy">
-            <span class="card-meta">
-              {{ spotlightProject.type }}
-              <span *ngIf="spotlightProject.releaseDate"> / {{ spotlightProject.releaseDate }}</span>
-            </span>
+            <span class="card-meta">{{ spotlightProject.type }}</span>
             <h3>{{ spotlightProject.title }}</h3>
             <p>{{ spotlightProject.description }}</p>
-            <div class="project-credit">Directed by {{ spotlightProject.director }}</div>
+            <div class="project-details">
+              <div class="project-detail">
+                <span>Release</span>
+                <strong>{{ spotlightProject.releaseLabel }}</strong>
+              </div>
+              <div class="project-detail">
+                <span>{{ spotlightProject.creditsLabel }}</span>
+                <strong>{{ spotlightProject.credits }}</strong>
+              </div>
+              <div class="project-detail">
+                <span>Cast</span>
+                <strong>{{ spotlightProject.cast }}</strong>
+              </div>
+            </div>
             <a routerLink="/filmography" class="card-link">View Filmography</a>
           </div>
         </article>
@@ -363,13 +510,23 @@
               <img [src]="project.image" [alt]="project.title" loading="lazy" decoding="async" (error)="project.image = fallbackImage" />
             </div>
             <div class="project-copy">
-              <span class="card-meta">
-                {{ project.type }}
-                <span *ngIf="project.releaseDate"> / {{ project.releaseDate }}</span>
-              </span>
+              <span class="card-meta">{{ project.type }}</span>
               <h3>{{ project.title }}</h3>
               <p>{{ project.description }}</p>
-              <div class="project-credit">Directed by {{ project.director }}</div>
+              <div class="project-details">
+                <div class="project-detail">
+                  <span>Release</span>
+                  <strong>{{ project.releaseLabel }}</strong>
+                </div>
+                <div class="project-detail">
+                  <span>{{ project.creditsLabel }}</span>
+                  <strong>{{ project.credits }}</strong>
+                </div>
+                <div class="project-detail">
+                  <span>Cast</span>
+                  <strong>{{ project.cast }}</strong>
+                </div>
+              </div>
             </div>
           </article>
         </div>
@@ -382,29 +539,84 @@
   </section>
 
   <section class="home-section gallery-section">
-    <div class="home-section-heading">
-      <span class="section-kicker">Visual Journey</span>
-      <h2>Featured Gallery</h2>
-      <p>Every existing gallery item is preserved here, now arranged in a more editorial mosaic.</p>
+    <div class="gallery-section-topbar">
+      <div class="home-section-heading">
+        <span class="section-kicker">Visual Journey</span>
+        <h2>Featured Gallery</h2>
+        <p>
+          This mosaic now pulls directly from the live official gallery, so the homepage and gallery screen stay in sync.
+          Tap jumble to surface a fresh set of frames from the archive.
+        </p>
+      </div>
+
+      <div *ngIf="featuredGallery.length > 0" class="gallery-section-status" aria-label="Featured gallery sync status">
+        <span>{{ featuredGallery.length }} live frames</span>
+        <span>{{ galleryArchiveCount }} synced photos</span>
+        <span>{{ galleryCollectionCount }} collections</span>
+      </div>
     </div>
 
-    <div class="gallery-grid">
-      <article
-        *ngFor="let image of featuredGallery; let i = index"
-        class="gallery-tile"
-        [class.gallery-tile-wide]="i === 0 || i % 5 === 0"
-        [class.gallery-tile-tall]="i === 0 || i % 4 === 0"
+    <div class="gallery-actions">
+      <button
+        type="button"
+        class="hero-button hero-button-secondary gallery-jumble-button"
+        [class.is-active]="isGalleryJumbling"
+        [disabled]="!canJumbleGallery"
+        (click)="jumbleFeaturedGallery()"
       >
-        <img [src]="image.url" [alt]="image.alt" loading="lazy" decoding="async" (error)="image.url = fallbackImage" />
-        <div class="gallery-overlay">
-          <span>{{ image.caption || 'Samantha Ruth Prabhu' }}</span>
-        </div>
-      </article>
-    </div>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M17 3h4v4M7 21H3v-4M21 7l-5.4 5.4a3 3 0 0 1-4.2 0L8.6 9.6a3 3 0 0 0-4.2 0L3 11M21 17l-1.4-1.4a3 3 0 0 0-4.2 0l-2.8 2.8a3 3 0 0 1-4.2 0L7 17"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.8"
+          />
+        </svg>
+        <span>Jumble Gallery</span>
+      </button>
 
-    <div class="section-action">
       <a routerLink="/gallery" class="hero-button hero-button-primary">Open Full Gallery</a>
     </div>
+
+    <div *ngIf="featuredGallery.length > 0; else emptyFeaturedGalleryState" class="gallery-grid" [class.is-jumbling]="isGalleryJumbling">
+      <a
+        *ngFor="let image of featuredGallery; let i = index; trackBy: trackByFeaturedGallery"
+        class="gallery-tile"
+        [class.gallery-tile-featured]="i === 0"
+        [class.gallery-tile-wide]="i === 0 || image.frameStyle === 'landscape'"
+        [class.gallery-tile-portrait]="image.frameStyle === 'portrait'"
+        [class.gallery-tile-square]="image.frameStyle === 'square'"
+        [style.--tile-index]="i"
+        [style.--tile-accent]="image.accentTone"
+        routerLink="/gallery"
+        [queryParams]="getFeaturedGalleryLinkParams(image)"
+        [attr.aria-label]="'Open ' + image.collectionTitle + ' in the gallery'"
+      >
+        <div class="gallery-media-shell">
+          <div class="gallery-media">
+            <img
+              [src]="image.url"
+              [alt]="image.alt"
+              loading="lazy"
+              decoding="async"
+              (load)="onFeaturedGalleryImageLoad(image, $event)"
+              (error)="image.url = fallbackImage"
+            />
+          </div>
+        </div>
+        <div class="gallery-overlay">
+          <span class="gallery-overlay-label">{{ image.collectionTitle }}</span>
+          <strong>{{ image.caption || 'Samantha Ruth Prabhu' }}</strong>
+          <small>{{ getFeaturedGalleryCta(image) }}</small>
+        </div>
+      </a>
+    </div>
+
+    <ng-template #emptyFeaturedGalleryState>
+      <div class="empty-state">Official gallery highlights will appear here once the latest collection sync completes.</div>
+    </ng-template>
   </section>
 
   <section class="home-section extras-section">
@@ -415,10 +627,10 @@
     </div>
 
     <div class="extras-grid">
-      <a routerLink="/timeline" class="extra-card">
-        <span class="section-kicker">Timeline</span>
-        <h3>Walk the career year by year.</h3>
-        <p>Films, awards, and key shifts mapped into one scrolling narrative.</p>
+      <a routerLink="/journal" class="extra-card">
+        <span class="section-kicker">Journal</span>
+        <h3>Read thoughts from Samantha's world.</h3>
+        <p>Personal reflections, behind-the-scenes notes, wellness insights, and official long-form stories in one place.</p>
       </a>
       <a routerLink="/fan-wall" class="extra-card">
         <span class="section-kicker">Fan Wall</span>
