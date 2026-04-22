@@ -738,12 +738,35 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       return url;
     }
 
-    const [path, hashFragment] = url.split('#', 2);
+    const normalizedUrl = this.normalizeHomepageAssetUrl(url);
+    const [path, hashFragment] = normalizedUrl.split('#', 2);
     const withoutCache = path
       .replace(/([?&])cache=[^&]*&?/i, '$1')
       .replace(/[?&]$/, '');
     const separator = withoutCache.includes('?') ? '&' : '?';
     return `${withoutCache}${separator}cache=${encodeURIComponent(version)}${hashFragment ? `#${hashFragment}` : ''}`;
+  }
+
+  private normalizeHomepageAssetUrl(url: string): string {
+    const apiOrigin = this.apiService.getApiBaseOrigin();
+    if (!apiOrigin) {
+      return url;
+    }
+
+    if (url.startsWith('/uploads/')) {
+      return `${apiOrigin}${url}`;
+    }
+
+    try {
+      const parsed = new URL(url);
+      if ((parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') && parsed.pathname.startsWith('/uploads/')) {
+        return `${apiOrigin}${parsed.pathname}${parsed.search}${parsed.hash}`;
+      }
+    } catch {
+      return url;
+    }
+
+    return url;
   }
 
   private applyCacheBusting(layers: HomePerformanceLayer[], version: string): HomePerformanceLayer[] {

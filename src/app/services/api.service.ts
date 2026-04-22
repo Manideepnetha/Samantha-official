@@ -278,6 +278,14 @@ export class ApiService {
     return 'https://samantha-official-website-api.onrender.com/api';
   }
 
+  getApiBaseOrigin(): string {
+    try {
+      return new URL(this.apiUrl).origin;
+    } catch {
+      return '';
+    }
+  }
+
   // --- STORAGE HELPERS ---
   private saveToStorage(key: string, data: any) {
     try {
