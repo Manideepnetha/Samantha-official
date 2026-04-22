@@ -108,7 +108,10 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
   `,
   styles: [`
     :host {
-      display: contents;
+      display: block;
+      width: 100%;
+      min-width: 0;
+      align-self: start;
     }
     .ig-section {
       position: relative;
@@ -118,7 +121,8 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
       align-content: start;
       justify-items: stretch;
       align-self: start;
-      gap: 1.2rem;
+      width: 100%;
+      gap: 1rem;
       height: auto;
       min-height: 0;
       padding: clamp(1.05rem, 2vw, 1.45rem);
@@ -254,14 +258,15 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
     .ig-layout {
       display: grid;
       grid-template-columns: minmax(0, 1.04fr) minmax(310px, 0.96fr);
-      gap: 1rem;
+      gap: 0.9rem;
       align-items: start;
     }
     .ig-feature-card,
     .ig-side-card { color: inherit; text-decoration: none; }
     .ig-feature-card {
       display: grid;
-      gap: 1rem;
+      gap: 0.85rem;
+      align-content: start;
       padding: 0.95rem;
       border: 1px solid rgba(214, 169, 93, 0.16);
       border-radius: 1.7rem;
@@ -362,8 +367,8 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
       justify-content: center;
     }
     .ig-media-frame-featured {
-      min-height: clamp(22rem, 34vw, 30rem);
-      aspect-ratio: 4 / 5;
+      min-height: clamp(15rem, 24vw, 20rem);
+      aspect-ratio: 5 / 4;
     }
     .ig-media-frame-compact {
       width: 100%;
@@ -450,7 +455,10 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
       .ig-follow-btn { justify-content: center; }
       .ig-feature-card,
       .ig-side-card { padding: 0.75rem; }
-      .ig-media-frame-featured { min-height: 18rem; }
+      .ig-media-frame-featured {
+        min-height: 13rem;
+        aspect-ratio: 4 / 3;
+      }
       .ig-side-card {
         grid-template-columns: 1fr;
       }

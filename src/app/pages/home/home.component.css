@@ -2034,15 +2034,18 @@
 .quote-grid {
   display: grid;
   grid-template-columns: minmax(320px, 0.74fr) minmax(0, 1.26fr);
+  grid-auto-rows: min-content;
   gap: 1rem;
   align-items: start;
 }
 
 .quote-grid > app-quote-of-the-day,
 .quote-grid > app-instagram-feed-embed {
+  display: block;
   align-self: start;
   height: auto;
   min-height: 0;
+  min-width: 0;
 }
 
 .connect-grid {
