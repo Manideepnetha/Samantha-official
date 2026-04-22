@@ -13,97 +13,103 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
       <span class="ig-orbit ig-orbit-top" aria-hidden="true"></span>
       <span class="ig-orbit ig-orbit-bottom" aria-hidden="true"></span>
 
-      <div class="ig-header">
-        <div class="ig-profile">
-          <div class="ig-avatar">
-            <img
-              src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748007968/8F9A7052_blcxqk.jpg"
-              alt="Samantha Ruth Prabhu"
-            />
-          </div>
-          <div class="ig-profile-copy">
-            <span class="ig-handle">{{ config.handle }}</span>
-            <span class="ig-sub">Official Instagram</span>
-          </div>
-        </div>
-        <a [href]="config.profileUrl" target="_blank" rel="noreferrer" class="ig-follow-btn">
-          <span>Follow on Instagram</span>
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </a>
-      </div>
-
-      <ng-container *ngIf="featuredPost as featured">
-        <div class="ig-layout">
-          <a
-            [href]="featured.href"
-            target="_blank"
-            rel="noreferrer"
-            class="ig-feature-card"
-          >
-            <div class="ig-media-frame ig-media-frame-featured">
-              <div class="ig-media-backdrop" [style.background-image]="getBackdropImage(featured.imageUrl)"></div>
-              <div class="ig-media-sheen" aria-hidden="true"></div>
-              <div class="ig-feature-badges">
-                <span class="ig-type-pill">{{ featured.typeLabel }}</span>
-                <span class="ig-date-pill">{{ featured.dateLabel }}</span>
-              </div>
+      <div class="ig-content">
+        <div class="ig-header">
+          <div class="ig-profile">
+            <div class="ig-avatar">
               <img
-                [src]="featured.imageUrl"
-                [alt]="featured.alt"
-                loading="lazy"
-                decoding="async"
+                src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748007968/8F9A7052_blcxqk.jpg"
+                alt="Samantha Ruth Prabhu"
               />
-              <div *ngIf="isReel(featured)" class="ig-play-badge" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 6.25v11.5l9-5.75-9-5.75z" />
-                </svg>
-              </div>
             </div>
-
-            <div class="ig-feature-copy">
-              <h3>{{ featured.title }}</h3>
-              <p>{{ featured.caption }}</p>
+            <div class="ig-profile-copy">
+              <span class="ig-handle">{{ config.handle }}</span>
+              <span class="ig-sub">Official Instagram</span>
             </div>
+          </div>
+          <a [href]="config.profileUrl" target="_blank" rel="noreferrer" class="ig-follow-btn">
+            <span>Follow on Instagram</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </a>
+        </div>
 
-          <div class="ig-side-grid" aria-label="More Instagram posts">
+        <ng-container *ngIf="featuredPost as featured; else emptyInstagramFeed">
+          <div class="ig-layout">
             <a
-              *ngFor="let post of secondaryPosts; trackBy: trackByPost"
-              [href]="post.href"
+              [href]="featured.href"
               target="_blank"
               rel="noreferrer"
-              class="ig-side-card"
+              class="ig-feature-card"
             >
-              <div class="ig-media-frame ig-media-frame-compact">
-                <div class="ig-media-backdrop" [style.background-image]="getBackdropImage(post.imageUrl)"></div>
+              <div class="ig-media-frame ig-media-frame-featured">
+                <div class="ig-media-backdrop" [style.background-image]="getBackdropImage(featured.imageUrl)"></div>
                 <div class="ig-media-sheen" aria-hidden="true"></div>
-                <div class="ig-side-card-topbar">
-                  <span class="ig-type-pill ig-type-pill-compact">{{ post.typeLabel }}</span>
+                <div class="ig-feature-badges">
+                  <span class="ig-type-pill">{{ featured.typeLabel }}</span>
+                  <span class="ig-date-pill">{{ featured.dateLabel }}</span>
                 </div>
                 <img
-                  [src]="post.imageUrl"
-                  [alt]="post.alt"
+                  [src]="featured.imageUrl"
+                  [alt]="featured.alt"
                   loading="lazy"
                   decoding="async"
                 />
-                <div *ngIf="isReel(post)" class="ig-play-badge ig-play-badge-compact" aria-hidden="true">
+                <div *ngIf="isReel(featured)" class="ig-play-badge" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8 6.25v11.5l9-5.75-9-5.75z" />
                   </svg>
                 </div>
               </div>
 
-              <div class="ig-side-copy">
-                <span class="ig-card-date">{{ post.dateLabel }}</span>
-                <h4>{{ post.title }}</h4>
-                <p>{{ post.caption }}</p>
+              <div class="ig-feature-copy">
+                <h3>{{ featured.title }}</h3>
+                <p>{{ featured.caption }}</p>
               </div>
             </a>
+
+            <div class="ig-side-grid" aria-label="More Instagram posts">
+              <a
+                *ngFor="let post of secondaryPosts; trackBy: trackByPost"
+                [href]="post.href"
+                target="_blank"
+                rel="noreferrer"
+                class="ig-side-card"
+              >
+                <div class="ig-media-frame ig-media-frame-compact">
+                  <div class="ig-media-backdrop" [style.background-image]="getBackdropImage(post.imageUrl)"></div>
+                  <div class="ig-media-sheen" aria-hidden="true"></div>
+                  <div class="ig-side-card-topbar">
+                    <span class="ig-type-pill ig-type-pill-compact">{{ post.typeLabel }}</span>
+                  </div>
+                  <img
+                    [src]="post.imageUrl"
+                    [alt]="post.alt"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div *ngIf="isReel(post)" class="ig-play-badge ig-play-badge-compact" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 6.25v11.5l9-5.75-9-5.75z" />
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="ig-side-copy">
+                  <span class="ig-card-date">{{ post.dateLabel }}</span>
+                  <h4>{{ post.title }}</h4>
+                  <p>{{ post.caption }}</p>
+                </div>
+              </a>
+            </div>
           </div>
-        </div>
-      </ng-container>
+        </ng-container>
+
+        <ng-template #emptyInstagramFeed>
+          <div class="ig-empty-state">Latest Instagram updates are syncing.</div>
+        </ng-template>
+      </div>
     </div>
   `,
   styles: [`
@@ -116,13 +122,8 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
     .ig-section {
       position: relative;
       isolation: isolate;
-      display: grid;
-      grid-auto-rows: max-content;
-      align-content: start;
-      justify-items: stretch;
-      align-self: start;
+      display: block;
       width: 100%;
-      gap: 1rem;
       height: auto;
       min-height: 0;
       padding: clamp(1.05rem, 2vw, 1.45rem);
@@ -138,6 +139,15 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
     .ig-section > * {
       position: relative;
       z-index: 1;
+    }
+    .ig-content {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 1rem;
+      width: 100%;
+      min-width: 0;
     }
     .ig-orbit {
       position: absolute;
@@ -163,7 +173,7 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
     }
     .ig-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 1rem;
       flex-wrap: wrap;
@@ -260,6 +270,9 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
       grid-template-columns: minmax(0, 1.04fr) minmax(310px, 0.96fr);
       gap: 0.9rem;
       align-items: start;
+      align-content: start;
+      width: 100%;
+      min-width: 0;
     }
     .ig-feature-card,
     .ig-side-card { color: inherit; text-decoration: none; }
@@ -340,6 +353,7 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
       display: grid;
       gap: 0.95rem;
       align-items: start;
+      min-width: 0;
     }
     .ig-side-card {
       display: grid;
@@ -439,6 +453,16 @@ type InstagramPreviewCard = (typeof LATEST_INSTAGRAM_POSTS)[number];
       width: 2.4rem;
       height: 2.4rem;
       inset: auto auto 0.7rem 0.7rem;
+    }
+    .ig-empty-state {
+      padding: 1rem 1.1rem;
+      border: 1px dashed rgba(214, 169, 93, 0.22);
+      border-radius: 1.2rem;
+      background: rgba(243, 232, 220, 0.03);
+      font-family: "Manrope","Inter",sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      color: rgba(243, 232, 220, 0.68);
     }
     @media (max-width: 1180px) {
       .ig-layout { grid-template-columns: 1fr; }

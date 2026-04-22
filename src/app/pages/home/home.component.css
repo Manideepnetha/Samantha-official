@@ -2043,7 +2043,7 @@
 .quote-grid > app-instagram-feed-embed {
   display: block;
   align-self: start;
-  height: auto;
+  height: fit-content;
   min-height: 0;
   min-width: 0;
 }
