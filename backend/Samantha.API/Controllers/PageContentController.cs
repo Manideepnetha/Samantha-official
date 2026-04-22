@@ -33,15 +33,16 @@ public class PageContentController : ControllerBase
 
         if (pageContent == null)
         {
-            return NotFound();
+            if (!FrontendContentSync.TryGetDefaultPageContent(key, out _, out var fallbackContentJson))
+            {
+                return NotFound();
+            }
+
+            ApplyResponseHeaders(GetFallbackUpdatedAtUtc());
+            return Content(NormalizePageContentJson(fallbackContentJson), "application/json");
         }
 
-        Response.Headers.CacheControl = "no-store, no-cache, max-age=0, must-revalidate";
-        Response.Headers.Pragma = "no-cache";
-        Response.Headers.Expires = "0";
-        Response.Headers.ETag = $"W/\"{pageContent.UpdatedAt.Ticks}\"";
-        Response.Headers.LastModified = pageContent.UpdatedAt.ToUniversalTime().ToString("R");
-        Response.Headers["X-Content-Updated-At"] = pageContent.UpdatedAt.ToUniversalTime().ToString("O");
+        ApplyResponseHeaders(pageContent.UpdatedAt);
 
         return Content(NormalizePageContentJson(pageContent.ContentJson), "application/json");
     }
@@ -76,6 +77,18 @@ public class PageContentController : ControllerBase
 
         await _context.SaveChangesAsync();
         return Ok(existing);
+    }
+
+    private void ApplyResponseHeaders(DateTime updatedAt)
+    {
+        var updatedAtUtc = updatedAt.ToUniversalTime();
+
+        Response.Headers.CacheControl = "no-store, no-cache, max-age=0, must-revalidate";
+        Response.Headers.Pragma = "no-cache";
+        Response.Headers.Expires = "0";
+        Response.Headers.ETag = $"W/\"{updatedAtUtc.Ticks}\"";
+        Response.Headers.LastModified = updatedAtUtc.ToString("R");
+        Response.Headers["X-Content-Updated-At"] = updatedAtUtc.ToString("O");
     }
 
     private string NormalizePageContentJson(string contentJson)
@@ -116,6 +129,14 @@ public class PageContentController : ControllerBase
         }
 
         return string.Empty;
+    }
+
+    private static DateTime GetFallbackUpdatedAtUtc()
+    {
+        var assemblyPath = typeof(PageContentController).Assembly.Location;
+        return System.IO.File.Exists(assemblyPath)
+            ? System.IO.File.GetLastWriteTimeUtc(assemblyPath)
+            : DateTime.UnixEpoch;
     }
 
     private static void NormalizeUploadUrls(JsonNode node, string uploadsOrigin)

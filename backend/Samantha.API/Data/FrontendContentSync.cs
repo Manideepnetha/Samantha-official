@@ -20,6 +20,37 @@ public static class FrontendContentSync
         return Synchronize(context, overwritePageContent: true, overwritePhilanthropyDefaults: true);
     }
 
+    public static bool TryGetDefaultPageContent(string key, out string description, out string contentJson)
+    {
+        switch ((key ?? string.Empty).Trim().ToLowerInvariant())
+        {
+            case "about-page":
+                description = "About page content synced from the frontend defaults.";
+                contentJson = Serialize(GetAboutPageContent());
+                return true;
+
+            case "contact-page":
+                description = "Contact page content synced from the frontend defaults.";
+                contentJson = Serialize(GetContactPageContent());
+                return true;
+
+            case "home-page":
+                description = "Home page editorial content synced from the frontend defaults.";
+                contentJson = Serialize(GetHomePageContent());
+                return true;
+
+            case "philanthropy-page":
+                description = "Philanthropy page hero and mission content synced from the frontend defaults.";
+                contentJson = Serialize(GetPhilanthropyPageContent());
+                return true;
+
+            default:
+                description = string.Empty;
+                contentJson = string.Empty;
+                return false;
+        }
+    }
+
     private static object Synchronize(AppDbContext context, bool overwritePageContent, bool overwritePhilanthropyDefaults)
     {
         SeedMovies.Initialize(context);
