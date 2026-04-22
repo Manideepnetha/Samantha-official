@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, of, concat, EMPTY, throwError } from 'rxjs';
 import { tap, shareReplay, map, catchError, retry } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -154,6 +154,11 @@ export interface UploadedMediaAsset {
   height: number;
 }
 
+export interface PageContentEnvelope<T> {
+  content: T;
+  updatedAt?: string;
+}
+
 export interface VisitorEntrySubmission {
   clientVisitorId: string;
   name: string;
@@ -231,7 +236,7 @@ export class ApiService {
   private fashionCache$: Observable<FashionItem[]> | null = null;
   private settingsCache$: Observable<SiteSetting[]> | null = null;
   private fanCreationsCache$: Observable<FanCreation[]> | null = null;
-  private pageContentCache = new Map<string, Observable<unknown>>();
+  private pageContentCache = new Map<string, Observable<PageContentEnvelope<unknown>>>();
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -295,17 +300,52 @@ export class ApiService {
     localStorage.removeItem(`cache_${key}`);
   }
 
+  private getPageContentStorageKeys(key: string): string[] {
+    return [`pagecontent_v2_${key}`, `pagecontent_${key}`];
+  }
+
+  private loadCachedPageContentEnvelope<T>(key: string): PageContentEnvelope<T> | null {
+    const [currentStorageKey, legacyStorageKey] = this.getPageContentStorageKeys(key);
+    const cachedEnvelope = this.loadFromStorage<PageContentEnvelope<T>>(currentStorageKey);
+
+    if (cachedEnvelope && typeof cachedEnvelope === 'object' && 'content' in cachedEnvelope) {
+      return cachedEnvelope;
+    }
+
+    const legacyContent = this.loadFromStorage<T>(legacyStorageKey);
+    if (legacyContent === null) {
+      return null;
+    }
+
+    return { content: legacyContent };
+  }
+
+  private savePageContentEnvelope<T>(key: string, entry: PageContentEnvelope<T>) {
+    const [currentStorageKey, legacyStorageKey] = this.getPageContentStorageKeys(key);
+    this.saveToStorage(currentStorageKey, entry);
+    this.removeFromStorage(legacyStorageKey);
+  }
+
   private clearPageContentCache(key?: string) {
     if (key) {
       this.pageContentCache.delete(key);
-      this.removeFromStorage(`pagecontent_${key}`);
+      const storageKeys = this.getPageContentStorageKeys(key);
+      storageKeys.forEach(storageKey => this.removeFromStorage(storageKey));
       return;
     }
 
     this.pageContentCache.clear();
     Object.keys(localStorage)
-      .filter(storageKey => storageKey.startsWith('cache_pagecontent_'))
+      .filter(storageKey =>
+        storageKey.startsWith('cache_pagecontent_')
+        || storageKey.startsWith('cache_pagecontent_v2_'))
       .forEach(storageKey => localStorage.removeItem(storageKey));
+  }
+
+  private extractPageContentUpdatedAt<T>(response: HttpResponse<T>): string | undefined {
+    return response.headers.get('X-Content-Updated-At')
+      ?? response.headers.get('Last-Modified')
+      ?? undefined;
   }
 
   // Helper to clear cache (call on create/update/delete)
@@ -707,26 +747,49 @@ export class ApiService {
   }
 
   // --- PAGE CONTENT ---
-  getPageContent<T>(key: string): Observable<T> {
-    const storageKey = `pagecontent_${key}`;
-    const cached = this.loadFromStorage<T>(storageKey);
+  getPageContentWithMetadata<T>(key: string, forceRefresh = false): Observable<PageContentEnvelope<T>> {
+    const cached = this.loadCachedPageContentEnvelope<T>(key);
 
-    if (!this.pageContentCache.has(key)) {
-      const request$ = this.http.get<T>(`${this.apiUrl}/pagecontent/${encodeURIComponent(key)}`, this.getPublicOptions())
-        .pipe(
-          tap(data => this.saveToStorage(storageKey, data)),
-          shareReplay(1)
-        );
+    if (!this.pageContentCache.has(key) || forceRefresh) {
+      const request$ = this.http.get<T>(`${this.apiUrl}/pagecontent/${encodeURIComponent(key)}`, {
+        ...this.getPublicOptions(),
+        observe: 'response' as const
+      }).pipe(
+        map((response: HttpResponse<T>) => ({
+          content: response.body as T,
+          updatedAt: this.extractPageContentUpdatedAt(response)
+        })),
+        tap(entry => this.savePageContentEnvelope(key, entry)),
+        catchError(error => {
+          if (cached) {
+            console.warn(`Page content request failed for ${key}. Falling back to cached page content.`, error);
+            return of(cached);
+          }
 
-      this.pageContentCache.set(key, request$);
+          return throwError(() => error);
+        }),
+        shareReplay(1)
+      );
+
+      this.pageContentCache.set(key, request$ as Observable<PageContentEnvelope<unknown>>);
     }
 
-    const request$ = this.pageContentCache.get(key) as Observable<T>;
+    const request$ = this.pageContentCache.get(key) as Observable<PageContentEnvelope<T>>;
+    if (forceRefresh) {
+      return request$;
+    }
+
     if (cached) {
       return concat(of(cached), request$);
     }
 
     return request$;
+  }
+
+  getPageContent<T>(key: string, forceRefresh = false): Observable<T> {
+    return this.getPageContentWithMetadata<T>(key, forceRefresh).pipe(
+      map(entry => entry.content)
+    );
   }
 
   upsertPageContent<T>(key: string, content: T): Observable<any> {

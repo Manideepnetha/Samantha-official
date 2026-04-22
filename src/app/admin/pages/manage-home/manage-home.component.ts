@@ -441,7 +441,7 @@ export class ManageHomeComponent implements OnInit {
   }
 
   loadEditorialContent(): void {
-    this.apiService.getPageContent<Record<string, unknown>>('home-page').subscribe({
+    this.apiService.getPageContent<Record<string, unknown>>('home-page', true).subscribe({
       next: (content) => {
         this.homePageContent = content ?? {};
         this.editorialContent = this.mergeEditorialContent(content ?? {});

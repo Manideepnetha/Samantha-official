@@ -377,7 +377,7 @@ export class ContactComponent implements OnInit {
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.apiService.getPageContent<Partial<ContactPageContent>>('contact-page').subscribe({
+    this.apiService.getPageContent<Partial<ContactPageContent>>('contact-page', true).subscribe({
       next: (content) => {
         this.content = this.mergeContent(content);
       },

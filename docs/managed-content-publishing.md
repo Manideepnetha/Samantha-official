@@ -60,4 +60,5 @@ npm run sync:managed-content:prod
 - `managed-content:verify` is read-only
 - `sync:managed-content:prod` creates a production JSON backup before writing
 - duplicate natural keys are reported so you can spot bad local data early
+- `PageContents` are protected from stale overwrites: if production has a newer `UpdatedAt` than local, the publish tools skip that page-content update instead of rolling production back
 - the old GitHub workflow is now validation-only because GitHub runners cannot access your actual local database

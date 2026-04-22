@@ -30,6 +30,13 @@ public class PageContentController : ControllerBase
             return NotFound();
         }
 
+        Response.Headers.CacheControl = "no-store, no-cache, max-age=0, must-revalidate";
+        Response.Headers.Pragma = "no-cache";
+        Response.Headers.Expires = "0";
+        Response.Headers.ETag = $"W/\"{pageContent.UpdatedAt.Ticks}\"";
+        Response.Headers.LastModified = pageContent.UpdatedAt.ToUniversalTime().ToString("R");
+        Response.Headers["X-Content-Updated-At"] = pageContent.UpdatedAt.ToUniversalTime().ToString("O");
+
         return Content(pageContent.ContentJson, "application/json");
     }
 

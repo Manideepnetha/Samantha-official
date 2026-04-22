@@ -387,7 +387,9 @@ internal static class Program
                 UpdatePageContentAsync,
                 DeleteByIdAsync("PageContents"),
                 production,
-                transaction
+                transaction,
+                deleteMissing: false,
+                getSkipUpdateReason: GetPageContentSkipUpdateReason
             );
 
             await SyncByKeyAsync(
@@ -508,7 +510,8 @@ internal static class Program
         Func<NpgsqlConnection, NpgsqlTransaction, int, Task> delete,
         NpgsqlConnection production,
         NpgsqlTransaction transaction,
-        bool deleteMissing = true)
+        bool deleteMissing = true,
+        Func<T, T, string?>? getSkipUpdateReason = null)
     {
         WarnForDuplicateKeys("local", label, localItems, keySelector);
 
@@ -523,6 +526,7 @@ internal static class Program
 
         var created = 0;
         var updated = 0;
+        var skipped = 0;
         var deleted = 0;
 
         foreach (var (key, localItem) in localMap)
@@ -536,8 +540,17 @@ internal static class Program
                     throw new InvalidOperationException($"{label} row did not contain an id for key '{key}'.");
                 }
 
-                await update(production, transaction, existingId.Value, localItem);
-                updated += 1;
+                var skipUpdateReason = getSkipUpdateReason?.Invoke(localItem, existing);
+                if (string.IsNullOrWhiteSpace(skipUpdateReason))
+                {
+                    await update(production, transaction, existingId.Value, localItem);
+                    updated += 1;
+                }
+                else
+                {
+                    skipped += 1;
+                    Console.WriteLine($"[{label}] skipped update for key '{key}': {skipUpdateReason}");
+                }
 
                 foreach (var duplicate in matches.Skip(1))
                 {
@@ -581,7 +594,17 @@ internal static class Program
             }
         }
 
-        Console.WriteLine($"[{label}] local={localItems.Count} created={created} updated={updated} deleted={deleted}");
+        Console.WriteLine($"[{label}] local={localItems.Count} created={created} updated={updated} skipped={skipped} deleted={deleted}");
+    }
+
+    private static string? GetPageContentSkipUpdateReason(PageContentRow localItem, PageContentRow productionItem)
+    {
+        if (productionItem.UpdatedAt > localItem.UpdatedAt)
+        {
+            return $"production UpdatedAt {productionItem.UpdatedAt:O} is newer than local {localItem.UpdatedAt:O}";
+        }
+
+        return null;
     }
 
     private static Dictionary<string, T> BuildUniqueMap<T>(IEnumerable<T> items, Func<T, string> keySelector)

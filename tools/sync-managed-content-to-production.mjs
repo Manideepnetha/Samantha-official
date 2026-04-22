@@ -90,7 +90,7 @@ function createTimeoutSignal(timeoutMs) {
   };
 }
 
-async function requestJson(url, options = {}) {
+async function requestJsonResponse(url, options = {}) {
   const { timeoutMs = REQUEST_TIMEOUT_MS, ...fetchOptions } = options;
   const { signal, clear } = createTimeoutSignal(timeoutMs);
   const isFormDataBody = typeof FormData !== 'undefined' && fetchOptions.body instanceof FormData;
@@ -121,10 +121,22 @@ async function requestJson(url, options = {}) {
       throw new Error(`${response.status} ${response.statusText}: ${typeof parsed === 'string' ? parsed : JSON.stringify(parsed)}`);
     }
 
-    return parsed;
+    return {
+      data: parsed,
+      headers: response.headers
+    };
   } finally {
     clear();
   }
+}
+
+async function requestJson(url, options = {}) {
+  const { data } = await requestJsonResponse(url, options);
+  return data;
+}
+
+function getPageContentUpdatedAt(headers) {
+  return headers.get('x-content-updated-at') || headers.get('last-modified') || '';
 }
 
 async function login(baseApiUrl) {
@@ -403,11 +415,27 @@ async function syncPageContent(prodToken, uploadedAssetCache) {
   const summary = {
     name: 'page content',
     updated: 0,
-    keys: []
+    skipped: 0,
+    keys: [],
+    skippedKeys: []
   };
 
   for (const key of PAGE_CONTENT_KEYS) {
-    const localContent = await requestJson(`${LOCAL_API}/pagecontent/${encodeURIComponent(key)}`);
+    const localResponse = await requestJsonResponse(`${LOCAL_API}/pagecontent/${encodeURIComponent(key)}`);
+    const prodResponse = await requestJsonResponse(`${PROD_API}/pagecontent/${encodeURIComponent(key)}`);
+    const localUpdatedAt = getPageContentUpdatedAt(localResponse.headers);
+    const prodUpdatedAt = getPageContentUpdatedAt(prodResponse.headers);
+    const localUpdatedAtMs = Date.parse(localUpdatedAt);
+    const prodUpdatedAtMs = Date.parse(prodUpdatedAt);
+
+    if (Number.isFinite(localUpdatedAtMs) && Number.isFinite(prodUpdatedAtMs) && prodUpdatedAtMs > localUpdatedAtMs) {
+      summary.skipped += 1;
+      summary.skippedKeys.push(key);
+      console.warn(`[page content] skipped ${key} because production is newer (${prodUpdatedAt} > ${localUpdatedAt}).`);
+      continue;
+    }
+
+    const localContent = localResponse.data;
     const normalizedPayload = await normalizePayloadForProduction(localContent, prodToken, uploadedAssetCache);
 
     await requestJson(`${PROD_API}/pagecontent/${encodeURIComponent(key)}`, {
@@ -445,7 +473,9 @@ async function main() {
 
   const pageContentSummary = await syncPageContent(prodToken, uploadedAssetCache);
   results.push(pageContentSummary);
-  console.log(`[page content] updated=${pageContentSummary.updated} keys=${pageContentSummary.keys.join(', ')}`);
+  console.log(
+    `[page content] updated=${pageContentSummary.updated} skipped=${pageContentSummary.skipped} keys=${pageContentSummary.keys.join(', ') || 'none'} skippedKeys=${pageContentSummary.skippedKeys.join(', ') || 'none'}`
+  );
 
   console.log('Managed content sync completed successfully.');
 }

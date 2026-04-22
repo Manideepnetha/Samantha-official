@@ -639,9 +639,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadHomepageContent(): void {
-    this.apiService.getPageContent<Partial<HomePageContent>>('home-page').subscribe({
-      next: (content) => {
-        const merged = this.mergeEditorialContent(content);
+    this.apiService.getPageContentWithMetadata<Partial<HomePageContent>>('home-page', true).subscribe({
+      next: ({ content, updatedAt }) => {
+        const contentVersion = this.resolvePageContentVersion(updatedAt);
+        const merged = this.mergeEditorialContent(content, contentVersion);
         this.performanceRange = merged.performanceRange;
         this.instagramSpotlight = merged.instagramSpotlight;
         this.featureShowcaseImage = merged.featureShowcaseImage;
@@ -702,33 +703,53 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private mergeEditorialContent(content: Partial<HomePageContent>): HomePageContent {
+  private mergeEditorialContent(content: Partial<HomePageContent>, cacheVersion: string): HomePageContent {
+    const instagramSpotlight = {
+      ...DEFAULT_HOME_CONTENT.instagramSpotlight,
+      ...(content.instagramSpotlight ?? {})
+    };
+    const featureShowcaseImage = {
+      ...DEFAULT_HOME_CONTENT.featureShowcaseImage,
+      ...(content.featureShowcaseImage ?? {})
+    };
+
     return {
       ...DEFAULT_HOME_CONTENT,
       ...content,
       instagramSpotlight: {
-        ...DEFAULT_HOME_CONTENT.instagramSpotlight,
-        ...(content.instagramSpotlight ?? {})
+        ...instagramSpotlight,
+        image: this.getCacheBustedUrl(instagramSpotlight.image, cacheVersion)
       },
       featureShowcaseImage: {
-        ...DEFAULT_HOME_CONTENT.featureShowcaseImage,
-        ...(content.featureShowcaseImage ?? {})
+        ...featureShowcaseImage,
+        url: this.getCacheBustedUrl(featureShowcaseImage.url, cacheVersion)
       },
-      performanceLayers: this.applyCacheBusting(content.performanceLayers ?? DEFAULT_HOME_CONTENT.performanceLayers),
+      performanceLayers: this.applyCacheBusting(content.performanceLayers ?? DEFAULT_HOME_CONTENT.performanceLayers, cacheVersion),
       keyFeatureCards: content.keyFeatureCards ?? DEFAULT_HOME_CONTENT.keyFeatureCards
     };
   }
 
-  private getCacheBustedUrl(url: string): string {
-    if (!url || url.includes('cache=')) return url;
-    const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}cache=${this.CACHE_VERSION}`;
+  private resolvePageContentVersion(updatedAt?: string): string {
+    return updatedAt?.trim() || this.CACHE_VERSION;
   }
 
-  private applyCacheBusting(layers: HomePerformanceLayer[]): HomePerformanceLayer[] {
+  private getCacheBustedUrl(url: string, version: string = this.CACHE_VERSION): string {
+    if (!url) {
+      return url;
+    }
+
+    const [path, hashFragment] = url.split('#', 2);
+    const withoutCache = path
+      .replace(/([?&])cache=[^&]*&?/i, '$1')
+      .replace(/[?&]$/, '');
+    const separator = withoutCache.includes('?') ? '&' : '?';
+    return `${withoutCache}${separator}cache=${encodeURIComponent(version)}${hashFragment ? `#${hashFragment}` : ''}`;
+  }
+
+  private applyCacheBusting(layers: HomePerformanceLayer[], version: string): HomePerformanceLayer[] {
     return layers.map(layer => ({
       ...layer,
-      image: this.getCacheBustedUrl(layer.image)
+      image: this.getCacheBustedUrl(layer.image, version)
     }));
   }
 

@@ -315,7 +315,7 @@ export class AboutComponent implements OnInit, AfterViewInit {
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.apiService.getPageContent<Partial<AboutPageContent>>('about-page').subscribe({
+    this.apiService.getPageContent<Partial<AboutPageContent>>('about-page', true).subscribe({
       next: (content) => {
         this.content = this.mergeContent(content);
       },
