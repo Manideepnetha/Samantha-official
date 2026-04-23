@@ -367,6 +367,7 @@
 
 .status-msg { font-size: 0.8rem; color: rgba(247,239,229,0.45); margin: 0.5rem 0; }
 .status-msg.ok { color: #6ee7b7; }
+.status-msg.pending { color: #fcd34d; }
 
 .result-share {
   display: flex;

@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService, FanWallMessage } from '../../services/api.service';
 
+const PENDING_FAN_WALL_MESSAGES_STORAGE_KEY = 'srp_pending_fan_wall_messages_v1';
+
 @Component({
   selector: 'app-fan-wall',
   standalone: true,
@@ -219,6 +221,7 @@ export class FanWallComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.retryPendingMessages();
     this.loadMessages();
   }
 
@@ -236,19 +239,26 @@ export class FanWallComponent implements OnInit {
       return;
     }
 
-    this.submitting = true;
-    this.apiService.submitFanWallMessage({
+    const payload: FanWallMessage = {
+      clientSubmissionId: crypto.randomUUID(),
       name: this.form.name.trim(),
       city: this.form.city?.trim(),
       message: this.form.message.trim()
-    }).subscribe({
+    };
+
+    this.persistPendingMessage(payload);
+    this.submitting = true;
+    this.apiService.submitFanWallMessage(payload).subscribe({
       next: () => {
+        this.removePendingMessage(payload.clientSubmissionId!);
         this.form = { name: '', city: '', message: '' };
         this.statusMessage = 'Your message has been sent for moderation and will appear once approved.';
         this.submitting = false;
       },
       error: (error: { error?: { message?: string } }) => {
-        this.errorMessage = error.error?.message || 'Could not submit your message. Please try again.';
+        this.errorMessage = '';
+        this.statusMessage = error.error?.message
+          || 'Your message is safely saved on this device and will retry automatically if production is briefly unavailable.';
         this.submitting = false;
       }
     });
@@ -263,5 +273,52 @@ export class FanWallComponent implements OnInit {
         this.messages = [];
       }
     });
+  }
+
+  private retryPendingMessages(): void {
+    for (const message of this.loadPendingMessages()) {
+      this.apiService.submitFanWallMessage(message).subscribe({
+        next: () => {
+          if (message.clientSubmissionId) {
+            this.removePendingMessage(message.clientSubmissionId);
+          }
+        },
+        error: () => {}
+      });
+    }
+  }
+
+  private persistPendingMessage(message: FanWallMessage): void {
+    const pending = this.loadPendingMessages()
+      .filter(item => item.clientSubmissionId !== message.clientSubmissionId);
+    pending.push(message);
+    localStorage.setItem(PENDING_FAN_WALL_MESSAGES_STORAGE_KEY, JSON.stringify(pending));
+  }
+
+  private loadPendingMessages(): FanWallMessage[] {
+    const raw = localStorage.getItem(PENDING_FAN_WALL_MESSAGES_STORAGE_KEY);
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      localStorage.removeItem(PENDING_FAN_WALL_MESSAGES_STORAGE_KEY);
+      return [];
+    }
+  }
+
+  private removePendingMessage(clientSubmissionId: string): void {
+    const pending = this.loadPendingMessages()
+      .filter(item => item.clientSubmissionId !== clientSubmissionId);
+
+    if (pending.length === 0) {
+      localStorage.removeItem(PENDING_FAN_WALL_MESSAGES_STORAGE_KEY);
+      return;
+    }
+
+    localStorage.setItem(PENDING_FAN_WALL_MESSAGES_STORAGE_KEY, JSON.stringify(pending));
   }
 }

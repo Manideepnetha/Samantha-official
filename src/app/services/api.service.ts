@@ -109,6 +109,7 @@ export interface SiteSetting {
 }
 
 export interface QuizSubmission {
+  clientSubmissionId?: string | null;
   name: string;
   email: string;
   city?: string | null;
@@ -181,6 +182,7 @@ export interface VisitorEntry {
 
 export interface FanWallMessage {
   id?: number;
+  clientSubmissionId?: string | null;
   name: string;
   city?: string;
   message: string;
@@ -832,7 +834,8 @@ export class ApiService {
 
   // --- VISITOR ENTRY TRACKING ---
   recordVisitorEntry(payload: VisitorEntrySubmission): Observable<VisitorEntry> {
-    return this.http.post<VisitorEntry>(`${this.apiUrl}/visitorentries`, payload, this.getPublicOptions());
+    return this.http.post<VisitorEntry>(`${this.apiUrl}/visitorentries`, payload, this.getPublicOptions())
+      .pipe(retry({ count: 2, delay: 1000 }));
   }
 
   getVisitorEntries(): Observable<VisitorEntry[]> {
@@ -845,7 +848,8 @@ export class ApiService {
   }
 
   submitFanWallMessage(message: FanWallMessage): Observable<FanWallMessage> {
-    return this.http.post<FanWallMessage>(`${this.apiUrl}/fanwall`, message, this.getPublicOptions());
+    return this.http.post<FanWallMessage>(`${this.apiUrl}/fanwall`, message, this.getPublicOptions())
+      .pipe(retry({ count: 2, delay: 1000 }));
   }
 
   getAdminFanWallMessages(): Observable<FanWallMessage[]> {
@@ -867,7 +871,8 @@ export class ApiService {
   }
 
   submitFanPollVote(pollKey: string, payload: FanPollVoteRequest): Observable<FanPollResult> {
-    return this.http.post<FanPollResult>(`${this.apiUrl}/fanpoll/${encodeURIComponent(pollKey)}/vote`, payload, this.getPublicOptions());
+    return this.http.post<FanPollResult>(`${this.apiUrl}/fanpoll/${encodeURIComponent(pollKey)}/vote`, payload, this.getPublicOptions())
+      .pipe(retry({ count: 2, delay: 1000 }));
   }
 
   // --- QUIZ ---
@@ -876,7 +881,8 @@ export class ApiService {
   }
 
   submitQuizEntry(entry: QuizSubmission): Observable<QuizLeaderboardEntry> {
-    return this.http.post<QuizLeaderboardEntry>(`${this.apiUrl}/quiz/submit`, entry, this.getPublicOptions());
+    return this.http.post<QuizLeaderboardEntry>(`${this.apiUrl}/quiz/submit`, entry, this.getPublicOptions())
+      .pipe(retry({ count: 2, delay: 1000 }));
   }
 
   getQuizLeaderboard(): Observable<QuizLeaderboardEntry[]> {

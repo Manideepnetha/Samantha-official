@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Samantha.API.Models;
 
 public class User
@@ -166,6 +168,7 @@ public class SiteSetting
 public class QuizEntry
 {
     public int Id { get; set; }
+    public string? ClientSubmissionId { get; set; }
     public required string Name { get; set; }
     public required string Email { get; set; }
     public string? City { get; set; }
@@ -205,6 +208,8 @@ public class VisitorEntry
 public class FanWallMessage
 {
     public int Id { get; set; }
+    [JsonIgnore]
+    public string? ClientSubmissionId { get; set; }
     public required string Name { get; set; }
     public string? City { get; set; }
     public required string Message { get; set; }

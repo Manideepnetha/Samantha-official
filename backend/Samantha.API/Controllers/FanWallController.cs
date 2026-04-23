@@ -30,10 +30,25 @@ public class FanWallController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<FanWallMessage>> SubmitMessage(FanWallMessage message)
     {
+        message.ClientSubmissionId = string.IsNullOrWhiteSpace(message.ClientSubmissionId)
+            ? null
+            : message.ClientSubmissionId.Trim();
+
         var normalized = Normalize(message);
         if (normalized is not null)
         {
             return normalized;
+        }
+
+        if (!string.IsNullOrWhiteSpace(message.ClientSubmissionId))
+        {
+            var existing = await _context.FanWallMessages
+                .FirstOrDefaultAsync(item => item.ClientSubmissionId == message.ClientSubmissionId);
+
+            if (existing != null)
+            {
+                return Ok(existing);
+            }
         }
 
         message.Status = "Pending";

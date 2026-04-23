@@ -88,6 +88,7 @@ public static class DatabaseSchemaBootstrap
         Execute(context, logger, "quiz and fan schema", @"
             CREATE TABLE IF NOT EXISTS ""QuizEntries"" (
                 ""Id"" serial NOT NULL,
+                ""ClientSubmissionId"" text NULL,
                 ""Name"" text NOT NULL,
                 ""Email"" text NOT NULL,
                 ""City"" text NULL,
@@ -99,7 +100,9 @@ public static class DatabaseSchemaBootstrap
             );
 
             CREATE INDEX IF NOT EXISTS ""IX_QuizEntries_Email"" ON ""QuizEntries"" (""Email"");
+            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_QuizEntries_ClientSubmissionId"" ON ""QuizEntries"" (""ClientSubmissionId"") WHERE ""ClientSubmissionId"" IS NOT NULL;
 
+            ALTER TABLE IF EXISTS ""QuizEntries"" ADD COLUMN IF NOT EXISTS ""ClientSubmissionId"" text;
             ALTER TABLE IF EXISTS ""QuizEntries"" ADD COLUMN IF NOT EXISTS ""City"" text;
             ALTER TABLE IF EXISTS ""QuizEntries"" ADD COLUMN IF NOT EXISTS ""TotalQuestions"" integer NOT NULL DEFAULT 0;
             ALTER TABLE IF EXISTS ""QuizEntries"" ADD COLUMN IF NOT EXISTS ""TimeTakenSeconds"" integer NOT NULL DEFAULT 0;
@@ -156,6 +159,7 @@ public static class DatabaseSchemaBootstrap
         Execute(context, logger, "fan wall and poll schema", @"
             CREATE TABLE IF NOT EXISTS ""FanWallMessages"" (
                 ""Id"" serial NOT NULL,
+                ""ClientSubmissionId"" text NULL,
                 ""Name"" text NOT NULL,
                 ""City"" text NULL,
                 ""Message"" text NOT NULL,
@@ -165,7 +169,9 @@ public static class DatabaseSchemaBootstrap
             );
 
             CREATE INDEX IF NOT EXISTS ""IX_FanWallMessages_Status"" ON ""FanWallMessages"" (""Status"");
+            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_FanWallMessages_ClientSubmissionId"" ON ""FanWallMessages"" (""ClientSubmissionId"") WHERE ""ClientSubmissionId"" IS NOT NULL;
 
+            ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""ClientSubmissionId"" text;
             ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""City"" text;
             ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""Status"" text NOT NULL DEFAULT 'Pending';
             ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT NOW();

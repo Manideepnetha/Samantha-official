@@ -22,6 +22,9 @@ interface PlayerInfo {
 
 type Screen = 'landing' | 'register' | 'quiz' | 'result' | 'leaderboard';
 
+const PENDING_QUIZ_SUBMISSION_STORAGE_KEY = 'srp_pending_quiz_submission_v1';
+const LIVE_LEADERBOARD_REFRESH_MS = 15000;
+
 const QUESTIONS: Question[] = [
   { id: 1, text: 'What is Samantha Ruth Prabhu\'s birth name?', options: ['Samantha Akkineni', 'Samantha Ruth Prabhu', 'Samantha Naga Chaitanya', 'Samantha Daggubati'], correct: 1, difficulty: 'easy', points: 10 },
   { id: 2, text: 'In which city was Samantha born?', options: ['Hyderabad', 'Chennai', 'Bengaluru', 'Mumbai'], correct: 1, difficulty: 'easy', points: 10 },
@@ -73,18 +76,23 @@ export class FanZoneComponent implements OnInit, OnDestroy {
   loadingLeaderboard = false;
   submitting = false;
   submitDone = false;
+  submissionNotice = '';
 
   fanCreations: FanCreation[] = [];
   loadingFanCreations = false;
+  private leaderboardRefreshRef: ReturnType<typeof setInterval> | null = null;
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
+    this.retryPendingQuizSubmission();
     this.loadLandingData();
+    this.startLiveLeaderboardRefresh();
   }
 
   ngOnDestroy(): void {
     this.clearTimer();
+    this.clearLiveLeaderboardRefresh();
   }
 
   get topLeaderboard(): QuizLeaderboardEntry[] {
@@ -242,6 +250,7 @@ export class FanZoneComponent implements OnInit, OnDestroy {
     this.screen = 'register';
     this.submitDone = false;
     this.submitting = false;
+    this.submissionNotice = '';
     this.registerError = '';
     this.currentPlayerEntry = null;
     this.answered = false;
@@ -292,12 +301,7 @@ export class FanZoneComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.apiService.getQuizLeaderboard().subscribe({
-      next: (data) => {
-        this.leaderboard = data;
-      },
-      error: () => {}
-    });
+    this.refreshLeaderboardSnapshot();
   }
 
   private beginQuiz(): void {
@@ -313,6 +317,7 @@ export class FanZoneComponent implements OnInit, OnDestroy {
     this.timeLeft = TOTAL_TIME;
     this.timeTaken = 0;
     this.currentPlayerEntry = null;
+    this.submissionNotice = '';
     this.screen = 'quiz';
     this.startTimer();
   }
@@ -343,24 +348,25 @@ export class FanZoneComponent implements OnInit, OnDestroy {
   }
 
   private submitScore(): void {
+    const payload = this.buildQuizSubmission();
+    this.persistPendingQuizSubmission(payload);
     this.submitting = true;
     this.submitDone = false;
+    this.submissionNotice = '';
 
-    this.apiService.submitQuizEntry({
-      name: this.player.name,
-      email: this.player.email,
-      city: this.player.city || null,
-      score: this.score,
-      totalQuestions: this.questions.length,
-      timeTakenSeconds: this.timeTaken
-    }).subscribe({
+    this.apiService.submitQuizEntry(payload).subscribe({
       next: (entry) => {
+        this.clearPendingQuizSubmission();
         this.currentPlayerEntry = entry;
         this.submitting = false;
         this.submitDone = true;
+        this.submissionNotice = '';
+        this.refreshLeaderboardSnapshot();
       },
       error: () => {
         this.submitting = false;
+        this.submitDone = false;
+        this.submissionNotice = 'Your score is saved on this device and will retry automatically until it reaches the live leaderboard.';
       }
     });
   }
@@ -381,5 +387,114 @@ export class FanZoneComponent implements OnInit, OnDestroy {
 
   private countCreations(type: FanCreation['type']): number {
     return this.fanCreations.filter(item => item.type === type).length;
+  }
+
+  private buildQuizSubmission(): {
+    clientSubmissionId: string;
+    name: string;
+    email: string;
+    city: string | null;
+    score: number;
+    totalQuestions: number;
+    timeTakenSeconds: number;
+  } {
+    return {
+      clientSubmissionId: crypto.randomUUID(),
+      name: this.player.name.trim(),
+      email: this.player.email.trim(),
+      city: this.player.city?.trim() || null,
+      score: this.score,
+      totalQuestions: this.questions.length,
+      timeTakenSeconds: this.timeTaken
+    };
+  }
+
+  private startLiveLeaderboardRefresh(): void {
+    this.clearLiveLeaderboardRefresh();
+    this.leaderboardRefreshRef = setInterval(() => {
+      if (this.screen !== 'landing' && this.screen !== 'leaderboard') {
+        return;
+      }
+
+      this.refreshLeaderboardSnapshot();
+    }, LIVE_LEADERBOARD_REFRESH_MS);
+  }
+
+  private clearLiveLeaderboardRefresh(): void {
+    if (this.leaderboardRefreshRef) {
+      clearInterval(this.leaderboardRefreshRef);
+      this.leaderboardRefreshRef = null;
+    }
+  }
+
+  private refreshLeaderboardSnapshot(): void {
+    this.apiService.getQuizLeaderboard().subscribe({
+      next: (data) => {
+        this.leaderboard = data;
+        if (this.screen === 'leaderboard') {
+          this.loadCurrentPlayerEntry();
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  private retryPendingQuizSubmission(): void {
+    const pending = this.loadPendingQuizSubmission();
+    if (!pending) {
+      return;
+    }
+
+    this.apiService.submitQuizEntry(pending).subscribe({
+      next: (entry) => {
+        this.clearPendingQuizSubmission();
+        this.currentPlayerEntry = entry;
+        this.submitDone = true;
+        this.submitting = false;
+        this.submissionNotice = '';
+        this.refreshLeaderboardSnapshot();
+      },
+      error: () => {
+        this.submissionNotice = 'A queued quiz score is still waiting to sync to the live leaderboard.';
+      }
+    });
+  }
+
+  private persistPendingQuizSubmission(payload: {
+    clientSubmissionId: string;
+    name: string;
+    email: string;
+    city: string | null;
+    score: number;
+    totalQuestions: number;
+    timeTakenSeconds: number;
+  }): void {
+    localStorage.setItem(PENDING_QUIZ_SUBMISSION_STORAGE_KEY, JSON.stringify(payload));
+  }
+
+  private loadPendingQuizSubmission(): {
+    clientSubmissionId: string;
+    name: string;
+    email: string;
+    city: string | null;
+    score: number;
+    totalQuestions: number;
+    timeTakenSeconds: number;
+  } | null {
+    const raw = localStorage.getItem(PENDING_QUIZ_SUBMISSION_STORAGE_KEY);
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      localStorage.removeItem(PENDING_QUIZ_SUBMISSION_STORAGE_KEY);
+      return null;
+    }
+  }
+
+  private clearPendingQuizSubmission(): void {
+    localStorage.removeItem(PENDING_QUIZ_SUBMISSION_STORAGE_KEY);
   }
 }

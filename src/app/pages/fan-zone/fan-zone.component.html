@@ -261,6 +261,7 @@
 
       <p *ngIf="submitting" class="status-msg">Saving score...</p>
       <p *ngIf="submitDone" class="status-msg ok">✓ Score saved to leaderboard</p>
+      <p *ngIf="submissionNotice" class="status-msg pending">{{ submissionNotice }}</p>
 
       <div class="form-actions">
         <button type="button" class="btn-primary" (click)="openLeaderboard()">View Leaderboard</button>

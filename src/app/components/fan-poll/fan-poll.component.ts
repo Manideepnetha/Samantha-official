@@ -4,6 +4,7 @@ import { ApiService, FanPollResult } from '../../services/api.service';
 import { FAN_POLL_DEFINITION } from '../../data/fan-experience.data';
 
 const CLIENT_ID_KEY = 'srp_fan_poll_client_id_v1';
+const PENDING_VOTE_KEY_PREFIX = 'srp_fan_poll_pending_vote_v1_';
 
 @Component({
   selector: 'app-fan-poll',
@@ -41,6 +42,7 @@ const CLIENT_ID_KEY = 'srp_fan_poll_client_id_v1';
         <span>{{ result?.totalVotes || 0 }} total votes</span>
         <span *ngIf="result?.hasVoted">Your vote is locked in.</span>
         <span *ngIf="!result?.hasVoted">Vote once to reveal the live split.</span>
+        <span *ngIf="notice">{{ notice }}</span>
       </div>
     </section>
   `,
@@ -148,11 +150,13 @@ export class FanPollComponent implements OnInit {
   readonly poll = FAN_POLL_DEFINITION;
   result: FanPollResult | null = null;
   voting = false;
+  notice = '';
   private readonly clientId = this.resolveClientId();
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
+    this.retryPendingVote();
     this.loadPoll();
   }
 
@@ -162,16 +166,25 @@ export class FanPollComponent implements OnInit {
     }
 
     this.voting = true;
+    this.notice = '';
+    this.persistPendingVote(optionKey);
     this.apiService.submitFanPollVote(this.poll.key, {
       optionKey,
       clientId: this.clientId
     }).subscribe({
       next: (result) => {
         this.result = result;
+        this.clearPendingVote();
         this.voting = false;
       },
-      error: (error: { error?: FanPollResult }) => {
+      error: (error: { status?: number; error?: FanPollResult }) => {
         this.result = error.error ?? this.result;
+        if (error.status === 409 || error.error?.hasVoted) {
+          this.clearPendingVote();
+          this.notice = '';
+        } else {
+          this.notice = 'Your vote is saved on this device and will retry automatically if the network was interrupted.';
+        }
         this.voting = false;
       }
     });
@@ -181,6 +194,10 @@ export class FanPollComponent implements OnInit {
     this.apiService.getFanPollResult(this.poll.key, this.clientId).subscribe({
       next: (result) => {
         this.result = result;
+        if (result.hasVoted) {
+          this.clearPendingVote();
+          this.notice = '';
+        }
       },
       error: () => {
         this.result = null;
@@ -197,5 +214,52 @@ export class FanPollComponent implements OnInit {
     const generated = `poll-${crypto.randomUUID()}`;
     localStorage.setItem(CLIENT_ID_KEY, generated);
     return generated;
+  }
+
+  private retryPendingVote(): void {
+    const pendingOptionKey = this.loadPendingVote();
+    if (!pendingOptionKey) {
+      return;
+    }
+
+    this.voting = true;
+    this.apiService.submitFanPollVote(this.poll.key, {
+      optionKey: pendingOptionKey,
+      clientId: this.clientId
+    }).subscribe({
+      next: (result) => {
+        this.result = result;
+        this.clearPendingVote();
+        this.notice = '';
+        this.voting = false;
+      },
+      error: (error: { status?: number; error?: FanPollResult }) => {
+        this.result = error.error ?? this.result;
+        if (error.status === 409 || error.error?.hasVoted) {
+          this.clearPendingVote();
+          this.notice = '';
+        } else {
+          this.notice = 'A vote is still waiting to sync and will retry automatically.';
+        }
+        this.voting = false;
+      }
+    });
+  }
+
+  private getPendingVoteKey(): string {
+    return `${PENDING_VOTE_KEY_PREFIX}${this.poll.key}`;
+  }
+
+  private persistPendingVote(optionKey: string): void {
+    localStorage.setItem(this.getPendingVoteKey(), optionKey);
+  }
+
+  private loadPendingVote(): string | null {
+    const optionKey = localStorage.getItem(this.getPendingVoteKey());
+    return optionKey?.trim() || null;
+  }
+
+  private clearPendingVote(): void {
+    localStorage.removeItem(this.getPendingVoteKey());
   }
 }
