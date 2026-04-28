@@ -1,0 +1,205 @@
+<div class="fashion-page" [style.--fashion-accent]="fashionAccent">
+  <section *ngIf="loading" class="fashion-shell fashion-loading-state">
+    <span class="fashion-kicker">Loading</span>
+    <h1>Preparing the fashion archive...</h1>
+    <p>Gathering the official feed, curated gallery frames, and linked source notes.</p>
+  </section>
+
+  <ng-container *ngIf="!loading && activeSlide as slide">
+    <section
+      class="fashion-shell fashion-hero"
+      (mouseenter)="pauseAutoRotate()"
+      (mouseleave)="resumeAutoRotate()"
+    >
+      <div class="fashion-backdrop-layer" aria-hidden="true">
+        <img
+          *ngFor="let item of featureSlides; let i = index; trackBy: trackBySlide"
+          [src]="item.imageUrl"
+          [alt]="item.altText"
+          [class.is-active]="selectedSlideIndex === i"
+        />
+      </div>
+
+      <div class="fashion-copy">
+        <a routerLink="/gallery" class="fashion-back-link">
+          <svg xmlns="http://www.w3.org/2000/svg" class="fashion-back-link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back To Gallery
+        </a>
+
+        <span class="fashion-kicker">Official Fashion Screen</span>
+        <h1>{{ fashionTitle }}</h1>
+        <p class="fashion-intro">{{ fashionSubtitle }}</p>
+
+        <div class="fashion-stat-grid">
+          <article class="fashion-stat-card">
+            <strong>{{ featureSlides.length }}</strong>
+            <span>Feature slides</span>
+          </article>
+          <article class="fashion-stat-card">
+            <strong>{{ feedStoryCount }}</strong>
+            <span>Feed stories</span>
+          </article>
+          <article class="fashion-stat-card">
+            <strong>{{ archiveFrameCount }}</strong>
+            <span>Archive frames</span>
+          </article>
+          <article class="fashion-stat-card">
+            <strong>{{ sourceCount }}</strong>
+            <span>Source channels</span>
+          </article>
+        </div>
+
+        <article class="fashion-active-copy">
+          <span class="fashion-kicker">{{ slide.eyebrow }}</span>
+          <h2>{{ slide.title }}</h2>
+          <p>{{ slide.description }}</p>
+
+          <div class="fashion-pill-row">
+            <span class="fashion-pill">{{ slide.dateLabel }}</span>
+            <span class="fashion-pill">{{ slide.sourceLabel }}</span>
+            <span class="fashion-pill">{{ slide.metaLabel }}</span>
+          </div>
+
+          <div class="fashion-active-actions">
+            <a
+              *ngIf="slide.isExternal; else internalHeroCta"
+              [href]="slide.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="fashion-primary-link"
+            >
+              {{ slide.ctaLabel }}
+            </a>
+            <ng-template #internalHeroCta>
+              <a [routerLink]="slide.href" class="fashion-primary-link">{{ slide.ctaLabel }}</a>
+            </ng-template>
+
+            <a routerLink="/gallery/set/fashion-editorials" class="fashion-secondary-link">
+              Explore Full Editorial Set
+            </a>
+          </div>
+        </article>
+      </div>
+
+      <aside class="fashion-feature-panel">
+        <div class="fashion-feature-frame">
+          <img [src]="slide.imageUrl" [alt]="slide.altText" />
+          <div class="fashion-feature-meta">
+            <span>{{ slide.sourceLabel }}</span>
+            <strong>{{ slide.title }}</strong>
+            <small>{{ getDisplayIndex(selectedSlideIndex) }} / {{ getDisplayIndex(featureSlides.length - 1) }}</small>
+          </div>
+        </div>
+
+        <div *ngIf="featureSlides.length > 1" class="fashion-slider-controls" aria-label="Fashion slides">
+          <button type="button" class="fashion-slider-button" (click)="previousSlide()" aria-label="Previous fashion slide">
+            Prev
+          </button>
+          <div class="fashion-slider-pagination" aria-hidden="true">
+            <span>{{ getDisplayIndex(selectedSlideIndex) }}</span>
+            <span class="fashion-slider-line"></span>
+            <span>{{ getDisplayIndex(featureSlides.length - 1) }}</span>
+          </div>
+          <button type="button" class="fashion-slider-button" (click)="nextSlide()" aria-label="Next fashion slide">
+            Next
+          </button>
+        </div>
+      </aside>
+    </section>
+
+    <section *ngIf="featureSlides.length > 1" class="fashion-shell fashion-rail">
+      <div class="fashion-section-head">
+        <span>Slide Rail</span>
+        <h2>Curated from every official source already available in this project</h2>
+        <p>Switch between the fashion feed, archive editorials, and linked brand-led frames without leaving the page.</p>
+      </div>
+
+      <div class="fashion-thumb-grid">
+        <button
+          *ngFor="let item of featureSlides; let i = index; trackBy: trackBySlide"
+          type="button"
+          class="fashion-thumb-card"
+          [class.is-active]="selectedSlideIndex === i"
+          (click)="selectSlide(i)"
+          [attr.aria-label]="'Open fashion slide ' + getDisplayIndex(i)"
+        >
+          <div class="fashion-thumb-media">
+            <img [src]="item.imageUrl" [alt]="item.altText" loading="lazy" decoding="async" />
+            <span class="fashion-thumb-index">{{ getDisplayIndex(i) }}</span>
+          </div>
+          <div class="fashion-thumb-copy">
+            <span>{{ item.sourceLabel }}</span>
+            <strong>{{ item.title }}</strong>
+            <small>{{ item.dateLabel }}</small>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <section class="fashion-shell fashion-sources">
+      <div class="fashion-section-head">
+        <span>Source Map</span>
+        <h2>What the screen is built from</h2>
+        <p>The new layout now surfaces the available official fashion materials instead of leaving them flattened into a simple card list.</p>
+      </div>
+
+      <div class="fashion-source-grid">
+        <article *ngFor="let source of sourceNotes; trackBy: trackBySource" class="fashion-source-card">
+          <span>{{ source.label }}</span>
+          <strong>{{ source.value }}</strong>
+          <p>{{ source.detail }}</p>
+
+          <a
+            *ngIf="source.href && source.isExternal; else internalSourceLink"
+            [href]="source.href"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="fashion-source-link"
+          >
+            Open Source
+          </a>
+          <ng-template #internalSourceLink>
+            <a *ngIf="source.href" [routerLink]="source.href" class="fashion-source-link">Open Source</a>
+          </ng-template>
+        </article>
+      </div>
+    </section>
+
+    <section class="fashion-shell fashion-grid-section">
+      <div class="fashion-section-head">
+        <span>All Looks</span>
+        <h2>Every story still lives below the feature slider</h2>
+        <p>The slider handles the hero storytelling, while the archive grid keeps the full visual browse experience available.</p>
+      </div>
+
+      <div class="fashion-card-grid">
+        <article *ngFor="let card of editorialCards; trackBy: trackByCard" class="fashion-card">
+          <div class="fashion-card-media">
+            <img [src]="card.imageUrl" [alt]="card.altText" loading="lazy" decoding="async" />
+          </div>
+          <div class="fashion-card-body">
+            <span class="fashion-card-source">{{ card.sourceLabel }}</span>
+            <h3>{{ card.title }}</h3>
+            <p class="fashion-card-date">{{ card.dateLabel }}</p>
+            <p class="fashion-card-description">{{ card.description }}</p>
+
+            <a
+              *ngIf="card.isExternal; else internalCardCta"
+              [href]="card.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="fashion-card-link"
+            >
+              {{ card.ctaLabel }}
+            </a>
+            <ng-template #internalCardCta>
+              <a [routerLink]="card.href" class="fashion-card-link">{{ card.ctaLabel }}</a>
+            </ng-template>
+          </div>
+        </article>
+      </div>
+    </section>
+  </ng-container>
+</div>
