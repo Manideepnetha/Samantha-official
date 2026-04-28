@@ -99,14 +99,14 @@ public static class DatabaseSchemaBootstrap
                 CONSTRAINT ""PK_QuizEntries"" PRIMARY KEY (""Id"")
             );
 
-            CREATE INDEX IF NOT EXISTS ""IX_QuizEntries_Email"" ON ""QuizEntries"" (""Email"");
-            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_QuizEntries_ClientSubmissionId"" ON ""QuizEntries"" (""ClientSubmissionId"") WHERE ""ClientSubmissionId"" IS NOT NULL;
-
             ALTER TABLE IF EXISTS ""QuizEntries"" ADD COLUMN IF NOT EXISTS ""ClientSubmissionId"" text;
             ALTER TABLE IF EXISTS ""QuizEntries"" ADD COLUMN IF NOT EXISTS ""City"" text;
             ALTER TABLE IF EXISTS ""QuizEntries"" ADD COLUMN IF NOT EXISTS ""TotalQuestions"" integer NOT NULL DEFAULT 0;
             ALTER TABLE IF EXISTS ""QuizEntries"" ADD COLUMN IF NOT EXISTS ""TimeTakenSeconds"" integer NOT NULL DEFAULT 0;
             ALTER TABLE IF EXISTS ""QuizEntries"" ADD COLUMN IF NOT EXISTS ""SubmittedAt"" timestamp with time zone NOT NULL DEFAULT NOW();
+
+            CREATE INDEX IF NOT EXISTS ""IX_QuizEntries_Email"" ON ""QuizEntries"" (""Email"");
+            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_QuizEntries_ClientSubmissionId"" ON ""QuizEntries"" (""ClientSubmissionId"") WHERE ""ClientSubmissionId"" IS NOT NULL;
 
             CREATE TABLE IF NOT EXISTS ""FanCreations"" (
                 ""Id"" serial NOT NULL,
@@ -168,13 +168,13 @@ public static class DatabaseSchemaBootstrap
                 CONSTRAINT ""PK_FanWallMessages"" PRIMARY KEY (""Id"")
             );
 
-            CREATE INDEX IF NOT EXISTS ""IX_FanWallMessages_Status"" ON ""FanWallMessages"" (""Status"");
-            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_FanWallMessages_ClientSubmissionId"" ON ""FanWallMessages"" (""ClientSubmissionId"") WHERE ""ClientSubmissionId"" IS NOT NULL;
-
             ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""ClientSubmissionId"" text;
             ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""City"" text;
             ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""Status"" text NOT NULL DEFAULT 'Pending';
             ALTER TABLE IF EXISTS ""FanWallMessages"" ADD COLUMN IF NOT EXISTS ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT NOW();
+
+            CREATE INDEX IF NOT EXISTS ""IX_FanWallMessages_Status"" ON ""FanWallMessages"" (""Status"");
+            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_FanWallMessages_ClientSubmissionId"" ON ""FanWallMessages"" (""ClientSubmissionId"") WHERE ""ClientSubmissionId"" IS NOT NULL;
 
             CREATE TABLE IF NOT EXISTS ""FanPollVotes"" (
                 ""Id"" serial NOT NULL,
@@ -196,12 +196,22 @@ public static class DatabaseSchemaBootstrap
     {
         try
         {
-            context.Database.ExecuteSqlRaw(sql);
+            foreach (var statement in SplitSqlStatements(sql))
+            {
+                context.Database.ExecuteSqlRaw(statement);
+            }
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Database schema bootstrap failed while applying {Operation}.", operation);
             throw;
         }
+    }
+
+    private static IEnumerable<string> SplitSqlStatements(string sql)
+    {
+        return sql
+            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(statement => !string.IsNullOrWhiteSpace(statement));
     }
 }
