@@ -30,7 +30,8 @@ interface BlogPost {
           <div class="sr-hero-panel min-h-[500px]">
             <div class="sr-hero-media">
               <img
-                src="https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008413/PAND7159_k4qlvo.jpg"
+                [src]="journalHeroImage"
+                (error)="onHeroImageError($event)"
                 alt="Journal"
                 class="object-[center_30%]"
               />
@@ -71,6 +72,7 @@ interface BlogPost {
               <div class="relative h-72 overflow-hidden lg:h-full">
                 <img
                   [src]="featuredPost.coverImage || fallbackCoverImage"
+                  (error)="onPostImageError(featuredPost, $event)"
                   [alt]="featuredPost.title"
                   class="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                   loading="lazy"
@@ -103,6 +105,7 @@ interface BlogPost {
               <div class="relative h-56 overflow-hidden">
                 <img
                   [src]="post.coverImage || fallbackCoverImage"
+                  (error)="onPostImageError(post, $event)"
                   [alt]="post.title"
                   class="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
                   loading="lazy"
@@ -136,8 +139,9 @@ interface BlogPost {
           </button>
 
           <img
-            *ngIf="selectedPost.coverImage"
-            [src]="selectedPost.coverImage"
+            *ngIf="selectedPost.coverImage || fallbackCoverImage"
+            [src]="selectedPost.coverImage || fallbackCoverImage"
+            (error)="onPostImageError(selectedPost, $event)"
             [alt]="selectedPost.title"
             class="h-64 w-full rounded-t-[1.75rem] object-cover"
           />
@@ -215,13 +219,16 @@ interface BlogPost {
 })
 export class BlogComponent implements OnInit, OnDestroy {
   readonly fallbackCoverImage =
-    'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008412/DSC_9143-1_ayf7fl.jpg';
+    'assets/images/philanthropy/samantha-pratyusha.png';
+  readonly defaultJournalHeroImage =
+    'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1748008413/PAND7159_k4qlvo.jpg';
 
   posts: BlogPost[] = [];
   featuredPost: BlogPost | null = null;
   otherPosts: BlogPost[] = [];
   selectedPost: BlogPost | null = null;
   isLoading = true;
+  journalHeroImage = this.defaultJournalHeroImage;
 
   constructor(private apiService: ApiService) {}
 
@@ -261,6 +268,19 @@ export class BlogComponent implements OnInit, OnDestroy {
     document.body.style.overflow = '';
   }
 
+  onHeroImageError(event: Event): void {
+    this.journalHeroImage = this.fallbackCoverImage;
+    this.replaceImageSource(event, this.fallbackCoverImage);
+  }
+
+  onPostImageError(post: BlogPost | null, event: Event): void {
+    if (post) {
+      post.coverImage = this.fallbackCoverImage;
+    }
+
+    this.replaceImageSource(event, this.fallbackCoverImage);
+  }
+
   private setResolvedPosts(posts: BlogPost[]): void {
     this.posts = posts;
     this.featuredPost = posts[0] || null;
@@ -293,7 +313,7 @@ export class BlogComponent implements OnInit, OnDestroy {
       id: post?.id ?? post?.title,
       title: post?.title || 'Untitled Post',
       summary,
-      coverImage: post?.coverImage || this.fallbackCoverImage,
+      coverImage: this.resolveCoverImage(post?.coverImage),
       publishedAt: post?.publishedAt,
       isPublished: post?.isPublished !== false,
       sections: this.buildSectionsFromContent(content, summary),
@@ -307,7 +327,7 @@ export class BlogComponent implements OnInit, OnDestroy {
       id: post.id,
       title: post.title,
       summary: post.summary,
-      coverImage: post.coverImage,
+      coverImage: this.resolveCoverImage(post.coverImage),
       publishedAt: post.publishedAt,
       isPublished: post.isPublished,
       sections: post.sections,
@@ -341,6 +361,20 @@ export class BlogComponent implements OnInit, OnDestroy {
     }
 
     return content.length > 160 ? `${content.substring(0, 160).trim()}...` : content;
+  }
+
+  private resolveCoverImage(value?: string): string {
+    return typeof value === 'string' && value.trim() ? value.trim() : this.fallbackCoverImage;
+  }
+
+  private replaceImageSource(event: Event, nextSource: string): void {
+    const target = event.target as HTMLImageElement | null;
+    if (!target || target.getAttribute('src') === nextSource) {
+      return;
+    }
+
+    target.onerror = null;
+    target.src = nextSource;
   }
 
   private normalizeTitle(value: string): string {

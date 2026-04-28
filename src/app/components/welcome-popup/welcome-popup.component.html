@@ -1,202 +1,98 @@
-<div *ngIf="isVisible" class="entry-overlay">
-  <div class="entry-backdrop"></div>
+<div *ngIf="isVisible" class="celebration-overlay">
+  <div class="celebration-backdrop" (click)="onEnterSite()"></div>
 
-  <section class="entry-dialog" aria-modal="true" role="dialog" aria-labelledby="entry-title">
-    <div class="entry-shell">
-      <div class="entry-copy">
-        <div class="entry-heading">
-          <span class="entry-kicker">Interactive Welcome</span>
-          <h2 id="entry-title">Solve the portrait puzzle to enter.</h2>
-          <p class="entry-description">Place the missing piece to unlock the website.</p>
+  <div class="celebration-confetti" aria-hidden="true">
+    <span
+      *ngFor="let piece of confettiPieces"
+      class="confetti-piece"
+      [style.left]="piece.left"
+      [style.--fall-delay]="piece.delay"
+      [style.--fall-duration]="piece.duration"
+      [style.--piece-rotation]="piece.rotation"
+      [style.--piece-color]="piece.color"
+      [style.--piece-width]="piece.width"
+      [style.--piece-height]="piece.height"
+    ></span>
+  </div>
+
+  <div class="celebration-sparkles" aria-hidden="true">
+    <span
+      *ngFor="let sparkle of sparkles"
+      class="sparkle"
+      [style.top]="sparkle.top"
+      [style.left]="sparkle.left"
+      [style.--sparkle-size]="sparkle.size"
+      [style.--sparkle-delay]="sparkle.delay"
+      [style.--sparkle-duration]="sparkle.duration"
+    ></span>
+  </div>
+
+  <section class="celebration-dialog" aria-modal="true" role="dialog" aria-labelledby="welcome-title">
+    <button type="button" class="celebration-close" (click)="onEnterSite()" aria-label="Close welcome popup">
+      <span aria-hidden="true">&#10005;</span>
+    </button>
+
+    <div class="celebration-shell">
+      <div class="celebration-visual">
+        <div
+          *ngFor="let burst of fireworkBursts"
+          class="firework"
+          [style.top]="burst.top"
+          [style.left]="burst.left"
+          [style.--burst-size]="burst.size"
+          [style.--burst-delay]="burst.delay"
+          [style.--burst-color]="burst.color"
+          aria-hidden="true"
+        >
+          <span class="firework-core"></span>
+          <span
+            *ngFor="let angle of fireworkRays"
+            class="firework-ray"
+            [style.--ray-angle]="angle"
+          ></span>
         </div>
 
-        <div class="entry-meta-row" *ngIf="visitorName.trim() || socialMediaId.trim()">
-          <div class="visitor-badge" *ngIf="visitorName.trim() || socialMediaId.trim()">
-            <strong>{{ visitorName.trim() || 'Guest Visitor' }}</strong>
-            <span *ngIf="socialMediaId.trim()">{{ socialMediaId.trim() }}</span>
+        <div class="photo-halo" aria-hidden="true"></div>
+
+        <figure class="celebration-portrait">
+          <div class="portrait-frame">
+            <img
+              [src]="photoUrl"
+              (error)="onPhotoError()"
+              alt="Samantha welcome portrait"
+              class="celebration-photo"
+              draggable="false"
+            />
           </div>
-        </div>
-
-        <div class="entry-board-card">
-          <div class="board-status">
-            <div class="board-status-copy">
-              <span class="board-status-label">Portrait Puzzle</span>
-              <strong>{{ stage === 'success' ? 'Unlocked' : puzzleProgressLabel }}</strong>
-            </div>
-            <p>{{ boardHint }}</p>
-          </div>
-
-          <div class="puzzle-stage" [class.is-interactive]="stage !== 'intro'" [class.is-solved]="stage === 'success'">
-            <img [src]="puzzleImageUrl" alt="Samantha portrait puzzle" class="puzzle-base-image" draggable="false" />
-
-            <svg class="puzzle-cut-lines" [attr.viewBox]="boardViewBox" preserveAspectRatio="none" aria-hidden="true">
-              <defs>
-                <pattern id="entry-missing-pattern" patternUnits="userSpaceOnUse" width="18" height="18" patternTransform="rotate(45)">
-                  <rect width="18" height="18" fill="#241915"></rect>
-                  <path d="M 0 5 L 18 5 M 0 14 L 18 14" stroke="#f0d3ae" stroke-opacity="0.12" stroke-width="2"></path>
-                </pattern>
-              </defs>
-
-              <g class="puzzle-seam-layer">
-                <g *ngFor="let slot of puzzleSlots" [attr.transform]="getBoardPieceTransform(slot)">
-                  <path class="puzzle-seam-shadow" [attr.d]="getPieceVectorPath(slot.shape)"></path>
-                  <path class="puzzle-seam-line" [attr.d]="getPieceVectorPath(slot.shape)"></path>
-                </g>
-              </g>
-
-              <g class="puzzle-gap-layer">
-                <ng-container *ngFor="let slot of puzzleSlots">
-                  <ng-container *ngIf="isMissingSlot(slot.id) && !getSlotPiece(slot.id)">
-                    <g [attr.transform]="getBoardPieceTransform(slot)">
-                      <path class="puzzle-gap-fill" [attr.d]="getPieceVectorPath(slot.shape)"></path>
-                      <path class="puzzle-gap-stripe" [attr.d]="getPieceVectorPath(slot.shape)"></path>
-                    </g>
-                  </ng-container>
-                </ng-container>
-              </g>
-            </svg>
-
-            <ng-container *ngFor="let slot of puzzleSlots">
-              <div
-                *ngIf="isMissingSlot(slot.id)"
-                class="puzzle-slot-zone"
-                [class.is-empty]="!getSlotPiece(slot.id)"
-                [class.is-filled]="!!getSlotPiece(slot.id)"
-                [class.is-drag-ready]="stage === 'puzzle' && !!draggingPieceId && !getSlotPiece(slot.id)"
-                [class.is-incorrect]="isSlotIncorrect(slot.id)"
-                [ngStyle]="getBoardSlotStyle(slot)"
-                (dragover)="allowPieceDrop($event)"
-                (drop)="onSlotDrop($event, slot.id)"
-                (click)="onMissingSlotClick(slot.id)"
-              >
-                <ng-container *ngIf="getSlotPiece(slot.id) as piece; else emptyBoardSlot">
-                  <div
-                    class="slot-piece-draggable"
-                    [attr.draggable]="stage === 'puzzle' ? true : null"
-                    (dragstart)="onDragStarted($event, piece.id)"
-                    (dragend)="onDragEnded()"
-                  >
-                    <div class="board-piece-fill" [ngStyle]="getBoardPlacedPieceStyle(piece)"></div>
-                  </div>
-                </ng-container>
-
-                <ng-template #emptyBoardSlot>
-                  <span *ngIf="stage === 'puzzle'" class="slot-hint">+</span>
-                </ng-template>
-              </div>
-            </ng-container>
-
-            <div *ngIf="stage === 'intro'" class="puzzle-locked-overlay">
-              <span class="locked-label">Enter your name to activate the puzzle</span>
-            </div>
-
-            <div *ngIf="stage === 'success'" class="success-bloom" aria-hidden="true">
-              <span *ngFor="let heart of successHearts; let index = index" [style.--heart-index]="index">{{ heart }}</span>
-            </div>
-          </div>
-
-          <div class="board-footer">
-            <span>One-piece challenge</span>
-            <span>Drag or tap to place</span>
-          </div>
-        </div>
+          <figcaption class="portrait-caption">
+            <span class="portrait-kicker">Welcome Celebration</span>
+            <strong>Samantha Ruth Prabhu</strong>
+          </figcaption>
+        </figure>
       </div>
 
-      <aside class="entry-panel">
-        <div class="entry-panel-inner">
-          <div class="entry-panel-head">
-            <span class="entry-panel-kicker">Welcome Gate</span>
-            <p *ngIf="stage === 'intro'">Add your details and get the portrait challenge ready.</p>
-            <p *ngIf="stage === 'puzzle'">Pick from the tray and place the one piece that completes the portrait.</p>
-            <p *ngIf="stage === 'success'">The portrait is complete and your entry is unlocked.</p>
-          </div>
+      <div class="celebration-copy">
+        <span class="celebration-kicker">Grand Welcome</span>
+        <h2 id="welcome-title">Step into Samantha&apos;s world with a celebration-first welcome.</h2>
+        <p class="celebration-description">
+          A cleaner opening moment, centered on Samantha&apos;s portrait, glowing crackers, and animated festive motion
+          that feels polished on both desktop and mobile.
+        </p>
 
-          <div *ngIf="stage === 'intro'" class="entry-step">
-            <span class="entry-step-label">Step 1</span>
-            <h3>Tell us your name</h3>
-            <p>Add your name first, then optionally a social handle so we can recognize unique visitors.</p>
-
-            <label class="entry-field">
-              <span>Your Name</span>
-              <input [(ngModel)]="visitorName" type="text" maxlength="50" placeholder="Enter your name" autocomplete="name" />
-            </label>
-
-            <label class="entry-field">
-              <span>Social Media ID (Optional)</span>
-              <input [(ngModel)]="socialMediaId" type="text" maxlength="80" placeholder="@instagram / @x / handle" autocomplete="off" />
-            </label>
-
-            <p *ngIf="introError" class="entry-error">{{ introError }}</p>
-
-            <div class="entry-step-footer">
-              <div class="entry-mini-note">
-                One precise piece. One clean unlock.
-              </div>
-
-              <button type="button" class="entry-primary-button" (click)="beginPuzzle()">Start The Puzzle</button>
-            </div>
-          </div>
-
-          <div *ngIf="stage === 'puzzle'" class="entry-step">
-            <span class="entry-step-label">Step 2</span>
-            <h3>Place the missing piece</h3>
-            <p>Four pieces are in the tray. Only one belongs in the portrait, so study the details before you place it.</p>
-
-            <div class="option-tray" (dragover)="allowPieceDrop($event)" (drop)="onTrayDrop($event)">
-              <div
-                *ngFor="let option of trayOptions"
-                class="option-piece"
-                [class.is-selected]="selectedPieceId === option.id"
-                [attr.draggable]="stage === 'puzzle' ? true : null"
-                (dragstart)="onDragStarted($event, option.id)"
-                (dragend)="onDragEnded()"
-                (click)="selectPiece(option.id)"
-              >
-                <div class="option-piece-visual">
-                  <div class="puzzle-piece-visual is-artwork is-tray-piece" [ngStyle]="getPieceArtworkStyle(option)"></div>
-                </div>
-                <div class="option-piece-copy">
-                  <strong>{{ option.title }}</strong>
-                  <span>Inspect and place</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="entry-note">
-              The missing space is subtle. Compare the dress folds, lighting, and floor lines before choosing.
-            </div>
-
-            <p *ngIf="puzzleMessage" class="entry-message">{{ puzzleMessage }}</p>
-            <p *ngIf="puzzleError" class="entry-error">{{ puzzleError }}</p>
-
-            <div class="entry-actions">
-              <button type="button" class="entry-secondary-button" (click)="resetPuzzle(true)">Shuffle And Retry</button>
-            </div>
-          </div>
-
-          <div *ngIf="stage === 'success'" class="entry-step is-success">
-            <div class="success-ribbon">Portrait Solved</div>
-            <span class="entry-step-label">Unlocked</span>
-            <h3>Beautifully done, {{ completedName }}! &#10084;&#65039;</h3>
-            <p class="entry-success-copy">Welcome to Samantha&apos;s world. Enjoy exploring it. &#10024;</p>
-
-            <div class="entry-success-card">
-              <p>The portrait is complete and the website is ready for you. &#128150;</p>
-            </div>
-
-            <button type="button" class="entry-primary-button" (click)="onEnterSite()">Enter Website</button>
-          </div>
-
-          <div *ngIf="stage !== 'success'" class="entry-panel-note">
-            <span class="entry-panel-note-label">Quick Guide</span>
-            <div class="entry-panel-stats">
-              <span>1 Missing Piece</span>
-              <span>4 Options</span>
-              <span>Fast Unlock</span>
-            </div>
-          </div>
+        <div class="celebration-highlights">
+          <span>Animated fireworks</span>
+          <span>Local Samantha artwork</span>
+          <span>One-tap entry</span>
         </div>
-      </aside>
+
+        <div class="celebration-note">
+          Fresh visuals, cinematic warmth, and a smoother first impression before visitors enter the homepage.
+        </div>
+
+        <div class="celebration-actions">
+          <button type="button" class="enter-button" (click)="onEnterSite()">Enter Website</button>
+        </div>
+      </div>
     </div>
   </section>
 </div>
