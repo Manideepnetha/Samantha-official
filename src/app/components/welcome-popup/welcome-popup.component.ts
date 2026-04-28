@@ -41,7 +41,7 @@ interface CelebrationSparkle {
 export class WelcomePopupComponent implements OnInit, OnDestroy {
   @Output() close = new EventEmitter<void>();
 
-  readonly primaryPhotoUrl = 'assets/images/philanthropy/samantha-pratyusha.png';
+  readonly primaryPhotoUrl = 'https://res.cloudinary.com/dpnd6ve1e/image/upload/v1777361483/samantha-official-website/welcome-popup/welcome-popup-birthday_qtcxlk.jpg';
   readonly fallbackPhotoUrl = 'assets/images/samantha-login.png';
   readonly fireworkRays = Array.from({ length: 12 }, (_, index) => `${index * 30}deg`);
   readonly confettiPieces = this.buildConfettiPieces();
