@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, HostListener, OnDestroy, OnInit, Output } from '@angular/core';
-import { ENTRY_EXPERIENCE_COMPLETED_STORAGE_KEY } from './entry-experience.storage';
+import {
+  ENTRY_EXPERIENCE_COMPLETED_STORAGE_KEY,
+  LEGACY_ENTRY_EXPERIENCE_STORAGE_KEYS
+} from './entry-experience.storage';
 
 interface CelebrationConfettiPiece {
   left: string;
@@ -73,8 +76,11 @@ export class WelcomePopupComponent implements OnInit, OnDestroy {
 
   onEnterSite(): void {
     localStorage.setItem(ENTRY_EXPERIENCE_COMPLETED_STORAGE_KEY, 'true');
-    localStorage.setItem('srp_welcome_seen', 'true');
-    localStorage.setItem('srp_entry_completed', 'true');
+    LEGACY_ENTRY_EXPERIENCE_STORAGE_KEYS.forEach(key => {
+      if (key !== ENTRY_EXPERIENCE_COMPLETED_STORAGE_KEY) {
+        localStorage.removeItem(key);
+      }
+    });
     this.closePopup();
   }
 
@@ -85,7 +91,7 @@ export class WelcomePopupComponent implements OnInit, OnDestroy {
   }
 
   private buildConfettiPieces(): CelebrationConfettiPiece[] {
-    const palette = ['#f4d39a', '#ff9f7b', '#f6f0e8', '#ffc5ba', '#ffd974', '#c9a3ff'];
+    const palette = ['#f4d39a', '#ffb38a', '#f6f0e8', '#ffd2c2', '#ffd974', '#ffe9b5'];
 
     return Array.from({ length: 22 }, (_, index) => ({
       left: `${4 + ((index * 9) % 92)}%`,
@@ -103,7 +109,7 @@ export class WelcomePopupComponent implements OnInit, OnDestroy {
       { top: '11%', left: '15%', size: '138px', delay: '0s', color: '#ffd480' },
       { top: '18%', left: '82%', size: '118px', delay: '0.75s', color: '#ff9c7a' },
       { top: '67%', left: '13%', size: '110px', delay: '1.45s', color: '#fff3d9' },
-      { top: '74%', left: '79%', size: '130px', delay: '2.15s', color: '#efb6ff' }
+      { top: '74%', left: '79%', size: '130px', delay: '2.15s', color: '#ffd8a8' }
     ];
   }
 
