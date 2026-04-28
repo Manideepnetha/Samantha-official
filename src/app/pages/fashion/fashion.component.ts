@@ -54,6 +54,18 @@ interface FashionSourceNote {
 
 const FASHION_COLLECTION_KEY = 'fashion-editorials';
 const FALLBACK_EXTERNAL_SOURCE = 'https://saaki.co/';
+const BLOCKED_FASHION_TERMS = ['blenders pride', 'blenders-pride', 'blenders'];
+const FEATURED_FASHION_COLLECTION_KEYS = [
+  'saaki',
+  'burberry',
+  'tommy-hilfiger',
+  'peacock',
+  'louis-vuitton',
+  'kresha-bajaj',
+  'secret-alchemist',
+  'saaki-pink',
+  'myntra'
+];
 const FALLBACK_FASHION_ITEMS: FashionItem[] = [
   {
     title: 'Style Evolution',
@@ -78,6 +90,7 @@ export class FashionComponent implements OnInit, OnDestroy {
   editorialCards: FashionEditorialCard[] = [];
   sourceNotes: FashionSourceNote[] = [];
   fashionItems: FashionItem[] = [];
+  curatedFashionSets: GalleryStorySet[] = [];
   fashionSet: GalleryStorySet | null = null;
 
   private slideTimer: ReturnType<typeof setInterval> | null = null;
@@ -95,16 +108,21 @@ export class FashionComponent implements OnInit, OnDestroy {
         : getFallbackGalleryStorySets();
 
       const fallbackFashionSet = getFallbackGalleryStorySets().find(set => set.key === FASHION_COLLECTION_KEY) || null;
-      const nextFashionSet = storySets.find(set => set.key === FASHION_COLLECTION_KEY)
-        || storySets.find(set => set.category === 'fashion')
-        || fallbackFashionSet;
       const nextFashionItems = this.resolveFashionItems(fashionItems);
+      const nextFashionSets = this.resolveCuratedFashionSets(storySets);
+      const nextFashionSet = nextFashionSets[0]
+        || storySets.find(set => set.key === FASHION_COLLECTION_KEY && !this.isBlockedFashionSet(set))
+        || storySets.find(set => set.category === 'fashion' && !this.isBlockedFashionSet(set))
+        || fallbackFashionSet;
 
       this.fashionItems = nextFashionItems;
+      this.curatedFashionSets = nextFashionSets.length > 0
+        ? nextFashionSets
+        : nextFashionSet ? [nextFashionSet] : [];
       this.fashionSet = nextFashionSet;
-      this.featureSlides = this.buildFeatureSlides(nextFashionItems, nextFashionSet);
-      this.editorialCards = this.buildEditorialCards(nextFashionItems, nextFashionSet);
-      this.sourceNotes = this.buildSourceNotes(nextFashionItems, nextFashionSet);
+      this.featureSlides = this.buildFeatureSlides(nextFashionItems, this.curatedFashionSets);
+      this.editorialCards = this.buildEditorialCards(nextFashionItems, this.curatedFashionSets);
+      this.sourceNotes = this.buildSourceNotes(nextFashionItems, this.curatedFashionSets);
       this.selectedSlideIndex = Math.min(this.selectedSlideIndex, Math.max(this.featureSlides.length - 1, 0));
       this.loading = false;
       this.restartAutoRotate();
@@ -124,12 +142,17 @@ export class FashionComponent implements OnInit, OnDestroy {
   }
 
   get fashionTitle(): string {
-    return this.fashionSet?.title || 'Fashion Journey';
+    return 'Fashion Screen';
   }
 
   get fashionSubtitle(): string {
-    return this.fashionSet?.description
-      || 'A cinematic mix of editorial looks, brand-linked stories, and official archive frames.';
+    const featuredCollections = this.getFeaturedCollectionNames(this.curatedFashionSets, 3);
+
+    if (featuredCollections) {
+      return `A sharper editorial mix built from Samantha's live fashion collections, featuring ${featuredCollections}.`;
+    }
+
+    return 'A cinematic mix of editorial looks, brand-linked stories, and official archive frames.';
   }
 
   get feedStoryCount(): number {
@@ -137,11 +160,17 @@ export class FashionComponent implements OnInit, OnDestroy {
   }
 
   get archiveFrameCount(): number {
-    return this.fashionSet?.itemCount || 0;
+    return this.curatedFashionSets.reduce((total, set) => total + set.itemCount, 0);
   }
 
   get sourceCount(): number {
     return this.sourceNotes.length;
+  }
+
+  get editorialArchiveLink(): string {
+    return this.curatedFashionSets[0]
+      ? `/gallery/set/${this.curatedFashionSets[0].key}`
+      : `/gallery/set/${FASHION_COLLECTION_KEY}`;
   }
 
   previousSlide(): void {
@@ -199,9 +228,11 @@ export class FashionComponent implements OnInit, OnDestroy {
   }
 
   private resolveFashionItems(items: FashionItem[]): FashionItem[] {
-    const candidateItems = items.length > 0 ? items : FALLBACK_FASHION_ITEMS;
+    const candidateItems = (items.length > 0 ? items : FALLBACK_FASHION_ITEMS)
+      .filter(item => !this.isBlockedFashionCopy(item.title, item.description, item.link, item.type));
+    const safeItems = candidateItems.length > 0 ? candidateItems : FALLBACK_FASHION_ITEMS;
 
-    return [...candidateItems].sort((left, right) => {
+    return [...safeItems].sort((left, right) => {
       const dateDelta = this.parseContentDate(right.date) - this.parseContentDate(left.date);
 
       if (dateDelta !== 0) {
@@ -212,7 +243,18 @@ export class FashionComponent implements OnInit, OnDestroy {
     });
   }
 
-  private buildFeatureSlides(items: FashionItem[], fashionSet: GalleryStorySet | null): FashionFeatureSlide[] {
+  private resolveCuratedFashionSets(storySets: GalleryStorySet[]): GalleryStorySet[] {
+    const fashionSets = storySets.filter(set => set.category === 'fashion' && set.itemCount > 0 && !this.isBlockedFashionSet(set));
+    const orderedKeys = new Set(FEATURED_FASHION_COLLECTION_KEYS);
+    const preferredSets = FEATURED_FASHION_COLLECTION_KEYS
+      .map(key => fashionSets.find(set => set.key === key))
+      .filter((set): set is GalleryStorySet => !!set);
+    const remainingSets = fashionSets.filter(set => !orderedKeys.has(set.key));
+
+    return [...preferredSets, ...remainingSets];
+  }
+
+  private buildFeatureSlides(items: FashionItem[], fashionSets: GalleryStorySet[]): FashionFeatureSlide[] {
     const slides: FashionFeatureSlide[] = [];
     const seenImages = new Set<string>();
 
@@ -238,32 +280,34 @@ export class FashionComponent implements OnInit, OnDestroy {
       seenImages.add(item.imageUrl);
     }
 
-    for (const image of fashionSet?.images || []) {
-      if (!image.imageUrl || seenImages.has(image.imageUrl)) {
+    for (const set of fashionSets) {
+      const imageUrl = set.coverImageUrl || set.leadImage?.imageUrl || '';
+
+      if (!imageUrl || seenImages.has(imageUrl)) {
         continue;
       }
 
       slides.push({
-        id: `archive-${image.id}`,
-        title: image.caption,
-        dateLabel: image.date || fashionSet?.subtitle || 'Official Archive',
-        description: fashionSet?.description || 'A curated frame from the official Samantha fashion archive.',
-        imageUrl: image.imageUrl,
-        altText: image.altText,
-        eyebrow: fashionSet?.title || 'Official Fashion Archive',
-        sourceLabel: 'Gallery Archive',
-        metaLabel: fashionSet?.subtitle || 'Curated editorial set',
-        href: `/gallery/set/${fashionSet?.key || FASHION_COLLECTION_KEY}`,
+        id: `archive-${set.key}`,
+        title: set.title,
+        dateLabel: set.leadImage?.date || set.subtitle || 'Official Archive',
+        description: set.description || 'A curated frame from the official Samantha fashion archive.',
+        imageUrl,
+        altText: set.leadImage?.altText || set.title,
+        eyebrow: 'Curated Live Collection',
+        sourceLabel: this.getCollectionSourceLabel(set),
+        metaLabel: `${set.itemCount} frame${set.itemCount === 1 ? '' : 's'}`,
+        href: `/gallery/set/${set.key}`,
         isExternal: false,
-        ctaLabel: 'View Archive Set'
+        ctaLabel: 'Open Collection'
       });
-      seenImages.add(image.imageUrl);
+      seenImages.add(imageUrl);
     }
 
     return slides.slice(0, 6);
   }
 
-  private buildEditorialCards(items: FashionItem[], fashionSet: GalleryStorySet | null): FashionEditorialCard[] {
+  private buildEditorialCards(items: FashionItem[], fashionSets: GalleryStorySet[]): FashionEditorialCard[] {
     const cards: FashionEditorialCard[] = [];
     const seenImages = new Set<string>();
 
@@ -287,62 +331,77 @@ export class FashionComponent implements OnInit, OnDestroy {
       seenImages.add(item.imageUrl);
     }
 
-    for (const image of fashionSet?.images || []) {
-      if (!image.imageUrl || seenImages.has(image.imageUrl)) {
+    for (const set of fashionSets) {
+      const imageUrl = set.coverImageUrl || set.leadImage?.imageUrl || '';
+
+      if (!imageUrl || seenImages.has(imageUrl)) {
         continue;
       }
 
       cards.push({
-        id: `card-archive-${image.id}`,
-        title: image.caption,
-        dateLabel: image.date || fashionSet?.subtitle || 'Official Archive',
-        description: fashionSet?.description || 'A curated frame from the official fashion archive.',
-        imageUrl: image.imageUrl,
-        altText: image.altText,
-        sourceLabel: 'Official gallery archive',
-        href: `/gallery/set/${fashionSet?.key || FASHION_COLLECTION_KEY}`,
+        id: `card-archive-${set.key}`,
+        title: set.title,
+        dateLabel: set.leadImage?.date || set.subtitle || 'Official Collection',
+        description: set.description || 'A curated frame from the official fashion archive.',
+        imageUrl,
+        altText: set.leadImage?.altText || set.title,
+        sourceLabel: `${set.itemCount} frame${set.itemCount === 1 ? '' : 's'} in archive`,
+        href: `/gallery/set/${set.key}`,
         isExternal: false,
-        ctaLabel: 'Open Gallery Set'
+        ctaLabel: 'Open Collection'
       });
-      seenImages.add(image.imageUrl);
+      seenImages.add(imageUrl);
     }
 
     return cards;
   }
 
-  private buildSourceNotes(items: FashionItem[], fashionSet: GalleryStorySet | null): FashionSourceNote[] {
+  private buildSourceNotes(items: FashionItem[], fashionSets: GalleryStorySet[]): FashionSourceNote[] {
+    const archiveFrames = fashionSets.reduce((total, set) => total + set.itemCount, 0);
     const notes: FashionSourceNote[] = [
       {
         id: 'feed',
         label: 'Fashion Feed',
         value: items.length === 1 ? '1 story ready' : `${items.length} stories ready`,
         detail: 'Pulled from the public fashion endpoint already powering the site.'
+      },
+      {
+        id: 'collections',
+        label: 'Live Collections',
+        value: fashionSets.length === 1 ? '1 collection curated' : `${fashionSets.length} collections curated`,
+        detail: this.getFeaturedCollectionNames(fashionSets, 4)
+          ? `The hero slider now prioritises ${this.getFeaturedCollectionNames(fashionSets, 4)}.`
+          : 'The hero slider now prioritises the strongest live fashion collections.'
+      },
+      {
+        id: 'archive',
+        label: 'Archive Frames',
+        value: `${archiveFrames} official frame${archiveFrames === 1 ? '' : 's'}`,
+        detail: 'Every collection card opens the full set from the official gallery archive.',
+        href: this.editorialArchiveLink,
+        isExternal: false
       }
     ];
 
-    if (fashionSet) {
-      notes.push({
-        id: 'archive',
-        label: 'Editorial Archive',
-        value: `${fashionSet.itemCount} official frame${fashionSet.itemCount === 1 ? '' : 's'}`,
-        detail: fashionSet.subtitle || 'Curated from the official gallery archive.',
-        href: `/gallery/set/${fashionSet.key}`,
-        isExternal: false
-      });
-    }
-
-    if (items.some(item => this.isSaakiLink(item.link))) {
+    if (items.some(item => this.isSaakiLink(item.link)) || fashionSets.some(set => set.key.startsWith('saaki'))) {
       notes.push({
         id: 'brand',
         label: 'Brand Source',
-        value: 'Saaki official site',
-        detail: "Used where the fashion feed already links to Samantha's official fashion brand.",
+        value: 'Saaki official source',
+        detail: "Used where the live fashion feed already links to Samantha's official fashion brand.",
         href: FALLBACK_EXTERNAL_SOURCE,
         isExternal: true
       });
     }
 
     return notes;
+  }
+
+  private getFeaturedCollectionNames(sets: GalleryStorySet[], limit: number): string {
+    return sets
+      .slice(0, limit)
+      .map(set => set.title)
+      .join(', ');
   }
 
   private parseContentDate(value: string | undefined): number {
@@ -364,6 +423,33 @@ export class FashionComponent implements OnInit, OnDestroy {
 
   private isSaakiLink(link?: string): boolean {
     return !!link && link.toLowerCase().includes('saaki.co');
+  }
+
+  private getCollectionSourceLabel(set: GalleryStorySet): string {
+    if (set.key.startsWith('saaki')) {
+      return 'Saaki archive';
+    }
+
+    return 'Official collection';
+  }
+
+  private isBlockedFashionSet(set: GalleryStorySet): boolean {
+    return this.isBlockedFashionCopy(
+      set.key,
+      set.title,
+      set.subtitle,
+      set.description,
+      set.leadImage?.caption,
+      set.leadImage?.altText
+    );
+  }
+
+  private isBlockedFashionCopy(...values: Array<string | undefined>): boolean {
+    const normalizedValues = values
+      .map(value => value?.trim().toLowerCase() || '')
+      .filter(Boolean);
+
+    return BLOCKED_FASHION_TERMS.some(term => normalizedValues.some(value => value.includes(term)));
   }
 
   private restartAutoRotate(): void {
